@@ -7,6 +7,28 @@ import type { InferInput } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
+  'docs.ui': {
+    methods: ["GET","HEAD"]
+    pattern: '/docs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+    }
+  }
+  'docs.spec': {
+    methods: ["GET","HEAD"]
+    pattern: '/docs/openapi.yaml'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+    }
+  }
   'auth.new_account.store': {
     methods: ["POST"]
     pattern: '/api/v1/auth/signup'

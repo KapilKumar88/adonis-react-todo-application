@@ -13,7 +13,7 @@ export class AuthAccessTokenSchema extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
   @column()
-  declare tokenableId: number
+  declare tokenableId: string
   @column()
   declare type: string
   @column()
@@ -32,11 +32,45 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare expiresAt: DateTime | null
 }
 
+export class PermissionSchema extends BaseModel {
+  static $columns = ['id', 'name', 'displayName', 'description', 'createdAt', 'updatedAt'] as const
+  $columns = PermissionSchema.$columns
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
+  @column()
+  declare displayName: string | null
+  @column()
+  declare description: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
+export class RoleSchema extends BaseModel {
+  static $columns = ['id', 'name', 'displayName', 'description', 'createdAt', 'updatedAt'] as const
+  $columns = RoleSchema.$columns
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
+  @column()
+  declare displayName: string | null
+  @column()
+  declare description: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['id', 'fullName', 'email', 'password', 'createdAt', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column({ isPrimary: true })
-  declare id: number
+  declare id: string
   @column()
   declare fullName: string | null
   @column()

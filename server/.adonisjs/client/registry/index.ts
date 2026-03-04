@@ -6,6 +6,18 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
+  'docs.ui': {
+    methods: ["GET","HEAD"],
+    pattern: '/docs',
+    tokens: [{"old":"/docs","type":0,"val":"docs","end":""}],
+    types: placeholder as Registry['docs.ui']['types'],
+  },
+  'docs.spec': {
+    methods: ["GET","HEAD"],
+    pattern: '/docs/openapi.yaml',
+    tokens: [{"old":"/docs/openapi.yaml","type":0,"val":"docs","end":""},{"old":"/docs/openapi.yaml","type":0,"val":"openapi.yaml","end":""}],
+    types: placeholder as Registry['docs.spec']['types'],
+  },
   'auth.new_account.store': {
     methods: ["POST"],
     pattern: '/api/v1/auth/signup',
