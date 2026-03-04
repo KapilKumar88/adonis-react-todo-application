@@ -95,4 +95,59 @@ export interface Registry {
       response: unknown
     }
   }
+  'admin.permission.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/permissions'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.permission.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/admin/permissions'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.permission.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/permissions/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.permission.update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/admin/permissions/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.permission.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/admin/permissions/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+    }
+  }
 }

@@ -12,6 +12,7 @@ import router from '@adonisjs/core/services/router'
 import DocsController from '#controllers/docs_controller'
 import LoginController from '#controllers/api/v1/admin/auth/login_controller'
 import RolesController from '#controllers/api/v1/admin/role_management/roles_controller'
+import PermissionController from '#controllers/api/v1/admin/permission_management/permission_controller'
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -44,6 +45,18 @@ router
           router.delete('/:id', [RolesController, 'destroy'])
         })
         .prefix('roles')
+        .use(middleware.auth())
+
+      // Permission management — protected
+      router
+        .group(() => {
+          router.get('/', [PermissionController, 'index'])
+          router.post('/', [PermissionController, 'store'])
+          router.get('/:id', [PermissionController, 'show'])
+          router.put('/:id', [PermissionController, 'update'])
+          router.delete('/:id', [PermissionController, 'destroy'])
+        })
+        .prefix('permissions')
         .use(middleware.auth())
     }).prefix('admin').as('admin')
 

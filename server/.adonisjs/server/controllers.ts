@@ -14,6 +14,9 @@ export const controllers = {
         roleManagement: {
           Roles: () => import('#controllers/api/v1/admin/role_management/roles_controller'),
         },
+        permissionManagement: {
+          Permission: () => import('#controllers/api/v1/admin/permission_management/permission_controller'),
+        },
       },
     },
   },

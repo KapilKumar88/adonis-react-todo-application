@@ -132,6 +132,52 @@ components:
         firstPage:
           type: integer
 
+    Permission:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: users:create
+          description: Lowercase, colon-separated (e.g. resource:action)
+        displayName:
+          type: string
+          nullable: true
+          example: Create Users
+        description:
+          type: string
+          nullable: true
+          example: Allows creating new users
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PermissionBody:
+      type: object
+      required:
+        - name
+        - displayName
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: users:create
+          description: Lowercase letters, numbers, underscores and colons only
+        displayName:
+          type: string
+          maxLength: 150
+          example: Create Users
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          example: Allows creating new users
+
 paths:
   /admin/login:
     post:
@@ -443,3 +489,142 @@ paths:
           description: Unauthorized
         "404":
           description: Role not found
+
+  /admin/permissions:
+    get:
+      tags:
+        - Admin_Permissions
+      summary: List all permissions (paginated)
+      operationId: listPermissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Paginated list of permissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/PaginationMeta"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Permission"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - Admin_Permissions
+      summary: Create a new permission
+      operationId: createPermission
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PermissionBody"
+      responses:
+        "201":
+          description: Permission created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /admin/permissions/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        example: 1
+    get:
+      tags:
+        - Admin_Permissions
+      summary: Get a single permission
+      operationId: getPermission
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Permission details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Permission not found
+    put:
+      tags:
+        - Admin_Permissions
+      summary: Update a permission
+      operationId: updatePermission
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PermissionBody"
+      responses:
+        "200":
+          description: Permission updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Permission not found
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+    delete:
+      tags:
+        - Admin_Permissions
+      summary: Delete a permission
+      operationId: deletePermission
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Permission deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Permission not found
