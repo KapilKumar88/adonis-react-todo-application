@@ -24,5 +24,12 @@ export interface ApiDefinition {
       update: typeof routes['admin.permission.update']
       destroy: typeof routes['admin.permission.destroy']
     }
+    user: {
+      index: typeof routes['admin.user.index']
+      store: typeof routes['admin.user.store']
+      show: typeof routes['admin.user.show']
+      update: typeof routes['admin.user.update']
+      destroy: typeof routes['admin.user.destroy']
+    }
   }
 }

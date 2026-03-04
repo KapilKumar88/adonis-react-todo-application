@@ -150,4 +150,59 @@ export interface Registry {
       response: unknown
     }
   }
+  'admin.user.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/users'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.user.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/admin/users'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.user.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/users/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.user.update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/admin/users/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.user.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/admin/users/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+    }
+  }
 }

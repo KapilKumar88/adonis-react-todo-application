@@ -17,7 +17,7 @@ export default class DocsController {
    * Serve the raw OpenAPI YAML spec file
    */
   async spec({ response }: HttpContext) {
-    const filePath = app.makePath('start/openapi.yaml')
+    const filePath = app.makePath('swagger/openapi.yaml')
     const content = await readFile(filePath, 'utf-8')
     return response.header('Content-Type', 'text/yaml; charset=utf-8').send(content)
   }

@@ -13,6 +13,7 @@ import DocsController from '#controllers/docs_controller'
 import LoginController from '#controllers/api/v1/admin/auth/login_controller'
 import RolesController from '#controllers/api/v1/admin/role_management/roles_controller'
 import PermissionController from '#controllers/api/v1/admin/permission_management/permission_controller'
+import UserController from '#controllers/api/v1/admin/user_management/user_controller'
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -57,6 +58,18 @@ router
           router.delete('/:id', [PermissionController, 'destroy'])
         })
         .prefix('permissions')
+        .use(middleware.auth())
+
+      // User management — protected
+      router
+        .group(() => {
+          router.get('/', [UserController, 'index'])
+          router.post('/', [UserController, 'store'])
+          router.get('/:id', [UserController, 'show'])
+          router.put('/:id', [UserController, 'update'])
+          router.delete('/:id', [UserController, 'destroy'])
+        })
+        .prefix('users')
         .use(middleware.auth())
     }).prefix('admin').as('admin')
 

@@ -17,12 +17,13 @@ export const controllers = {
         permissionManagement: {
           Permission: () => import('#controllers/api/v1/admin/permission_management/permission_controller'),
         },
+        userManagement: {
+          User: () => import('#controllers/api/v1/admin/user_management/user_controller'),
+        },
       },
     },
   },
   Docs: () => import('#controllers/docs_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
-  Permissions: () => import('#controllers/permissions_controller'),
   Profile: () => import('#controllers/profile_controller'),
-  Roles: () => import('#controllers/roles_controller'),
 }

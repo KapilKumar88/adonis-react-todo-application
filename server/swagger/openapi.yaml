@@ -178,6 +178,81 @@ components:
           nullable: true
           example: Allows creating new users
 
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        fullName:
+          type: string
+          nullable: true
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        initials:
+          type: string
+          example: JD
+        roleId:
+          type: integer
+          nullable: true
+          example: 1
+        role:
+          $ref: "#/components/schemas/Role"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateUserBody:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        fullName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: John Doe
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: john@example.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 32
+          example: Secret@123
+        roleId:
+          type: integer
+          nullable: true
+          example: 1
+
+    UpdateUserBody:
+      type: object
+      properties:
+        fullName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: John Doe
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: john@example.com
+        roleId:
+          type: integer
+          nullable: true
+          example: 1
+
 paths:
   /admin/login:
     post:
@@ -628,3 +703,143 @@ paths:
           description: Unauthorized
         "404":
           description: Permission not found
+
+  /admin/users:
+    get:
+      tags:
+        - Admin_Users
+      summary: List all users (paginated)
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Paginated list of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/PaginationMeta"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - Admin_Users
+      summary: Create a new user
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /admin/users/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    get:
+      tags:
+        - Admin_Users
+      summary: Get a single user
+      operationId: getUser
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User details with role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+    put:
+      tags:
+        - Admin_Users
+      summary: Update a user
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+    delete:
+      tags:
+        - Admin_Users
+      summary: Delete a user
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
