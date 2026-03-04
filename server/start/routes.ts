@@ -10,10 +10,21 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import DocsController from '#controllers/docs_controller'
 
 router.get('/', () => {
   return { hello: 'world' }
 })
+
+/*
+|--------------------------------------------------------------------------
+| Swagger / OpenAPI docs
+|--------------------------------------------------------------------------
+| GET /docs          → Swagger UI
+| GET /docs/openapi.yaml → raw OpenAPI spec
+*/
+router.get('/docs', [DocsController, 'ui'])
+router.get('/docs/openapi.yaml', [DocsController, 'spec'])
 
 router
   .group(() => {
