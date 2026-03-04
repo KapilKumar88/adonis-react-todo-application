@@ -9,10 +9,9 @@
 
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
-import { controllers } from '#generated/controllers'
 import DocsController from '#controllers/docs_controller'
-import { group } from 'console'
 import LoginController from '#controllers/api/v1/admin/auth/login_controller'
+import RolesController from '#controllers/api/v1/admin/role_management/roles_controller'
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -34,6 +33,18 @@ router
   .group(() => {
     router.group(() => {
       router.post('login', [LoginController, 'login'])
+
+      // Role management — protected
+      router
+        .group(() => {
+          router.get('/', [RolesController, 'index'])
+          router.post('/', [RolesController, 'store'])
+          router.get('/:id', [RolesController, 'show'])
+          router.put('/:id', [RolesController, 'update'])
+          router.delete('/:id', [RolesController, 'destroy'])
+        })
+        .prefix('roles')
+        .use(middleware.auth())
     }).prefix('admin').as('admin')
 
 

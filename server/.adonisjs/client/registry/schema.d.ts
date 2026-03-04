@@ -40,4 +40,59 @@ export interface Registry {
       response: unknown
     }
   }
+  'admin.roles.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/roles'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.roles.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/admin/roles'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.roles.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/roles/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.roles.update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/admin/roles/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+    }
+  }
+  'admin.roles.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/admin/roles/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+    }
+  }
 }

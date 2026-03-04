@@ -11,6 +11,9 @@ export const controllers = {
         auth: {
           Login: () => import('#controllers/api/v1/admin/auth/login_controller'),
         },
+        roleManagement: {
+          Roles: () => import('#controllers/api/v1/admin/role_management/roles_controller'),
+        },
       },
     },
   },
