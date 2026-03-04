@@ -18,29 +18,11 @@ const routes = {
     tokens: [{"old":"/docs/openapi.yaml","type":0,"val":"docs","end":""},{"old":"/docs/openapi.yaml","type":0,"val":"openapi.yaml","end":""}],
     types: placeholder as Registry['docs.spec']['types'],
   },
-  'auth.new_account.store': {
+  'admin.login.login': {
     methods: ["POST"],
-    pattern: '/api/v1/auth/signup',
-    tokens: [{"old":"/api/v1/auth/signup","type":0,"val":"api","end":""},{"old":"/api/v1/auth/signup","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/signup","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/signup","type":0,"val":"signup","end":""}],
-    types: placeholder as Registry['auth.new_account.store']['types'],
-  },
-  'auth.access_token.store': {
-    methods: ["POST"],
-    pattern: '/api/v1/auth/login',
-    tokens: [{"old":"/api/v1/auth/login","type":0,"val":"api","end":""},{"old":"/api/v1/auth/login","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/login","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/login","type":0,"val":"login","end":""}],
-    types: placeholder as Registry['auth.access_token.store']['types'],
-  },
-  'auth.access_token.destroy': {
-    methods: ["POST"],
-    pattern: '/api/v1/auth/logout',
-    tokens: [{"old":"/api/v1/auth/logout","type":0,"val":"api","end":""},{"old":"/api/v1/auth/logout","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/logout","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/logout","type":0,"val":"logout","end":""}],
-    types: placeholder as Registry['auth.access_token.destroy']['types'],
-  },
-  'profile.profile.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/api/v1/account/profile',
-    tokens: [{"old":"/api/v1/account/profile","type":0,"val":"api","end":""},{"old":"/api/v1/account/profile","type":0,"val":"v1","end":""},{"old":"/api/v1/account/profile","type":0,"val":"account","end":""},{"old":"/api/v1/account/profile","type":0,"val":"profile","end":""}],
-    types: placeholder as Registry['profile.profile.show']['types'],
+    pattern: '/api/v1/admin/login',
+    tokens: [{"old":"/api/v1/admin/login","type":0,"val":"api","end":""},{"old":"/api/v1/admin/login","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/login","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/login","type":0,"val":"login","end":""}],
+    types: placeholder as Registry['admin.login.login']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 
