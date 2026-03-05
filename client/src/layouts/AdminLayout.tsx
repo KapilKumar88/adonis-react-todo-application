@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import { NavLink } from '@/components/NavLink';
-import { useAuth } from '@/context/AuthContext';
 import { getInitials } from '@/utils/helpers';
+import { useUserProfile } from '@/context/UserProfileContext';
 
 const navItems = [
   { title: 'Dashboard', url: '/admin/dashboard', icon: LayoutDashboard },
@@ -26,8 +26,15 @@ const navItems = [
 function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
-  const { currentUser, logout } = useAuth();
+  const { userInfo } = useUserProfile();
   const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.removeItem('user_profile');
+    localStorage.removeItem('todo-current-user');
+    localStorage.removeItem('todo-users');
+    localStorage.removeItem('api_token');
+  }
 
   return (
     <Sidebar collapsible="icon">
@@ -65,13 +72,13 @@ function AdminSidebar() {
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
               <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                {currentUser ? getInitials(currentUser.name) : '?'}
+                {userInfo ? getInitials(userInfo.fullName) : '?'}
               </AvatarFallback>
             </Avatar>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{currentUser?.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{currentUser?.email}</p>
+                <p className="text-sm font-medium truncate">{userInfo?.fullName}</p>
+                <p className="text-xs text-muted-foreground truncate">{userInfo?.email}</p>
               </div>
             )}
             {!collapsed && (
