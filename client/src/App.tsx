@@ -76,7 +76,7 @@ const App = () => (
                   <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                   {/* <Route path="/admin/users" element={<UsersPage />} /> */}
                   <Route path="/admin/roles" element={<RolesPage />} />
-                  {/* <Route path="/admin/permissions" element={<PermissionsPage />} /> */}
+                  <Route path="/admin/permissions" element={<PermissionsPage />} />
                   {/* <Route path="/admin/logs" element={<ActivityLogsPage />} /> */}
                   {/* <Route path="/admin/settings" element={<SettingsPage />} /> */}
                 </Route>

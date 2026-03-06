@@ -1,36 +1,33 @@
-import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageHeader from '@/components/common/PageHeader';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { roles as mockRoles, permissions as allPermissions } from '@/utils/mockData';
-import { Role } from '@/types';
-import { toast } from '@/hooks/use-toast';
-
-const resources = [...new Set(allPermissions.map(p => p.resource))];
-const actions = [...new Set(allPermissions.map(p => p.action))];
+import { useQuery } from '@tanstack/react-query';
+import { adminPermissionService } from '@/services/admin/permission.service';
+import ErrorState from '@/components/common/ErrorState';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import MatrixView from '@/components/admin/permission/tabView/MatrixView';
+import ListView from '@/components/admin/permission/tabView/ListView';
+import { adminRoleService } from '@/services/admin/role.service';
 
 const PermissionsPage: React.FC = () => {
-  const [roles, setRoles] = useLocalStorage<Role[]>('todo-roles', mockRoles);
 
-  const hasPerm = (role: Role, resource: string, action: string) =>
-    role.permissions.some(p => p.resource === resource && p.action === action);
+  const { isPending, isError, data, error, refetch } = useQuery({
+    queryKey: ['permissions'],
+    queryFn: () => adminPermissionService.list(),
+  });
 
-  const togglePerm = (roleId: string, resource: string, action: string) => {
-    const perm = allPermissions.find(p => p.resource === resource && p.action === action);
-    if (!perm) return;
-    setRoles(prev => prev.map(r => {
-      if (r.id !== roleId) return r;
-      const has = r.permissions.some(p => p.id === perm.id);
-      return {
-        ...r,
-        permissions: has ? r.permissions.filter(p => p.id !== perm.id) : [...r.permissions, perm],
-      };
-    }));
-    toast({ title: 'Permission updated' });
-  };
+  const { isPending: isRolesPending, isError: isRolesError, data: rolesData, error: rolesError, refetch: refetchRoles } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => adminRoleService.list(),
+  })
+
+  if (isPending) {
+    return <LoadingSpinner />
+  }
+
+  if (isError) {
+    return <ErrorState message={error?.message} onRetry={refetch} />
+  }
 
   return (
     <div>
@@ -43,69 +40,11 @@ const PermissionsPage: React.FC = () => {
         </TabsList>
 
         <TabsContent value="matrix">
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="sticky left-0 bg-background z-10">Resource / Action</TableHead>
-                  {roles.map(role => (
-                    <TableHead key={role.id} className="text-center min-w-[100px]">{role.name}</TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {resources.map(resource =>
-                  actions.filter(action => allPermissions.some(p => p.resource === resource && p.action === action)).map(action => (
-                    <TableRow key={`${resource}-${action}`}>
-                      <TableCell className="sticky left-0 bg-background z-10">
-                        <span className="capitalize font-medium">{resource}</span>
-                        <span className="text-muted-foreground"> / {action}</span>
-                      </TableCell>
-                      {roles.map(role => (
-                        <TableCell key={role.id} className="text-center">
-                          <Switch
-                            checked={hasPerm(role, resource, action)}
-                            onCheckedChange={() => togglePerm(role.id, resource, action)}
-                          />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <MatrixView data={data?.data} roles={rolesData?.data} />
         </TabsContent>
 
         <TabsContent value="list">
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Permission</TableHead>
-                  <TableHead>Resource</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Assigned To</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allPermissions.map(perm => (
-                  <TableRow key={perm.id}>
-                    <TableCell className="font-medium">{perm.name}</TableCell>
-                    <TableCell className="capitalize">{perm.resource}</TableCell>
-                    <TableCell className="capitalize">{perm.action}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {roles.filter(r => r.permissions.some(p => p.id === perm.id)).map(r => (
-                          <Badge key={r.id} variant="secondary" className="text-xs">{r.name}</Badge>
-                        ))}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <ListView data={data?.data} roles={rolesData?.data} />
         </TabsContent>
       </Tabs>
     </div>

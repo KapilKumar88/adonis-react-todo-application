@@ -10,6 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { getPasswordStrength } from '@/utils/helpers';
 import { cn } from '@/lib/utils';
+import AppLogo from '@/components/common/AppLogo';
 
 const RegisterPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -53,11 +54,7 @@ const RegisterPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-2">
-            <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
-              <CheckSquare className="h-6 w-6 text-primary-foreground" />
-            </div>
-          </div>
+          <AppLogo onlyLogo />
           <CardTitle className="text-2xl">Create an account</CardTitle>
           <CardDescription>Get started with your todo manager</CardDescription>
         </CardHeader>

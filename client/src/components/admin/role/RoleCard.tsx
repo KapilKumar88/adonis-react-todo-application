@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { toast } from '@/hooks/use-toast';
 import { adminRoleService } from '@/services/admin/role.service';
 import { AdminRole, USER_ROLE } from '@/types/role.types';
+import { firstLetterUpperCase } from '@/utils/helpers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -46,7 +47,7 @@ export default function RoleCard({
             <Card>
                 <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{role.name}</CardTitle>
+                        <CardTitle className="text-lg">{firstLetterUpperCase(role.name)}</CardTitle>
                         {/* <Badge variant="outline">{role.permissions.length} perms</Badge> */}
                     </div>
                     <CardDescription>{role.description}</CardDescription>

@@ -31,3 +31,10 @@ export const maskEmail = (email: string): string => {
 
 export const getInitials = (name: string): string =>
   name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+
+export const firstLetterUpperCase = (str: string): string =>
+  str?.replace(/_/g, " ")
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLocaleLowerCase())
+    .join(" ");

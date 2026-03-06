@@ -23,7 +23,7 @@ const RolesPage: React.FC = () => {
     return <span>Loading...</span>
   }
 
-  if (!isError) {
+  if (isError) {
     return <ErrorState message={error?.message} onRetry={refetch} />
   }
 
