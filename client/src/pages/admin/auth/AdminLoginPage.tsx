@@ -10,11 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { useAdminLogin } from '@/hooks/admin/useAdminLogin';
 import { loginSchema } from '@/validations/admin/auth.validation';
 import { InferType } from 'yup';
 import { tokenStorage } from '@/lib/api-client';
 import { useUserProfile } from '@/context/UserProfileContext';
+import { useMutation } from '@tanstack/react-query';
+import { ApiLoginResponse } from '@/types/api.types';
+import { adminAuthService, AdminLoginPayload } from '@/services/admin/auth.service';
 
 type LoginFormValues = InferType<typeof loginSchema>;
 
@@ -32,7 +34,8 @@ const AdminLoginPage: React.FC = () => {
     defaultValues: { email: '', password: '' },
   });
 
-  const { mutate: adminLogin, isPending } = useAdminLogin({
+  const { mutate: adminLogin, isPending } = useMutation<ApiLoginResponse, Error, AdminLoginPayload>({
+    mutationFn: adminAuthService.login,
     onSuccess: ({ data: { token, user } }) => {
       tokenStorage.set(token);
       setUserInfo(user);
