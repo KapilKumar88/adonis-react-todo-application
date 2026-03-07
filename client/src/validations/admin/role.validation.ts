@@ -1,18 +1,18 @@
-import { z } from 'zod';
+import * as yup from 'yup';
 
-export const upsertRoleSchema = z.object({
-  name: z
+export const upsertRoleSchema = yup.object({
+  name: yup
     .string()
     .trim()
     .min(2, 'Name must be at least 2 characters.')
     .max(50, 'Name must be at most 50 characters.')
-    .regex(/^[a-z0-9_-]+$/, 'Name must be lowercase letters, numbers, hyphens or underscores only.'),
-  displayName: z
+    .matches(/^[a-z0-9_-]+$/, 'Name must be lowercase letters, numbers, hyphens or underscores only.'),
+  displayName: yup
     .string()
     .trim()
     .min(2, 'Display name must be at least 2 characters.')
     .max(100, 'Display name must be at most 100 characters.'),
-  description: z
+  description: yup
     .string()
     .trim()
     .max(255, 'Description must be at most 255 characters.')
@@ -20,4 +20,4 @@ export const upsertRoleSchema = z.object({
     .optional(),
 });
 
-export type UpsertRoleFormValues = z.infer<typeof upsertRoleSchema>;
+export type UpsertRoleFormValues = yup.InferType<typeof upsertRoleSchema>;

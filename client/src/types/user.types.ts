@@ -38,14 +38,13 @@ export interface AdminUserListResponse {
 }
 
 export interface CreateUserPayload {
-    fullName?: string | null;
+    fullName: string;
     email: string;
-    password: string;
-    roleId?: number | null;
+    roleId: string;
 }
 
 export interface UpdateUserPayload {
     fullName?: string | null;
     email?: string;
-    roleId?: number | null;
+    roleId?: string | null;
 }

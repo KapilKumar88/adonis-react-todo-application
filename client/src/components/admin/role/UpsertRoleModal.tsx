@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -13,6 +12,7 @@ import { upsertRoleSchema, UpsertRoleFormValues } from '@/validations/admin/role
 import { toast } from '@/hooks/use-toast';
 import LoadingButton from '@/components/common/LoadingButton';
 import { SaveIcon } from 'lucide-react';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 export default function UpsertRoleModal({
   modalOpen,
@@ -33,7 +33,7 @@ export default function UpsertRoleModal({
     reset,
     formState: { errors },
   } = useForm<UpsertRoleFormValues>({
-    resolver: zodResolver(upsertRoleSchema),
+    resolver: yupResolver(upsertRoleSchema),
     defaultValues: {
       name: '',
       displayName: '',
