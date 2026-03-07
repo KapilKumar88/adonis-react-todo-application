@@ -11,11 +11,11 @@ export const controllers = {
         auth: {
           Login: () => import('#controllers/api/v1/admin/auth/login_controller'),
         },
-        roleManagement: {
-          Roles: () => import('#controllers/api/v1/admin/role_management/roles_controller'),
-        },
         permissionManagement: {
           Permission: () => import('#controllers/api/v1/admin/permission_management/permission_controller'),
+        },
+        roleManagement: {
+          Roles: () => import('#controllers/api/v1/admin/role_management/roles_controller'),
         },
         userManagement: {
           User: () => import('#controllers/api/v1/admin/user_management/user_controller'),

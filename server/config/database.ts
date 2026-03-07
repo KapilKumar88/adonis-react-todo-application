@@ -3,6 +3,7 @@ import { defineConfig } from '@adonisjs/lucid'
 import env from '#start/env'
 
 const dbConfig = defineConfig({
+  prettyPrintDebugQueries: app.inDev,
   /**
    * Default connection used for all queries.
    */

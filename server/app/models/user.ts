@@ -3,29 +3,38 @@ import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { type AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
-import { column, beforeCreate, belongsTo } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { column, beforeCreate, manyToMany } from '@adonisjs/lucid/orm'
+import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import { randomUUID } from 'node:crypto'
 import Role from '#models/role'
 
 export default class User extends compose(UserSchema, withAuthFinder(hash)) {
-  static accessTokens = DbAccessTokensProvider.forModel(User)
+  static readonly accessTokens = DbAccessTokensProvider.forModel(User)
   declare currentAccessToken?: AccessToken
 
   @column({ isPrimary: true })
   declare id: string
 
-  @column()
-  declare roleId: number | null
 
-  @belongsTo(() => Role)
-  declare role: BelongsTo<typeof Role>
+  // ------------------------------- model relations -------------------------------
+  @manyToMany(() => Role, {
+    pivotTable: 'role_users',
+  })
+  declare roles: ManyToMany<typeof Role>
 
+  // ------------------------------- model relations -------------------------------
+
+
+
+  // ------------------------------- model hooks -------------------------------
   @beforeCreate()
   static assignUuid(user: User) {
     user.id = randomUUID()
   }
+  // ------------------------------- model hooks -------------------------------
 
+
+  // ------------------------------- model getters & setters -------------------------------
   get initials() {
     const [first, last] = this.fullName ? this.fullName.split(' ') : this.email.split('@')
     if (first && last) {
@@ -33,4 +42,5 @@ export default class User extends compose(UserSchema, withAuthFinder(hash)) {
     }
     return `${first.slice(0, 2)}`.toUpperCase()
   }
+  // ------------------------------- model getters & setters -------------------------------
 }

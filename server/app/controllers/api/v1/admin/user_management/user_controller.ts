@@ -1,22 +1,26 @@
 import User from '#models/user'
+import UserTransformer from '#transformers/user_transformer'
 import { createUserValidator, updateUserValidator } from '#validators/api/v1/admin/user'
+import stringHelpers from '@adonisjs/core/helpers/string'
 import type { HttpContext } from '@adonisjs/core/http'
+import db from '@adonisjs/lucid/services/db'
 
 export default class UserController {
   /**
    * GET /api/v1/admin/users
    * Return paginated list of users with their role
    */
-  async index({ request, response }: HttpContext) {
+  async index({ serialize, request }: HttpContext) {
     const page = request.input('page', 1)
     const limit = request.input('limit', 10)
 
     const users = await User.query()
-      .preload('role')
+      .whereDoesntHave('roles', (qb) => qb.where('name', 'super_admin'))
+      .preload('roles', (qb) => qb.select('id', 'name', 'displayName'))
       .orderBy('created_at', 'desc')
       .paginate(page, limit)
 
-    return response.ok(users)
+    return serialize(UserTransformer.paginate(users.all(), users.getMeta()))
   }
 
   /**
@@ -24,12 +28,27 @@ export default class UserController {
    * Create a new user
    */
   async store({ request, response }: HttpContext) {
-    const payload = await request.validateUsing(createUserValidator)
+    const trx = await db.transaction()
+    try {
+      const payload = await request.validateUsing(createUserValidator)
+      const user = await User.create({
+        fullName: payload.fullName,
+        email: payload.email,
+        password: stringHelpers.random(32)
+      }, {
+        client: trx,
+      });
 
-    const user = await User.create(payload)
-    await user.load('role')
-
-    return response.created(user)
+      await user.related('roles').attach([payload.roleId])
+      await trx.commit()
+      return response.created(UserTransformer.transform(user))
+    } catch (error) {
+      await trx.rollback()
+      return response.internalServerError({
+        message: 'Internal server error',
+        errors: error.messages || [{ message: 'An error occurred while creating the user' }],
+      })
+    }
   }
 
   /**
@@ -37,9 +56,9 @@ export default class UserController {
    * Return a single user with role
    */
   async show({ params, response }: HttpContext) {
-    const user = await User.query().where('id', params.id).preload('role').firstOrFail()
+    const user = await User.query().where('id', params.id).preload('roles').firstOrFail()
 
-    return response.ok(user)
+    return response.ok(UserTransformer.transform(user))
   }
 
   /**
@@ -48,14 +67,14 @@ export default class UserController {
    */
   async update({ params, request, response }: HttpContext) {
     const user = await User.findOrFail(params.id)
-    const payload = await request.validateUsing(updateUserValidator)
+    const { roleId, ...payload } = await request.validateUsing(updateUserValidator)
 
     // Check email uniqueness manually (exclude current user)
     if (payload.email && payload.email !== user.email) {
       const exists = await User.query()
         .where('email', payload.email)
         .whereNot('id', user.id)
-        .first()
+        .first();
       if (exists) {
         return response.unprocessableEntity({
           message: 'Validation failed',
@@ -66,9 +85,9 @@ export default class UserController {
 
     user.merge(payload)
     await user.save()
-    await user.load('role')
+    await user.related('roles').sync([roleId])
 
-    return response.ok(user)
+    return response.ok(UserTransformer.transform(user))
   }
 
   /**

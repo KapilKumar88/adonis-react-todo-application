@@ -49,6 +49,21 @@ export class PermissionSchema extends BaseModel {
   declare updatedAt: DateTime
 }
 
+export class RoleUserSchema extends BaseModel {
+  static $columns = ['id', 'userId', 'roleId', 'createdAt', 'updatedAt'] as const
+  $columns = RoleUserSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare userId: string
+  @column()
+  declare roleId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class RoleSchema extends BaseModel {
   static $columns = ['id', 'name', 'displayName', 'description', 'createdAt', 'updatedAt'] as const
   $columns = RoleSchema.$columns
