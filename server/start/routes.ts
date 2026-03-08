@@ -19,6 +19,8 @@ const DocsController = () => import('#controllers/docs_controller')
 const NewAccountController = () => import('#controllers/api/v1/user/auth/new_account_controller')
 const AccessTokenController = () => import('#controllers/api/v1/user/auth/login_controller')
 const ForgotPasswordsController = () => import('#controllers/api/v1/user/auth/forgot_passwords_controller')
+const TagsController = () => import('#controllers/api/v1/user/tag_management/tags_controller')
+const TodosController = () => import('#controllers/api/v1/user/todo_management/todos_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -100,6 +102,32 @@ router
     //   .prefix('account')
     //   .as('profile')
     //   .use(middleware.auth())
+
+    // Tags management — protected
+    router
+      .group(() => {
+        router.get('/', [TagsController, 'index'])
+        router.post('/', [TagsController, 'store'])
+        router.get('/:id', [TagsController, 'show'])
+        router.put('/:id', [TagsController, 'update'])
+        router.delete('/:id', [TagsController, 'destroy'])
+      })
+      .prefix('tags')
+      .as('tags')
+      .use(middleware.auth())
+
+    // Todo management — protected
+    router
+      .group(() => {
+        router.get('/', [TodosController, 'index'])
+        router.post('/', [TodosController, 'store'])
+        router.get('/:id', [TodosController, 'show'])
+        router.put('/:id', [TodosController, 'update'])
+        router.delete('/:id', [TodosController, 'destroy'])
+      })
+      .prefix('todos')
+      .as('todos')
+      .use(middleware.auth())
 
     // ------------------------------------------- User Apis end-----------------------------------------------------------
   })

@@ -11,7 +11,7 @@ export default class UserTransformer extends BaseTransformer<User> {
         'initials',
         'createdAt',
       ]),
-      role: RoleTransformer.transform(this.whenLoaded(this.resource.roles[0])),
+      role: RoleTransformer.transform(this.whenLoaded(this.resource?.roles?.[0])),
     }
   }
 }

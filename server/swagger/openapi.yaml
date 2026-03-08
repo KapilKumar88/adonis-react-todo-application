@@ -253,6 +253,201 @@ components:
           nullable: true
           example: 1
 
+    ForgotPasswordBody:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: john@example.com
+
+    ResetPasswordBody:
+      type: object
+      required:
+        - token
+        - email
+        - password
+        - passwordConfirmation
+      properties:
+        token:
+          type: string
+          example: a1b2c3d4e5f6...
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: john@example.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 32
+          example: NewSecret@123
+        passwordConfirmation:
+          type: string
+          minLength: 8
+          maxLength: 32
+          example: NewSecret@123
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        name:
+          type: string
+          example: work
+        color:
+          type: string
+          nullable: true
+          example: "#3b82f6"
+        type:
+          type: string
+          enum: [system, custom]
+          example: custom
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateTagBody:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: work
+        color:
+          type: string
+          pattern: "^#[0-9a-fA-F]{6}$"
+          example: "#3b82f6"
+
+    UpdateTagBody:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: personal
+        color:
+          type: string
+          nullable: true
+          pattern: "^#[0-9a-fA-F]{6}$"
+          example: "#ef4444"
+
+    Todo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        title:
+          type: string
+          example: Buy groceries
+        description:
+          type: string
+          nullable: true
+          example: Milk, eggs, bread
+        priority:
+          type: string
+          nullable: true
+          enum: [low, medium, high]
+          example: medium
+        status:
+          type: string
+          enum: [pending, in_progress, completed, backlog, icebox]
+          example: pending
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tag"
+
+    CreateTodoBody:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Buy groceries
+        description:
+          type: string
+          maxLength: 5000
+          nullable: true
+          example: Milk, eggs, bread
+        priority:
+          type: string
+          enum: [low, medium, high]
+          example: medium
+        status:
+          type: string
+          enum: [pending, in_progress, completed, backlog, icebox]
+          example: pending
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+          example: "2026-03-15"
+        tagIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example: ["550e8400-e29b-41d4-a716-446655440000"]
+
+    UpdateTodoBody:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Buy groceries
+        description:
+          type: string
+          maxLength: 5000
+          nullable: true
+          example: Milk, eggs, bread
+        priority:
+          type: string
+          enum: [low, medium, high]
+          example: high
+        status:
+          type: string
+          enum: [pending, in_progress, completed, backlog, icebox]
+          example: completed
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+          example: "2026-03-20"
+        tagIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example: []
+
 paths:
   /admin/login:
     post:
@@ -407,6 +602,64 @@ paths:
                 $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Request a password reset link
+      operationId: forgotPassword
+      description: >
+        Sends a password-reset token for the given email.
+        Always returns success to prevent email enumeration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordBody"
+      responses:
+        "200":
+          description: Reset link sent (if account exists)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password using a token
+      operationId: resetPassword
+      description: >
+        Verifies the reset token and updates the user's password.
+        Revokes all existing access tokens for security.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordBody"
+      responses:
+        "200":
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Invalid or expired token / Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
 
   /account/profile:
     get:
@@ -843,3 +1096,288 @@ paths:
           description: Unauthorized
         "404":
           description: User not found
+
+  # ─── Tags ──────────────────────────────────────────────────────────────────────
+
+  /tags:
+    get:
+      tags:
+        - Tags
+      summary: List all tags for the authenticated user
+      operationId: listTags
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Array of tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tag"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - Tags
+      summary: Create a new tag
+      operationId: createTag
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagBody"
+      responses:
+        "201":
+          description: Tag created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tag"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /tags/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    get:
+      tags:
+        - Tags
+      summary: Get a single tag
+      operationId: getTag
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Tag details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tag"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Tag not found
+    put:
+      tags:
+        - Tags
+      summary: Update a tag
+      operationId: updateTag
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagBody"
+      responses:
+        "200":
+          description: Tag updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tag"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Tag not found
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+    delete:
+      tags:
+        - Tags
+      summary: Delete a tag
+      operationId: deleteTag
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Tag deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Tag not found
+
+  # ─── Todos ─────────────────────────────────────────────────────────────────────
+
+  /todos:
+    get:
+      tags:
+        - Todos
+      summary: List todos for the authenticated user (paginated)
+      operationId: listTodos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, in_progress, completed, backlog, icebox]
+          description: Filter by status
+        - in: query
+          name: priority
+          schema:
+            type: string
+            enum: [low, medium, high]
+          description: Filter by priority
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search in title and description
+      responses:
+        "200":
+          description: Paginated list of todos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/PaginationMeta"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Todo"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - Todos
+      summary: Create a new todo
+      operationId: createTodo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTodoBody"
+      responses:
+        "201":
+          description: Todo created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /todos/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    get:
+      tags:
+        - Todos
+      summary: Get a single todo
+      operationId: getTodo
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Todo details with tags
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Todo not found
+    put:
+      tags:
+        - Todos
+      summary: Update a todo
+      operationId: updateTodo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTodoBody"
+      responses:
+        "200":
+          description: Todo updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Todo not found
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+    delete:
+      tags:
+        - Todos
+      summary: Delete a todo
+      operationId: deleteTodo
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Todo deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Todo not found

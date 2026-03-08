@@ -7,6 +7,31 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class ActivityLogSchema extends BaseModel {
+  static $columns = ['id', 'action', 'description', 'ip', 'userAgent', 'status', 'resource', 'userId', 'createdAt', 'updatedAt'] as const
+  $columns = ActivityLogSchema.$columns
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare action: string
+  @column()
+  declare description: string | null
+  @column()
+  declare ip: string | null
+  @column()
+  declare userAgent: string | null
+  @column()
+  declare status: string
+  @column()
+  declare resource: string
+  @column()
+  declare userId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class AuthAccessTokenSchema extends BaseModel {
   static $columns = ['id', 'tokenableId', 'type', 'name', 'hash', 'abilities', 'createdAt', 'updatedAt', 'lastUsedAt', 'expiresAt'] as const
   $columns = AuthAccessTokenSchema.$columns
@@ -32,6 +57,23 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare expiresAt: DateTime | null
 }
 
+export class PasswordResetTokenSchema extends BaseModel {
+  static $columns = ['id', 'email', 'token', 'expiresAt', 'createdAt', 'updatedAt'] as const
+  $columns = PasswordResetTokenSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare email: string
+  @column()
+  declare token: string
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class PermissionSchema extends BaseModel {
   static $columns = ['id', 'name', 'displayName', 'description', 'createdAt', 'updatedAt'] as const
   $columns = PermissionSchema.$columns
@@ -47,6 +89,21 @@ export class PermissionSchema extends BaseModel {
   declare createdAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+}
+
+export class RolePermissionSchema extends BaseModel {
+  static $columns = ['id', 'roleId', 'permissionId', 'createdAt', 'updatedAt'] as const
+  $columns = RolePermissionSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare roleId: string
+  @column()
+  declare permissionId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class RoleUserSchema extends BaseModel {
@@ -65,7 +122,7 @@ export class RoleUserSchema extends BaseModel {
 }
 
 export class RoleSchema extends BaseModel {
-  static $columns = ['id', 'name', 'displayName', 'description', 'createdAt', 'updatedAt'] as const
+  static $columns = ['id', 'name', 'displayName', 'description', 'type', 'createdAt', 'updatedAt'] as const
   $columns = RoleSchema.$columns
   @column({ isPrimary: true })
   declare id: string
@@ -75,23 +132,86 @@ export class RoleSchema extends BaseModel {
   declare displayName: string | null
   @column()
   declare description: string | null
+  @column()
+  declare type: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 }
 
+export class TagSchema extends BaseModel {
+  static $columns = ['id', 'name', 'color', 'type', 'userId', 'createdAt', 'updatedAt'] as const
+  $columns = TagSchema.$columns
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
+  @column()
+  declare color: string | null
+  @column()
+  declare type: string
+  @column()
+  declare userId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class TodoTagSchema extends BaseModel {
+  static $columns = ['id', 'todoId', 'tagId', 'createdAt', 'updatedAt'] as const
+  $columns = TodoTagSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare todoId: string
+  @column()
+  declare tagId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class TodoSchema extends BaseModel {
+  static $columns = ['id', 'title', 'description', 'priority', 'status', 'dueDate', 'userId', 'createdAt', 'updatedAt'] as const
+  $columns = TodoSchema.$columns
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare title: string
+  @column()
+  declare description: string | null
+  @column()
+  declare priority: string | null
+  @column()
+  declare status: string
+  @column.dateTime()
+  declare dueDate: DateTime | null
+  @column()
+  declare userId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class UserSchema extends BaseModel {
-  static $columns = ['id', 'fullName', 'email', 'password', 'createdAt', 'updatedAt'] as const
+  static $columns = ['id', 'fullName', 'email', 'password', 'bio', 'profileImage', 'createdAt', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column({ isPrimary: true })
   declare id: string
   @column()
-  declare fullName: string | null
+  declare fullName: string
   @column()
   declare email: string
   @column({ serializeAs: null })
   declare password: string
+  @column()
+  declare bio: string | null
+  @column()
+  declare profileImage: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true })
