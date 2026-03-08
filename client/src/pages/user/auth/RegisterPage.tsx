@@ -1,53 +1,71 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, CheckSquare } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { InferType } from 'yup';
+import { useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { signupSchema } from '@/validations/user/auth.validation';
+import { userAuthService, SignupPayload } from '@/services/user/auth.service';
+import { ApiLoginResponse } from '@/types/api.types';
+import { useAuth } from '@/context/AuthContext';
 import { getPasswordStrength } from '@/utils/helpers';
 import { cn } from '@/lib/utils';
 import AppLogo from '@/components/common/AppLogo';
 
-const RegisterPage: React.FC = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [terms, setTerms] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
-  const navigate = useNavigate();
+type SignupFormValues = InferType<typeof signupSchema>;
 
-  const strength = password ? getPasswordStrength(password) : null;
+const RegisterPage: React.FC = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const { loginWithToken } = useAuth();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<SignupFormValues>({
+    resolver: yupResolver(signupSchema),
+    defaultValues: { fullName: '', email: '', password: '', passwordConfirmation: '', terms: false },
+  });
+
+  const passwordValue = watch('password');
+  const termsValue = watch('terms');
+  const strength = passwordValue ? getPasswordStrength(passwordValue) : null;
   const strengthColor = { weak: 'bg-destructive', medium: 'bg-warning', strong: 'bg-success' };
   const strengthWidth = { weak: 'w-1/3', medium: 'w-2/3', strong: 'w-full' };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      toast({ title: 'Error', description: 'Passwords do not match.', variant: 'destructive' });
-      return;
-    }
-    if (!terms) {
-      toast({ title: 'Error', description: 'Please accept the terms.', variant: 'destructive' });
-      return;
-    }
-    setLoading(true);
-    setTimeout(() => {
-      const success = register(name, email, password);
-      if (success) {
-        toast({ title: 'Account Created', description: 'Please sign in with your new account.' });
-        navigate('/login');
-      } else {
-        toast({ title: 'Error', description: 'Email already registered.', variant: 'destructive' });
-      }
-      setLoading(false);
-    }, 500);
+  const { mutate: signupMutate, isPending } = useMutation<ApiLoginResponse, Error, SignupPayload>({
+    mutationFn: userAuthService.signup,
+    onSuccess: ({ data: { token, user } }) => {
+      loginWithToken(token, user);
+      toast({ title: 'Account Created', description: 'Welcome! Your account has been created.' });
+      navigate('/dashboard');
+    },
+    onError: (error) => {
+      toast({
+        title: 'Registration Failed',
+        description: error.message ?? 'Could not create account.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const onSubmit = (values: SignupFormValues) => {
+    signupMutate({
+      fullName: values.fullName,
+      email: values.email,
+      password: values.password,
+      passwordConfirmation: values.passwordConfirmation,
+    });
   };
 
   return (
@@ -58,24 +76,27 @@ const RegisterPage: React.FC = () => {
           <CardTitle className="text-2xl">Create an account</CardTitle>
           <CardDescription>Get started with your todo manager</CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" placeholder="John Doe" value={name} onChange={e => setName(e.target.value)} required />
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input id="fullName" placeholder="John Doe" {...register('fullName')} />
+              {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
+              <Input id="email" type="email" placeholder="you@example.com" {...register('email')} />
+              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+                <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" {...register('password')} />
                 <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full px-3" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
+              {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
               {strength && (
                 <div className="space-y-1">
                   <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -86,17 +107,21 @@ const RegisterPage: React.FC = () => {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm">Confirm Password</Label>
-              <Input id="confirm" type="password" placeholder="••••••••" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+              <Label htmlFor="passwordConfirmation">Confirm Password</Label>
+              <Input id="passwordConfirmation" type="password" placeholder="••••••••" {...register('passwordConfirmation')} />
+              {errors.passwordConfirmation && <p className="text-sm text-destructive">{errors.passwordConfirmation.message}</p>}
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="terms" checked={terms} onCheckedChange={v => setTerms(v === true)} />
-              <Label htmlFor="terms" className="text-sm font-normal">I agree to the Terms & Conditions</Label>
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="terms" checked={termsValue} onCheckedChange={v => setValue('terms', v === true, { shouldValidate: true })} />
+                <Label htmlFor="terms" className="text-sm font-normal">I agree to the Terms & Conditions</Label>
+              </div>
+              {errors.terms && <p className="text-sm text-destructive">{errors.terms.message}</p>}
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creating account...' : 'Create Account'}
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? 'Creating account...' : 'Create Account'}
             </Button>
             <p className="text-sm text-muted-foreground">
               Already have an account?{' '}

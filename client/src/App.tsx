@@ -12,6 +12,7 @@ import ProtectedRoute from "@/routes/ProtectedRoute";
 import LoginPage from "@/pages/user/auth/LoginPage";
 import RegisterPage from "@/pages/user/auth/RegisterPage";
 import ForgotPasswordPage from "@/pages/user/auth/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/user/auth/ResetPasswordPage";
 import UserLayout from "@/layouts/UserLayout";
 import DashboardPage from "@/pages/user/DashboardPage";
 import TodosPage from "@/pages/user/TodosPage";
@@ -61,6 +62,7 @@ const App = () => (
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
                 {/* User protected routes */}
                 <Route element={<ProtectedRoute><UserLayout /></ProtectedRoute>}>

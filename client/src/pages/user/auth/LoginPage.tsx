@@ -1,36 +1,56 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, CheckSquare } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { InferType } from 'yup';
+import { useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { loginSchema } from '@/validations/user/auth.validation';
+import { userAuthService, LoginPayload } from '@/services/user/auth.service';
+import { ApiLoginResponse } from '@/types/api.types';
+import { useAuth } from '@/context/AuthContext';
 import AppLogo from '@/components/common/AppLogo';
 
-const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
+type LoginFormValues = InferType<typeof loginSchema>;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      const success = login(email, password);
-      if (success) {
-        toast({ title: 'Welcome back!', description: 'You have logged in successfully.' });
-        navigate('/dashboard');
-      } else {
-        toast({ title: 'Login Failed', description: 'Invalid email or password.', variant: 'destructive' });
-      }
-      setLoading(false);
-    }, 500);
+const LoginPage: React.FC = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const { loginWithToken } = useAuth();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: yupResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  });
+
+  const { mutate: loginMutate, isPending } = useMutation<ApiLoginResponse, Error, LoginPayload>({
+    mutationFn: userAuthService.login,
+    onSuccess: ({ data: { token, user } }) => {
+      loginWithToken(token, user);
+      toast({ title: 'Welcome back!', description: 'You have logged in successfully.' });
+      navigate('/dashboard');
+    },
+    onError: (error) => {
+      toast({
+        title: 'Login Failed',
+        description: error.message ?? 'Invalid email or password.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const onSubmit = (values: LoginFormValues) => {
+    loginMutate({ email: values.email, password: values.password });
   };
 
   return (
@@ -41,20 +61,22 @@ const LoginPage: React.FC = () => {
           <CardTitle className="text-2xl">Welcome back</CardTitle>
           <CardDescription>Sign in to your account to continue</CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
+              <Input id="email" type="email" placeholder="you@example.com" {...register('email')} />
+              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
+                <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" {...register('password')} />
                 <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full px-3" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
+              {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -65,8 +87,8 @@ const LoginPage: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? 'Signing in...' : 'Sign In'}
             </Button>
             <p className="text-sm text-muted-foreground">
               Don't have an account?{' '}

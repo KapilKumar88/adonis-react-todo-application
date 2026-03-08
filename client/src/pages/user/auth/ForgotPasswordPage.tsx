@@ -1,32 +1,52 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, CheckSquare } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { InferType } from 'yup';
+import { useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { forgotPasswordSchema } from '@/validations/user/auth.validation';
+import { userAuthService, ForgotPasswordPayload, MessageResponse } from '@/services/user/auth.service';
 import { maskEmail } from '@/utils/helpers';
 
-const ForgotPasswordPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { resetPassword } = useAuth();
+type ForgotPasswordFormValues = InferType<typeof forgotPasswordSchema>;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      const found = resetPassword(email);
-      if (found) {
-        setSent(true);
-      } else {
-        toast({ title: 'Error', description: 'No account found with that email.', variant: 'destructive' });
-      }
-      setLoading(false);
-    }, 500);
+const ForgotPasswordPage: React.FC = () => {
+  const [sent, setSent] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState('');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ForgotPasswordFormValues>({
+    resolver: yupResolver(forgotPasswordSchema),
+    defaultValues: { email: '' },
+  });
+
+  const { mutate: forgotPasswordMutate, isPending } = useMutation<MessageResponse, Error, ForgotPasswordPayload>({
+    mutationFn: userAuthService.forgotPassword,
+    onSuccess: (data) => {
+      setSent(true);
+      toast({ title: 'Email Sent', description: data.message ?? 'Check your inbox for the reset link.' });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: error.message ?? 'No account found with that email.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const onSubmit = (values: ForgotPasswordFormValues) => {
+    setSubmittedEmail(values.email);
+    forgotPasswordMutate({ email: values.email });
   };
 
   return (
@@ -41,21 +61,22 @@ const ForgotPasswordPage: React.FC = () => {
           <CardTitle className="text-2xl">{sent ? 'Check your email' : 'Reset password'}</CardTitle>
           <CardDescription>
             {sent
-              ? `We've sent a reset link to ${maskEmail(email)}`
+              ? `We've sent a reset link to ${maskEmail(submittedEmail)}`
               : 'Enter your email to receive a reset link'}
           </CardDescription>
         </CardHeader>
         {!sent ? (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
+                <Input id="email" type="email" placeholder="you@example.com" {...register('email')} />
+                {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
               </div>
             </CardContent>
             <CardFooter className="flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Sending...' : 'Send Reset Link'}
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? 'Sending...' : 'Send Reset Link'}
               </Button>
               <Link to="/login" className="text-sm text-primary hover:underline">Back to login</Link>
             </CardFooter>
