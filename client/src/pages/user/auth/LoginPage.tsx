@@ -14,15 +14,16 @@ import { toast } from '@/hooks/use-toast';
 import { loginSchema } from '@/validations/user/auth.validation';
 import { userAuthService, LoginPayload } from '@/services/user/auth.service';
 import { ApiLoginResponse } from '@/types/api.types';
-import { useAuth } from '@/context/AuthContext';
 import AppLogo from '@/components/common/AppLogo';
+import { tokenStorage } from '@/lib/api-client';
+import { useUserProfile } from '@/context/UserProfileContext';
 
 type LoginFormValues = InferType<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { loginWithToken } = useAuth();
+  const { setUserInfo } = useUserProfile();
 
   const {
     register,
@@ -36,7 +37,8 @@ const LoginPage: React.FC = () => {
   const { mutate: loginMutate, isPending } = useMutation<ApiLoginResponse, Error, LoginPayload>({
     mutationFn: userAuthService.login,
     onSuccess: ({ data: { token, user } }) => {
-      loginWithToken(token, user);
+      tokenStorage.set(token);
+      setUserInfo(user);
       toast({ title: 'Welcome back!', description: 'You have logged in successfully.' });
       navigate('/dashboard');
     },

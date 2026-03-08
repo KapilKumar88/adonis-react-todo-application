@@ -65,10 +65,10 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
 
                 {/* User protected routes */}
-                <Route element={<ProtectedRoute><UserLayout /></ProtectedRoute>}>
-                  <Route path="/dashboard" element={<DashboardPage />} />
+                <Route element={<UserLayout />}>
+                  {/* <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/todos" element={<TodosPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/profile" element={<ProfilePage />} /> */}
                 </Route>
 
                 {/* Admin routes */}

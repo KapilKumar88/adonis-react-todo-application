@@ -14,17 +14,18 @@ import { toast } from '@/hooks/use-toast';
 import { signupSchema } from '@/validations/user/auth.validation';
 import { userAuthService, SignupPayload } from '@/services/user/auth.service';
 import { ApiLoginResponse } from '@/types/api.types';
-import { useAuth } from '@/context/AuthContext';
 import { getPasswordStrength } from '@/utils/helpers';
 import { cn } from '@/lib/utils';
 import AppLogo from '@/components/common/AppLogo';
+import { tokenStorage } from '@/lib/api-client';
+import { useUserProfile } from '@/context/UserProfileContext';
 
 type SignupFormValues = InferType<typeof signupSchema>;
 
 const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { loginWithToken } = useAuth();
+  const { setUserInfo } = useUserProfile();
 
   const {
     register,
@@ -46,7 +47,8 @@ const RegisterPage: React.FC = () => {
   const { mutate: signupMutate, isPending } = useMutation<ApiLoginResponse, Error, SignupPayload>({
     mutationFn: userAuthService.signup,
     onSuccess: ({ data: { token, user } }) => {
-      loginWithToken(token, user);
+      tokenStorage.set(token);
+      setUserInfo(user);
       toast({ title: 'Account Created', description: 'Welcome! Your account has been created.' });
       navigate('/dashboard');
     },
