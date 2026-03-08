@@ -4,7 +4,6 @@ import { UserDetails } from '@/types/user.types';
 interface UserProfileContextType {
   userInfo: UserDetails | null;
   isAuthenticated: boolean;
-  isAdmin: boolean;
   setUserInfo: React.Dispatch<React.SetStateAction<UserDetails | null>>;
 }
 
@@ -23,7 +22,6 @@ export const UserProfileProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const value = useMemo(() => ({
     userInfo,
     isAuthenticated: !!userInfo,
-    isAdmin: userInfo?.role === 'admin',
     setUserInfo
   }), [userInfo, setUserInfo]);
 
