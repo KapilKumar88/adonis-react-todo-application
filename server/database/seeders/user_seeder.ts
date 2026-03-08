@@ -1,3 +1,4 @@
+import { UserFactory } from '#database/factories/user_factory'
 import Role from '#models/role'
 import User from '#models/user'
 import stringHelpers from '@adonisjs/core/helpers/string'
@@ -22,5 +23,8 @@ export default class extends BaseSeeder {
         await createdUser.related('roles').sync([role.id])
       }
     }
+
+    await UserFactory.createMany(2000)
+    await UserFactory.apply('asAdmin').createMany(2000)
   }
 }

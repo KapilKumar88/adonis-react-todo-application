@@ -5,10 +5,11 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-       table.specificType('id', 'uuid default gen_random_uuid()').notNullable().primary()
+      table.specificType('id', 'uuid default gen_random_uuid()').notNullable().primary()
       table.string('name', 50).notNullable().unique()
       table.string('display_name', 100).nullable()
       table.text('description').nullable()
+      table.enum('type', ['system', 'custom']).notNullable().defaultTo('custom')
 
       table.timestamp('created_at').notNullable().defaultTo(this.now())
       table.timestamp('updated_at').notNullable().defaultTo(this.now())

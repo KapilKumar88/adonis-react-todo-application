@@ -9,11 +9,16 @@
 
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
-import DocsController from '#controllers/docs_controller'
-import LoginController from '#controllers/api/v1/admin/auth/login_controller'
-import RolesController from '#controllers/api/v1/admin/role_management/roles_controller'
-import PermissionController from '#controllers/api/v1/admin/permission_management/permission_controller'
-import UserController from '#controllers/api/v1/admin/user_management/user_controller'
+
+const UserController = () => import('#controllers/api/v1/admin/user_management/user_controller');
+const PermissionController = () => import('#controllers/api/v1/admin/permission_management/permission_controller');
+const RolesController = () => import('#controllers/api/v1/admin/role_management/roles_controller');
+const LoginController = () => import('#controllers/api/v1/admin/auth/login_controller')
+const DocsController = () => import('#controllers/docs_controller')
+
+const NewAccountController = () => import('#controllers/api/v1/user/auth/new_account_controller')
+const AccessTokenController = () => import('#controllers/api/v1/user/auth/login_controller')
+const ForgotPasswordsController = () => import('#controllers/api/v1/user/auth/forgot_passwords_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -33,6 +38,7 @@ router.get('/docs/openapi.yaml', [DocsController, 'spec'])
 // api version 1 routes with auth middleware applied to protected routes
 router
   .group(() => {
+    // -------------------------------------- admin apis start ------------------------------------------------------
     router.group(() => {
       router.post('login', [LoginController, 'login'])
 
@@ -72,16 +78,20 @@ router
         .prefix('users')
         .use(middleware.auth())
     }).prefix('admin').as('admin')
+    // -------------------------------------- admin apis end ------------------------------------------------------
 
 
-    // router
-    //   .group(() => {
-    //     router.post('signup', [controllers.NewAccount, 'store'])
-    //     router.post('login', [controllers.AccessToken, 'store'])
-    //     router.post('logout', [controllers.AccessToken, 'destroy']).use(middleware.auth())
-    //   })
-    //   .prefix('auth')
-    //   .as('auth')
+    // ------------------------------------------- User Apis start-----------------------------------------------------------
+    router
+      .group(() => {
+        router.post('signup', [NewAccountController, 'store'])
+        router.post('login', [AccessTokenController, 'store'])
+        router.post('logout', [AccessTokenController, 'destroy']).use(middleware.auth())
+        router.post('forgot-password', [ForgotPasswordsController, 'store'])
+        router.post('reset-password', [ForgotPasswordsController, 'update'])
+      })
+      .prefix('auth')
+      .as('auth')
 
     // router
     //   .group(() => {
@@ -90,5 +100,7 @@ router
     //   .prefix('account')
     //   .as('profile')
     //   .use(middleware.auth())
+
+    // ------------------------------------------- User Apis end-----------------------------------------------------------
   })
   .prefix('/api/v1')

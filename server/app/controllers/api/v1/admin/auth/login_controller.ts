@@ -1,5 +1,5 @@
 import User from '#models/user'
-import UserTransformer from '#transformers/user_transformer'
+import UserForAdminTransformer from '#transformers/admin/user_for_admin_transformer'
 import { loginAdminValidator } from '#validators/api/v1/admin/login'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -11,7 +11,7 @@ export default class LoginController {
         const token = await User.accessTokens.create(user)
 
         return serialize({
-            user: UserTransformer.transform(user),
+            user: UserForAdminTransformer.transform(user),
             token: token.value!.release(),
         })
     }

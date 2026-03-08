@@ -1,5 +1,5 @@
 import User from '#models/user'
-import UserTransformer from '#transformers/user_transformer'
+import UserForAdminTransformer from '#transformers/admin/user_for_admin_transformer'
 import { createUserValidator, updateUserValidator } from '#validators/api/v1/admin/user'
 import stringHelpers from '@adonisjs/core/helpers/string'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -20,7 +20,7 @@ export default class UserController {
       .orderBy('created_at', 'desc')
       .paginate(page, limit)
 
-    return serialize(UserTransformer.paginate(users.all(), users.getMeta()))
+    return serialize(UserForAdminTransformer.paginate(users.all(), users.getMeta()))
   }
 
   /**
@@ -41,7 +41,7 @@ export default class UserController {
 
       await user.related('roles').attach([payload.roleId])
       await trx.commit()
-      return response.created(UserTransformer.transform(user))
+      return response.created(UserForAdminTransformer.transform(user))
     } catch (error) {
       await trx.rollback()
       return response.internalServerError({
@@ -58,7 +58,7 @@ export default class UserController {
   async show({ params, response }: HttpContext) {
     const user = await User.query().where('id', params.id).preload('roles').firstOrFail()
 
-    return response.ok(UserTransformer.transform(user))
+    return response.ok(UserForAdminTransformer.transform(user))
   }
 
   /**
@@ -87,7 +87,7 @@ export default class UserController {
     await user.save()
     await user.related('roles').sync([roleId])
 
-    return response.ok(UserTransformer.transform(user))
+    return response.ok(UserForAdminTransformer.transform(user))
   }
 
   /**

@@ -1,28 +1,36 @@
+import Permission from '#models/permission'
 import Role from '#models/role'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
-
-const SystemDefaultRoles = [
-  {
-    name: 'super_admin',
-    display_name: 'Super Admin',
-    description: 'User with this role has access to all the system features and settings.'
-  },
-  {
-    name: 'admin',
-    display_name: 'Admin',
-    description: 'User with this role has access to most of the system features and settings.'
-  },
-  {
-    name: 'user',
-    display_name: 'User',
-    description: 'User with this role has access to basic features and settings.'
-  }
-]
+import { DefaultSystemPermissions } from '../../constants/permission.contants.ts'
+import { DefaultSystemRoles } from '../../constants/role.contants.ts'
 
 export default class extends BaseSeeder {
   async run() {
-    for (const role of SystemDefaultRoles) {
-      await Role.updateOrCreate({ name: role.name }, role)
+    for (const roleKey in DefaultSystemRoles) {
+      const roleName = DefaultSystemRoles[roleKey as keyof typeof DefaultSystemRoles]
+      await Role.updateOrCreate(
+        { name: roleName },
+        {
+          name: roleName,
+          displayName: roleKey.replaceAll('_', ' '),
+          type: 'system',
+          description: `User with this role has access to ${roleName === DefaultSystemRoles.SUPER_ADMIN ? 'all' : 'basic'} features and settings.`,
+        }
+      )
     }
+
+    const superAdmin = await Role.findByOrFail('name', DefaultSystemRoles.SUPER_ADMIN)
+    const todoPermissionNames = Object.values({ ...DefaultSystemPermissions.TODO_MANAGEMENT, ...DefaultSystemPermissions.USER_DASHBOARD })
+    const superAdminPermissions = await Permission.query().whereNotIn('name', todoPermissionNames)
+    await superAdmin.related('permissions').sync(superAdminPermissions.map((p) => p.id))
+
+    const userRole = await Role.findByOrFail('name', DefaultSystemRoles.USER)
+    const userPermissionNames = [
+      ...Object.values(DefaultSystemPermissions.TODO_MANAGEMENT),
+      ...Object.values(DefaultSystemPermissions.USER_DASHBOARD),
+    ]
+    
+    const userPermissions = await Permission.query().whereIn('name', userPermissionNames)
+    await userRole.related('permissions').sync(userPermissions.map((p) => p.id))
   }
 }

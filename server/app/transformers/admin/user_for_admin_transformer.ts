@@ -1,11 +1,12 @@
-import type User from '#models/user'
 import { BaseTransformer } from '@adonisjs/core/transformers'
-import RoleTransformer from './role_transformer.ts'
+import User from '#models/user'
+import RoleTransformer from '../role_transformer.ts'
 
-export default class UserTransformer extends BaseTransformer<User> {
+export default class UserForAdminTransformer extends BaseTransformer<User> {
   toObject() {
     return {
       ...this.pick(this.resource, [
+        'id',
         'fullName',
         'email',
         'initials',
