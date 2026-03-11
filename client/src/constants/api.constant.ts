@@ -4,6 +4,10 @@ export default Object.freeze({
       LOGIN: '/api/v1/admin/login',
     },
     DASHBOARD: '/api/v1/admin/dashboard',
+    ACTIVITY_LOGS: {
+      GET_LIST: '/api/v1/admin/activity-logs',
+      EXPORT: '/api/v1/admin/activity-logs/export',
+    },
     USERS: {
       GET_USERS_LIST: '/api/v1/admin/users',
       CREATE_USER: '/api/v1/admin/users',

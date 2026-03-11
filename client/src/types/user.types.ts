@@ -5,7 +5,7 @@ export interface UserDetails {
     fullName: string;
     email: string;
     initials: string;
-    role: USER_ROLE;
+    role: AdminRole;
     bio: string | null;
     profileImage: string | null;
     createdAt: string;

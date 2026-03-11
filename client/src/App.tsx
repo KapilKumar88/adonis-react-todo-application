@@ -23,6 +23,7 @@ import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
 import UsersPage from "@/pages/admin/UsersPage";
 import RolesPage from "@/pages/admin/RolesPage";
 import PermissionsPage from "@/pages/admin/PermissionsPage";
+import ActivityLogsPage from "@/pages/admin/ActivityLogsPage";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -83,7 +84,7 @@ const App = () => (
                 <Route path="/admin/users" element={<UsersPage />} />
                 <Route path="/admin/roles" element={<RolesPage />} />
                 <Route path="/admin/permissions" element={<PermissionsPage />} />
-                {/* <Route path="/admin/logs" element={<ActivityLogsPage />} /> */}
+                <Route path="/admin/logs" element={<ActivityLogsPage />} />
                 {/* <Route path="/admin/settings" element={<SettingsPage />} /> */}
               </Route>
 
