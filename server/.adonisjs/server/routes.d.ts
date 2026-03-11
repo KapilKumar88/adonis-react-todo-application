@@ -29,6 +29,7 @@ export type ScannedRoutes = {
     'auth.forgot_passwords.update': { paramsTuple?: []; params?: {} }
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'profile.profile.update': { paramsTuple?: []; params?: {} }
+    'profile.change_passwords.update': { paramsTuple?: []; params?: {} }
     'tags.tags.index': { paramsTuple?: []; params?: {} }
     'tags.tags.store': { paramsTuple?: []; params?: {} }
     'tags.tags.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -88,6 +89,7 @@ export type ScannedRoutes = {
     'admin.permission.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.profile.update': { paramsTuple?: []; params?: {} }
+    'profile.change_passwords.update': { paramsTuple?: []; params?: {} }
     'tags.tags.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.todos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }

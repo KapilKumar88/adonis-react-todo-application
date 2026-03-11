@@ -50,6 +50,9 @@ export interface ApiDefinition {
       show: typeof routes['profile.profile.show']
       update: typeof routes['profile.profile.update']
     }
+    changePasswords: {
+      update: typeof routes['profile.change_passwords.update']
+    }
   }
   tags: {
     tags: {

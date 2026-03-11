@@ -268,7 +268,7 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/profile_controller').default['show']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/profile/profile_controller').default['show']>>>
     }
   }
   'profile.profile.update': {
@@ -279,7 +279,18 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/user/profile').userProfileValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/profile_controller').default['update']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/profile/profile_controller').default['update']>>>
+    }
+  }
+  'profile.change_passwords.update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/profile/change-password'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api/v1/user/change_password').changePasswordValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/user/change_password').changePasswordValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/profile/change_passwords_controller').default['update']>>>
     }
   }
   'tags.tags.index': {

@@ -29,7 +29,10 @@ export const controllers = {
           Login: () => import('#controllers/api/v1/user/auth/login_controller'),
           NewAccount: () => import('#controllers/api/v1/user/auth/new_account_controller'),
         },
-        Profile: () => import('#controllers/api/v1/user/profile_controller'),
+        profile: {
+          ChangePasswords: () => import('#controllers/api/v1/user/profile/change_passwords_controller'),
+          Profile: () => import('#controllers/api/v1/user/profile/profile_controller'),
+        },
         tagManagement: {
           Tags: () => import('#controllers/api/v1/user/tag_management/tags_controller'),
         },

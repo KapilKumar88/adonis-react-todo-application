@@ -21,7 +21,8 @@ const AccessTokenController = () => import('#controllers/api/v1/user/auth/login_
 const ForgotPasswordsController = () => import('#controllers/api/v1/user/auth/forgot_passwords_controller')
 const TagsController = () => import('#controllers/api/v1/user/tag_management/tags_controller')
 const TodosController = () => import('#controllers/api/v1/user/todo_management/todos_controller')
-const ProfileController = () => import('#controllers/api/v1/user/profile_controller')
+const ProfileController = () => import('#controllers/api/v1/user/profile/profile_controller')
+const ChangePasswordsController = () => import('#controllers/api/v1/user/profile/change_passwords_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -101,6 +102,7 @@ router
       .group(() => {
         router.get('/', [ProfileController, 'show'])
         router.put('/', [ProfileController, 'update'])
+        router.put('/change-password', [ChangePasswordsController, 'update'])
       })
       .prefix('profile')
       .as('profile')
