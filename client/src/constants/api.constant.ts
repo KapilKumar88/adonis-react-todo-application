@@ -3,6 +3,7 @@ export default Object.freeze({
     AUTH: {
       LOGIN: '/api/v1/admin/login',
     },
+    DASHBOARD: '/api/v1/admin/dashboard',
     USERS: {
       GET_USERS_LIST: '/api/v1/admin/users',
       CREATE_USER: '/api/v1/admin/users',

@@ -1,50 +1,46 @@
 import React from 'react';
-import { Users, UserCheck, ListTodo, CheckCircle2 } from 'lucide-react';
+import { Users, UserCheck, ListTodo, CheckCircle2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import PageHeader from '@/components/common/PageHeader';
 import StatCard from '@/components/common/StatCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { useTodos } from '@/context/TodoContext';
-import { activityLogs } from '@/utils/mockData';
+import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { formatRelativeTime, getInitials } from '@/utils/helpers';
 
 const AdminDashboardPage: React.FC = () => {
-  const { todos } = useTodos();
+  const { data, isLoading } = useAdminDashboard();
 
-  const activeUsers = 10;
-  const completedTodos = todos.filter(t => t.status === 'completed').length;
-  const pendingTodos = todos.filter(t => t.status === 'pending').length;
-  const inProgressTodos = todos.filter(t => t.status === 'in-progress').length;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
-  const recentLogs = activityLogs.slice(0, 10);
+  const userStats = data?.userStats ?? { totalUsers: 0, activeUsers: 0 };
+  const todoStats = data?.todoStats ?? { total: 0, completed: 0, inProgress: 0, pending: 0 };
+  const priorityBreakdown = data?.priorityBreakdown ?? { high: 0, medium: 0, low: 0 };
+  const recentActivity = data?.recentActivity ?? [];
+  const topActiveUsers = data?.topActiveUsers ?? [];
 
-  // Top users by todo count
-  const userTodoCounts = [
-    { id: '1', name: 'Alice Johnson', todoCount: 12 },
-  ];
+  const statusTotal = todoStats.completed + todoStats.inProgress + todoStats.pending || 1;
+  const completedPct = (todoStats.completed / statusTotal) * 100;
+  const inProgressPct = (todoStats.inProgress / statusTotal) * 100;
 
-  // Chart data
-  const statusTotal = completedTodos + pendingTodos + inProgressTodos || 1;
-  const completedPct = (completedTodos / statusTotal) * 100;
-  const inProgressPct = (inProgressTodos / statusTotal) * 100;
-  const pendingPct = (pendingTodos / statusTotal) * 100;
-
-  const highPriority = todos.filter(t => t.priority === 'high').length;
-  const medPriority = todos.filter(t => t.priority === 'medium').length;
-  const lowPriority = todos.filter(t => t.priority === 'low').length;
-  const maxPriority = Math.max(highPriority, medPriority, lowPriority, 1);
+  const maxPriority = Math.max(priorityBreakdown.high, priorityBreakdown.medium, priorityBreakdown.low, 1);
 
   return (
     <div>
       <PageHeader title="Admin Dashboard" subtitle="System overview and analytics" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard title="Total Users" value={10} icon={Users} color="info" trend={{ value: 15, positive: true }} />
-        <StatCard title="Active Users" value={activeUsers} icon={UserCheck} color="success" trend={{ value: 5, positive: true }} />
-        <StatCard title="Total Todos" value={todos.length} icon={ListTodo} color="primary" trend={{ value: 22, positive: true }} />
-        <StatCard title="Completed" value={completedTodos} icon={CheckCircle2} color="success" trend={{ value: 10, positive: true }} />
+        <StatCard title="Total Users" value={userStats.totalUsers} icon={Users} color="info" />
+        <StatCard title="Active Users" value={userStats.activeUsers} icon={UserCheck} color="success" />
+        <StatCard title="Total Todos" value={todoStats.total} icon={ListTodo} color="primary" />
+        <StatCard title="Completed" value={todoStats.completed} icon={CheckCircle2} color="success" />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6 mb-8">
@@ -68,9 +64,9 @@ const AdminDashboardPage: React.FC = () => {
               </div>
             </div>
             <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-success" /> Completed ({completedTodos})</div>
-              <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-info" /> In Progress ({inProgressTodos})</div>
-              <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-warning" /> Pending ({pendingTodos})</div>
+              <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-success" /> Completed ({todoStats.completed})</div>
+              <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-info" /> In Progress ({todoStats.inProgress})</div>
+              <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-warning" /> Pending ({todoStats.pending})</div>
             </div>
           </CardContent>
         </Card>
@@ -80,9 +76,9 @@ const AdminDashboardPage: React.FC = () => {
           <CardHeader><CardTitle className="text-lg">Priority Breakdown</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             {[
-              { label: 'High', count: highPriority, color: 'bg-destructive' },
-              { label: 'Medium', count: medPriority, color: 'bg-warning' },
-              { label: 'Low', count: lowPriority, color: 'bg-muted-foreground' },
+              { label: 'High', count: priorityBreakdown.high, color: 'bg-destructive' },
+              { label: 'Medium', count: priorityBreakdown.medium, color: 'bg-warning' },
+              { label: 'Low', count: priorityBreakdown.low, color: 'bg-muted-foreground' },
             ].map(p => (
               <div key={p.label} className="space-y-1">
                 <div className="flex justify-between text-sm">
@@ -104,14 +100,14 @@ const AdminDashboardPage: React.FC = () => {
           <CardHeader><CardTitle className="text-lg">Recent Activity</CardTitle></CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentLogs.map(log => (
+              {recentActivity.map(log => (
                 <div key={log.id} className="flex items-start gap-3 py-2 border-b last:border-0">
                   <Avatar className="h-8 w-8 mt-0.5">
                     <AvatarFallback className="text-xs bg-muted">{getInitials(log.userName)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm"><span className="font-medium">{log.userName}</span> {log.action.toLowerCase()}</p>
-                    <p className="text-xs text-muted-foreground">{formatRelativeTime(log.timestamp)}</p>
+                    <p className="text-xs text-muted-foreground">{formatRelativeTime(log.createdAt)}</p>
                   </div>
                   <StatusBadge status={log.status} />
                 </div>
@@ -132,14 +128,14 @@ const AdminDashboardPage: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {userTodoCounts.map(u => (
+                {topActiveUsers.map(u => (
                   <TableRow key={u.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
-                          <AvatarFallback className="text-xs bg-muted">{getInitials(u.name)}</AvatarFallback>
+                          <AvatarFallback className="text-xs bg-muted">{getInitials(u.fullName)}</AvatarFallback>
                         </Avatar>
-                        <span className="text-sm">{u.name}</span>
+                        <span className="text-sm">{u.fullName}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-medium">{u.todoCount}</TableCell>

@@ -45,7 +45,7 @@ const DashboardPage: React.FC = () => {
                 <div key={todo.id} className="flex items-center justify-between py-2 border-b last:border-0">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{todo.title}</p>
-                    <p className="text-xs text-muted-foreground">{formatRelativeTime(todo.updatedAt)}</p>
+                    <p className="text-xs text-muted-foreground">{formatRelativeTime(todo?.updatedAt)}</p>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
                     <PriorityBadge priority={todo.priority} />
