@@ -26,15 +26,24 @@ export default Object.freeze({
     },
   },
   USER: {
+    PROFILE: '/api/v1/profile',
+    UPDATE_PROFILE: '/api/v1/profile',
+
     AUTH: {
       LOGIN: '/api/v1/auth/login',
       SIGNUP: '/api/v1/auth/signup',
       LOGOUT: '/api/v1/auth/logout',
-      FORGOT_PASSWORD: '/api/v1/auth/forgot-password',
-      RESET_PASSWORD: '/api/v1/auth/reset-password',
+      FORGOT_CREDS: '/api/v1/auth/forgot-creds',
+      RESET_CREDS: '/api/v1/auth/reset-creds',
+      CHANGE_CREDS: '/api/v1/auth/change-creds',
+    },
+    TAGS: {
+      BASE: '/api/v1/tags',
+      BY_ID: '/api/v1/tags/{id}',
     },
     TODOS: {
-      BASE: '/todos',
+      BASE: '/api/v1/todos',
+      BY_ID: '/api/v1/todos/{id}',
     },
   }
 });

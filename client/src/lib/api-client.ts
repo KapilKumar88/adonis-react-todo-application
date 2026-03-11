@@ -12,9 +12,10 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
     const { body, headers: extraHeaders, ...rest } = options;
+    const isFormData = body instanceof FormData;
 
     const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         Accept: 'application/json',
         ...(extraHeaders as Record<string, string>),
     };
@@ -27,7 +28,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     const response = await fetch(`${apiConfig.API_BASE_URL}${path}`, {
         ...rest,
         headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
+        body: body === undefined ? undefined : isFormData ? body as FormData : JSON.stringify(body),
     });
 
     const data = await response.json().catch(() => null);

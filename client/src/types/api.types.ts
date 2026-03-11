@@ -10,3 +10,8 @@ export interface ApiLoginResponse {
         user: UserDetails;
     }
 }
+
+
+export interface ApiUserProfileResponse {
+    data: UserDetails;
+}

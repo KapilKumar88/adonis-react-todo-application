@@ -7,9 +7,9 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import ThemeToggle from '@/components/common/ThemeToggle';
-import { useAuth } from '@/context/AuthContext';
 import { getInitials } from '@/utils/helpers';
 import { NavLink } from '@/components/NavLink';
+import { useUserProfile } from '@/context/UserProfileContext';
 
 const navItems = [
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
@@ -18,12 +18,11 @@ const navItems = [
 ];
 
 const UserLayout: React.FC = () => {
-  const { currentUser, logout } = useAuth();
+  const { userInfo } = useUserProfile();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
     navigate('/login');
   };
 
@@ -58,15 +57,15 @@ const UserLayout: React.FC = () => {
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                      {currentUser ? getInitials(currentUser.name) : '?'}
+                      {userInfo ? getInitials(userInfo?.fullName) : '?'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium">{currentUser?.name}</p>
-                  <p className="text-xs text-muted-foreground">{currentUser?.email}</p>
+                  <p className="text-sm font-medium">{userInfo?.fullName}</p>
+                  <p className="text-xs text-muted-foreground">{userInfo?.email}</p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate('/profile')}>Profile</DropdownMenuItem>

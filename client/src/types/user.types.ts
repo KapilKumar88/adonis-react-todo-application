@@ -6,6 +6,9 @@ export interface UserDetails {
     email: string;
     initials: string;
     role: USER_ROLE;
+    bio: string | null;
+    profileImage: string | null;
+    createdAt: string;
 }
 
 // ─── Admin User Management ────────────────────────────────────────────────────

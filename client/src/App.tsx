@@ -29,6 +29,7 @@ import NotFound from "./pages/NotFound";
 import { UserProfileProvider } from "./context/UserProfileContext";
 import AuthGuard from "@/guard/AuthGuard";
 import { DEFAULT_ROLES } from "./constants/role.constant";
+import ErrorBoundary from "@/components/common/ErrorBoundary";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,6 +54,7 @@ const App = () => (
           <Toaster />
           <Sonner position="top-right" />
           <BrowserRouter>
+            <ErrorBoundary>
             <Routes>
               {/* Public routes users */}
               <Route path="/" element={<Index />} />
@@ -87,6 +89,7 @@ const App = () => (
 
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </ErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>

@@ -8,7 +8,10 @@ const statusStyles: Record<string, string> = {
   banned: 'bg-destructive/10 text-destructive border-destructive/20',
   pending: 'bg-warning/10 text-warning border-warning/20',
   'in-progress': 'bg-info/10 text-info border-info/20',
+  in_progress: 'bg-info/10 text-info border-info/20',
   completed: 'bg-success/10 text-success border-success/20',
+  backlog: 'bg-muted text-muted-foreground border-muted',
+  icebox: 'bg-muted text-muted-foreground border-muted',
   success: 'bg-success/10 text-success border-success/20',
   failed: 'bg-destructive/10 text-destructive border-destructive/20',
   warning: 'bg-warning/10 text-warning border-warning/20',
@@ -16,7 +19,7 @@ const statusStyles: Record<string, string> = {
 
 export const StatusBadge: React.FC<{ status: string }> = ({ status }) => (
   <Badge variant="outline" className={cn('capitalize text-xs', statusStyles[status] || '')}>
-    {status.replace('-', ' ')}
+    {status?.replace(/[-_]/g, ' ')}
   </Badge>
 );
 
