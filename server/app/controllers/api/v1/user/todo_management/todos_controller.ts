@@ -37,7 +37,7 @@ export default class TodosController {
 
     return response.ok({
       meta: todos.getMeta(),
-      data: todos.all().map((todo) => TodoTransformer.transform(todo)),
+      data: todos,
     })
   }
 

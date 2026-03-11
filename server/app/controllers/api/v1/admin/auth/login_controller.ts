@@ -8,7 +8,8 @@ export default class LoginController {
         const { email, password } = await request.validateUsing(loginAdminValidator)
 
         const user = await User.verifyCredentials(email, password)
-        const token = await User.accessTokens.create(user)
+        await user.load('roles', (q) => q.preload('permissions'));
+        const token = await User.accessTokens.create(user, user.roles.flatMap((r) => r.permissions.map((p) => p.name)))
 
         return serialize({
             user: UserForAdminTransformer.transform(user),

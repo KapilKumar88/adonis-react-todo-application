@@ -7,6 +7,7 @@ export type ScannedRoutes = {
     'docs.ui': { paramsTuple?: []; params?: {} }
     'docs.spec': { paramsTuple?: []; params?: {} }
     'admin.login.login': { paramsTuple?: []; params?: {} }
+    'admin.admin_dashboard.index': { paramsTuple?: []; params?: {} }
     'admin.roles.index': { paramsTuple?: []; params?: {} }
     'admin.roles.store': { paramsTuple?: []; params?: {} }
     'admin.roles.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -45,6 +46,7 @@ export type ScannedRoutes = {
   GET: {
     'docs.ui': { paramsTuple?: []; params?: {} }
     'docs.spec': { paramsTuple?: []; params?: {} }
+    'admin.admin_dashboard.index': { paramsTuple?: []; params?: {} }
     'admin.roles.index': { paramsTuple?: []; params?: {} }
     'admin.roles.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.permission.index': { paramsTuple?: []; params?: {} }
@@ -61,6 +63,7 @@ export type ScannedRoutes = {
   HEAD: {
     'docs.ui': { paramsTuple?: []; params?: {} }
     'docs.spec': { paramsTuple?: []; params?: {} }
+    'admin.admin_dashboard.index': { paramsTuple?: []; params?: {} }
     'admin.roles.index': { paramsTuple?: []; params?: {} }
     'admin.roles.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.permission.index': { paramsTuple?: []; params?: {} }

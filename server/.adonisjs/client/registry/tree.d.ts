@@ -10,6 +10,9 @@ export interface ApiDefinition {
     login: {
       login: typeof routes['admin.login.login']
     }
+    adminDashboard: {
+      index: typeof routes['admin.admin_dashboard.index']
+    }
     roles: {
       index: typeof routes['admin.roles.index']
       store: typeof routes['admin.roles.store']

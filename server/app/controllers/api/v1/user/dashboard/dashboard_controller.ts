@@ -37,7 +37,7 @@ export default class DashboardController {
         inProgress: statsResult?.in_progress ?? 0,
         pending: statsResult?.pending ?? 0,
       },
-      recentTodos: recentTodos.map((todo) => TodoTransformer.transform(todo)),
+      recentTodos: recentTodos,
     })
   }
 }

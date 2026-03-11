@@ -22,6 +22,9 @@ export const controllers = {
         userManagement: {
           User: () => import('#controllers/api/v1/admin/user_management/user_controller'),
         },
+        dashboard: {
+          Dashboard: () => import('#controllers/api/v1/admin/dashboard/dashboard_controller'),
+        },
       },
       user: {
         auth: {
@@ -43,7 +46,7 @@ export const controllers = {
           Dashboard: () => import('#controllers/api/v1/user/dashboard/dashboard_controller'),
         },
       },
-    },
+    },#controllers/api/v1/admin/dashboard/dashboard_controller
   },
   Docs: () => import('#controllers/docs_controller'),
 }

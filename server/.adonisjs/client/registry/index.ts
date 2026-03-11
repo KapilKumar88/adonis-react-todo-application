@@ -24,6 +24,12 @@ const routes = {
     tokens: [{"old":"/api/v1/admin/login","type":0,"val":"api","end":""},{"old":"/api/v1/admin/login","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/login","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/login","type":0,"val":"login","end":""}],
     types: placeholder as Registry['admin.login.login']['types'],
   },
+  'admin.admin_dashboard.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/dashboard',
+    tokens: [{"old":"/api/v1/admin/dashboard","type":0,"val":"api","end":""},{"old":"/api/v1/admin/dashboard","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/dashboard","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/dashboard","type":0,"val":"dashboard","end":""}],
+    types: placeholder as Registry['admin.admin_dashboard.index']['types'],
+  },
   'admin.roles.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/admin/roles',

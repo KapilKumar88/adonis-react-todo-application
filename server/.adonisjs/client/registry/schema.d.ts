@@ -40,6 +40,17 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/auth/login_controller').default['login']>>>
     }
   }
+  'admin.admin_dashboard.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/dashboard'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/dashboard/dashboard_controller').default['index']>>>
+    }
+  }
   'admin.roles.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/admin/roles'

@@ -14,6 +14,7 @@ const UserController = () => import('#controllers/api/v1/admin/user_management/u
 const PermissionController = () => import('#controllers/api/v1/admin/permission_management/permission_controller');
 const RolesController = () => import('#controllers/api/v1/admin/role_management/roles_controller');
 const LoginController = () => import('#controllers/api/v1/admin/auth/login_controller')
+const AdminDashboardController = () => import('#controllers/api/v1/admin/dashboard/dashboard_controller')
 const DocsController = () => import('#controllers/docs_controller')
 
 const NewAccountController = () => import('#controllers/api/v1/user/auth/new_account_controller')
@@ -46,6 +47,9 @@ router
     // -------------------------------------- admin apis start ------------------------------------------------------
     router.group(() => {
       router.post('login', [LoginController, 'login'])
+
+      // Dashboard — protected
+      router.get('dashboard', [AdminDashboardController, 'index']).use(middleware.auth())
 
       // Role management — protected
       router
