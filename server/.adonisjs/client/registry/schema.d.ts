@@ -293,6 +293,17 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/profile/change_passwords_controller').default['update']>>>
     }
   }
+  'dashboard.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/dashboard/dashboard_controller').default['index']>>>
+    }
+  }
   'tags.tags.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/tags'

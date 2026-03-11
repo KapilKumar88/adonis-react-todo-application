@@ -162,6 +162,12 @@ const routes = {
     tokens: [{"old":"/api/v1/profile/change-password","type":0,"val":"api","end":""},{"old":"/api/v1/profile/change-password","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/change-password","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/change-password","type":0,"val":"change-password","end":""}],
     types: placeholder as Registry['profile.change_passwords.update']['types'],
   },
+  'dashboard.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/dashboard',
+    tokens: [{"old":"/api/v1/dashboard","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard","type":0,"val":"dashboard","end":""}],
+    types: placeholder as Registry['dashboard.index']['types'],
+  },
   'tags.tags.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/tags',

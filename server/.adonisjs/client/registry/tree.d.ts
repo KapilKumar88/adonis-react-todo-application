@@ -54,6 +54,9 @@ export interface ApiDefinition {
       update: typeof routes['profile.change_passwords.update']
     }
   }
+  dashboard: {
+    index: typeof routes['dashboard.index']
+  }
   tags: {
     tags: {
       index: typeof routes['tags.tags.index']

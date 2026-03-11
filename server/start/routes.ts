@@ -23,6 +23,7 @@ const TagsController = () => import('#controllers/api/v1/user/tag_management/tag
 const TodosController = () => import('#controllers/api/v1/user/todo_management/todos_controller')
 const ProfileController = () => import('#controllers/api/v1/user/profile/profile_controller')
 const ChangePasswordsController = () => import('#controllers/api/v1/user/profile/change_passwords_controller')
+const DashboardController = () => import('#controllers/api/v1/user/dashboard/dashboard_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -107,6 +108,9 @@ router
       .prefix('profile')
       .as('profile')
       .use(middleware.auth())
+
+    // Dashboard — protected
+    router.get('dashboard', [DashboardController, 'index']).use(middleware.auth())
 
     // Tags management — protected
     router

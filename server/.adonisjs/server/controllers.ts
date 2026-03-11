@@ -39,6 +39,9 @@ export const controllers = {
         todoManagement: {
           Todos: () => import('#controllers/api/v1/user/todo_management/todos_controller'),
         },
+        dashboard: {
+          Dashboard: () => import('#controllers/api/v1/user/dashboard/dashboard_controller'),
+        },
       },
     },
   },
