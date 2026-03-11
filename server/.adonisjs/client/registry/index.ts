@@ -120,6 +120,18 @@ const routes = {
     tokens: [{"old":"/api/v1/admin/users/:id","type":0,"val":"api","end":""},{"old":"/api/v1/admin/users/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/users/:id","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/users/:id","type":0,"val":"users","end":""},{"old":"/api/v1/admin/users/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.user.destroy']['types'],
   },
+  'admin.activity_logs.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/activity-logs',
+    tokens: [{"old":"/api/v1/admin/activity-logs","type":0,"val":"api","end":""},{"old":"/api/v1/admin/activity-logs","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/activity-logs","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/activity-logs","type":0,"val":"activity-logs","end":""}],
+    types: placeholder as Registry['admin.activity_logs.index']['types'],
+  },
+  'admin.activity_logs.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/activity-logs/export',
+    tokens: [{"old":"/api/v1/admin/activity-logs/export","type":0,"val":"api","end":""},{"old":"/api/v1/admin/activity-logs/export","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/activity-logs/export","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/activity-logs/export","type":0,"val":"activity-logs","end":""},{"old":"/api/v1/admin/activity-logs/export","type":0,"val":"export","end":""}],
+    types: placeholder as Registry['admin.activity_logs.export']['types'],
+  },
   'auth.new_account.store': {
     methods: ["POST"],
     pattern: '/api/v1/auth/signup',

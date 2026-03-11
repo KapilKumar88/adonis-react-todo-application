@@ -15,6 +15,7 @@ const PermissionController = () => import('#controllers/api/v1/admin/permission_
 const RolesController = () => import('#controllers/api/v1/admin/role_management/roles_controller');
 const LoginController = () => import('#controllers/api/v1/admin/auth/login_controller')
 const AdminDashboardController = () => import('#controllers/api/v1/admin/dashboard/dashboard_controller')
+const ActivityLogsController = () => import('#controllers/api/v1/admin/activity_logs/activity_logs_controller')
 const DocsController = () => import('#controllers/docs_controller')
 
 const NewAccountController = () => import('#controllers/api/v1/user/auth/new_account_controller')
@@ -85,6 +86,15 @@ router
           router.delete('/:id', [UserController, 'destroy'])
         })
         .prefix('users')
+        .use(middleware.auth())
+
+      // Activity Logs — protected
+      router
+        .group(() => {
+          router.get('/', [ActivityLogsController, 'index'])
+          router.get('/export', [ActivityLogsController, 'export'])
+        })
+        .prefix('activity-logs')
         .use(middleware.auth())
     }).prefix('admin').as('admin')
     // -------------------------------------- admin apis end ------------------------------------------------------

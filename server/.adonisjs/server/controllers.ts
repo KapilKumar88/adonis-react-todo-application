@@ -46,7 +46,7 @@ export const controllers = {
           Dashboard: () => import('#controllers/api/v1/user/dashboard/dashboard_controller'),
         },
       },
-    },#controllers/api/v1/admin/dashboard/dashboard_controller
+    },
   },
   Docs: () => import('#controllers/docs_controller'),
 }

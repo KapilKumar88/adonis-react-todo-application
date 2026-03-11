@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Todo from '#models/todo'
 import { createTodoValidator, updateTodoValidator } from '#validators/api/v1/user/todo'
 import TodoTransformer from '#transformers/todo_transformer'
+import { logFromContext } from '#helpers/common.helper'
 
 export default class TodosController {
   /**
@@ -45,7 +46,8 @@ export default class TodosController {
    * POST /api/v1/todos
    * Create a new todo
    */
-  async store({ auth, request, response }: HttpContext) {
+  async store(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.getUserOrFail()
     const { tagIds, ...payload } = await request.validateUsing(createTodoValidator)
 
@@ -59,6 +61,13 @@ export default class TodosController {
     }
 
     await todo.load('tags')
+
+    await logFromContext(ctx, {
+      action: 'Created todo',
+      description: `${user.fullName} created todo — ${todo.title}`,
+      status: 'success',
+      resource: 'Todos',
+    })
 
     return response.created(TodoTransformer.transform(todo))
   }
@@ -82,7 +91,8 @@ export default class TodosController {
    * PUT /api/v1/todos/:id
    * Update a todo
    */
-  async update({ auth, params, request, response }: HttpContext) {
+  async update(ctx: HttpContext) {
+    const { auth, params, request, response } = ctx
     const user = auth.getUserOrFail()
     const todo = await Todo.query()
       .where('id', params.id)
@@ -100,6 +110,13 @@ export default class TodosController {
 
     await todo.load('tags')
 
+    await logFromContext(ctx, {
+      action: 'Updated todo',
+      description: `${user.fullName} updated todo — ${todo.title}`,
+      status: 'success',
+      resource: 'Todos',
+    })
+
     return response.ok(TodoTransformer.transform(todo))
   }
 
@@ -107,14 +124,23 @@ export default class TodosController {
    * DELETE /api/v1/todos/:id
    * Delete a todo
    */
-  async destroy({ auth, params, response }: HttpContext) {
+  async destroy(ctx: HttpContext) {
+    const { auth, params, response } = ctx
     const user = auth.getUserOrFail()
     const todo = await Todo.query()
       .where('id', params.id)
       .where('userId', user.id)
       .firstOrFail()
 
+    const todoTitle = todo.title
     await todo.delete()
+
+    await logFromContext(ctx, {
+      action: 'Deleted todo',
+      description: `${user.fullName} deleted todo — ${todoTitle}`,
+      status: 'success',
+      resource: 'Todos',
+    })
 
     return response.ok({ message: 'Todo deleted successfully' })
   }

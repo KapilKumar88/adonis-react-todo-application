@@ -216,6 +216,28 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/user_management/user_controller').default['destroy']>>>
     }
   }
+  'admin.activity_logs.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/activity-logs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/activity_logs/activity_logs_controller').default['index']>>>
+    }
+  }
+  'admin.activity_logs.export': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/activity-logs/export'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/activity_logs/activity_logs_controller').default['export']>>>
+    }
+  }
   'auth.new_account.store': {
     methods: ["POST"]
     pattern: '/api/v1/auth/signup'

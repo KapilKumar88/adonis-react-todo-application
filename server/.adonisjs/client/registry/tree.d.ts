@@ -34,6 +34,10 @@ export interface ApiDefinition {
       update: typeof routes['admin.user.update']
       destroy: typeof routes['admin.user.destroy']
     }
+    activityLogs: {
+      index: typeof routes['admin.activity_logs.index']
+      export: typeof routes['admin.activity_logs.export']
+    }
   }
   auth: {
     newAccount: {

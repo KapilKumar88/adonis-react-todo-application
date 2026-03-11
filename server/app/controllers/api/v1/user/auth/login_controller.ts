@@ -2,6 +2,7 @@ import User from '#models/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import UserTransformer from '#transformers/user_transformer'
 import { loginValidator } from '#validators/api/v1/user/auth'
+import { logActivity } from '#helpers/common.helper'
 
 export default class LoginController {
   async store({ request, serialize }: HttpContext) {
@@ -10,14 +11,35 @@ export default class LoginController {
     const user = await User.verifyCredentials(email, password)
     const token = await User.accessTokens.create(user)
 
+    await logActivity({
+      action: 'Logged in',
+      description: `${user.fullName} logged in`,
+      status: 'success',
+      resource: 'Auth',
+      userId: user.id,
+      ip: request.ip(),
+      userAgent: request.header('user-agent'),
+    })
+
     return serialize({
       user: UserTransformer.transform(user),
       token: token.value!.release(),
     })
   }
 
-  async destroy({ auth }: HttpContext) {
+  async destroy({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
+
+    await logActivity({
+      action: 'Logged out',
+      description: `${user.fullName} logged out`,
+      status: 'success',
+      resource: 'Auth',
+      userId: user.id,
+      ip: request.ip(),
+      userAgent: request.header('user-agent'),
+    })
+
     if (user.currentAccessToken) {
       await User.accessTokens.delete(user, user.currentAccessToken.identifier)
     }

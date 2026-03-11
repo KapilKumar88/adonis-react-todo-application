@@ -23,6 +23,8 @@ export type ScannedRoutes = {
     'admin.user.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.activity_logs.index': { paramsTuple?: []; params?: {} }
+    'admin.activity_logs.export': { paramsTuple?: []; params?: {} }
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
     'auth.access_token.store': { paramsTuple?: []; params?: {} }
     'auth.access_token.destroy': { paramsTuple?: []; params?: {} }
@@ -53,6 +55,8 @@ export type ScannedRoutes = {
     'admin.permission.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.index': { paramsTuple?: []; params?: {} }
     'admin.user.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.activity_logs.index': { paramsTuple?: []; params?: {} }
+    'admin.activity_logs.export': { paramsTuple?: []; params?: {} }
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'tags.tags.index': { paramsTuple?: []; params?: {} }
@@ -70,6 +74,8 @@ export type ScannedRoutes = {
     'admin.permission.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.index': { paramsTuple?: []; params?: {} }
     'admin.user.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.activity_logs.index': { paramsTuple?: []; params?: {} }
+    'admin.activity_logs.export': { paramsTuple?: []; params?: {} }
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'tags.tags.index': { paramsTuple?: []; params?: {} }

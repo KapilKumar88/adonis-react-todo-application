@@ -5,6 +5,7 @@ import app from '@adonisjs/core/services/app'
 import { randomUUID } from 'node:crypto'
 import { mkdir } from 'node:fs/promises'
 import { extname } from 'node:path'
+import { logFromContext } from '#helpers/common.helper'
 
 const UPLOAD_DIR = 'public/uploads/profiles'
 const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp']
@@ -15,7 +16,8 @@ export default class ProfileController {
     return serialize(UserTransformer.transform(auth.getUserOrFail()))
   }
 
-  async update({ auth, request, response, serialize }: HttpContext) {
+  async update(ctx: HttpContext) {
+    const { auth, request, response, serialize } = ctx
     const user = auth.getUserOrFail()
     const { fullName, bio } = await request.validateUsing(userProfileValidator)
 
@@ -48,6 +50,14 @@ export default class ProfileController {
     }
 
     await user.save()
+
+    await logFromContext(ctx, {
+      action: 'Updated profile',
+      description: `${user.fullName} updated profile`,
+      status: 'success',
+      resource: 'Profile',
+    })
+
     return serialize(UserTransformer.transform(user))
   }
 }

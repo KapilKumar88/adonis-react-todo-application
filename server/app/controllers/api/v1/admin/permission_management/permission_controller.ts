@@ -1,6 +1,7 @@
 import Permission from '#models/permission'
 import { createPermissionValidator } from '#validators/api/v1/admin/permission'
 import type { HttpContext } from '@adonisjs/core/http'
+import { logFromContext } from '#helpers/common.helper'
 
 export default class PermissionController {
   /**
@@ -22,10 +23,18 @@ export default class PermissionController {
    * POST /api/v1/admin/permissions
    * Create a new permission
    */
-  async store({ request, response }: HttpContext) {
+  async store(ctx: HttpContext) {
+    const { request, response } = ctx
     const payload = await request.validateUsing(createPermissionValidator)
 
     const permission = await Permission.create(payload)
+
+    await logFromContext(ctx, {
+      action: 'Created permission',
+      description: `${ctx.auth.user!.fullName} created permission — ${permission.displayName ?? permission.name}`,
+      status: 'success',
+      resource: 'Permissions',
+    })
 
     return response.created(permission)
   }
@@ -44,12 +53,20 @@ export default class PermissionController {
    * PUT /api/v1/admin/permissions/:id
    * Update an existing permission
    */
-  async update({ params, request, response }: HttpContext) {
+  async update(ctx: HttpContext) {
+    const { params, request, response } = ctx
     const permission = await Permission.findOrFail(params.id)
     const payload = await request.validateUsing(createPermissionValidator)
 
     permission.merge(payload)
     await permission.save()
+
+    await logFromContext(ctx, {
+      action: 'Updated permission',
+      description: `${ctx.auth.user!.fullName} updated permission — ${permission.displayName ?? permission.name}`,
+      status: 'success',
+      resource: 'Permissions',
+    })
 
     return response.ok(permission)
   }
@@ -58,9 +75,18 @@ export default class PermissionController {
    * DELETE /api/v1/admin/permissions/:id
    * Delete a permission
    */
-  async destroy({ params, response }: HttpContext) {
+  async destroy(ctx: HttpContext) {
+    const { params, response } = ctx
     const permission = await Permission.findOrFail(params.id)
+    const permName = permission.displayName ?? permission.name
     await permission.delete()
+
+    await logFromContext(ctx, {
+      action: 'Deleted permission',
+      description: `${ctx.auth.user!.fullName} deleted permission — ${permName}`,
+      status: 'success',
+      resource: 'Permissions',
+    })
 
     return response.ok({ message: 'Permission deleted successfully' })
   }

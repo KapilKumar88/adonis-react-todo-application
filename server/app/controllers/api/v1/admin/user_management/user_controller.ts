@@ -4,6 +4,7 @@ import { createUserValidator, updateUserValidator } from '#validators/api/v1/adm
 import stringHelpers from '@adonisjs/core/helpers/string'
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import { logFromContext } from '#helpers/common.helper'
 
 export default class UserController {
   /**
@@ -27,7 +28,8 @@ export default class UserController {
    * POST /api/v1/admin/users
    * Create a new user
    */
-  async store({ request, response }: HttpContext) {
+  async store(ctx: HttpContext) {
+    const { request, response } = ctx
     const trx = await db.transaction()
     try {
       const payload = await request.validateUsing(createUserValidator)
@@ -41,6 +43,14 @@ export default class UserController {
 
       await user.related('roles').attach([payload.roleId])
       await trx.commit()
+
+      await logFromContext(ctx, {
+        action: 'Created user',
+        description: `${ctx.auth.user!.fullName} created user — ${user.fullName}`,
+        status: 'success',
+        resource: 'Users',
+      })
+
       return response.created(UserForAdminTransformer.transform(user))
     } catch (error) {
       await trx.rollback()
@@ -65,7 +75,8 @@ export default class UserController {
    * PUT /api/v1/admin/users/:id
    * Update an existing user
    */
-  async update({ params, request, response }: HttpContext) {
+  async update(ctx: HttpContext) {
+    const { params, request, response } = ctx
     const user = await User.findOrFail(params.id)
     const { roleId, ...payload } = await request.validateUsing(updateUserValidator)
 
@@ -87,6 +98,13 @@ export default class UserController {
     await user.save()
     await user.related('roles').sync([roleId])
 
+    await logFromContext(ctx, {
+      action: 'Updated user',
+      description: `${ctx.auth.user!.fullName} updated user — ${user.fullName}`,
+      status: 'success',
+      resource: 'Users',
+    })
+
     return response.ok(UserForAdminTransformer.transform(user))
   }
 
@@ -94,9 +112,18 @@ export default class UserController {
    * DELETE /api/v1/admin/users/:id
    * Delete a user
    */
-  async destroy({ params, response }: HttpContext) {
+  async destroy(ctx: HttpContext) {
+    const { params, response } = ctx
     const user = await User.findOrFail(params.id)
+    const userName = user.fullName
     await user.delete()
+
+    await logFromContext(ctx, {
+      action: 'Deleted user',
+      description: `${ctx.auth.user!.fullName} deleted user — ${userName}`,
+      status: 'success',
+      resource: 'Users',
+    })
 
     return response.ok({ message: 'User deleted successfully' })
   }
