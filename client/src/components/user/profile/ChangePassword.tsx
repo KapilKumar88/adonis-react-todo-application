@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { InferType } from 'yup';
+import { useMutation } from '@tanstack/react-query';
 import { Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { changePasswordSchema } from '@/validations/user/profile.validation';
+import { userProfileService } from '@/services/user/profile.service';
 
 type ChangePasswordFormValues = InferType<typeof changePasswordSchema>;
 
@@ -26,10 +28,23 @@ export default function ChangePassword() {
         defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
     });
 
-    const onSubmit = (_values: ChangePasswordFormValues) => {
-        // TODO: Call change-password API once the server endpoint is implemented
-        toast({ title: 'Coming soon', description: 'Change password feature is not yet available.' });
-        reset();
+    const { mutate: changePassword, isPending } = useMutation({
+        mutationFn: userProfileService.changePassword,
+        onSuccess: (data) => {
+            toast({ title: 'Password changed', description: data.message });
+            reset();
+        },
+        onError: (error: Error) => {
+            toast({
+                title: 'Failed to change password',
+                description: error.message ?? 'Could not change password.',
+                variant: 'destructive',
+            });
+        },
+    });
+
+    const onSubmit = (values: ChangePasswordFormValues) => {
+        changePassword(values);
     };
 
     return (
@@ -65,7 +80,9 @@ export default function ChangePassword() {
                         {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
                     </div>
 
-                    <Button type="submit">Update Password</Button>
+                    <Button type="submit" disabled={isPending}>
+                        {isPending ? 'Updating...' : 'Update Password'}
+                    </Button>
                 </form>
             </CardContent>
         </Card>

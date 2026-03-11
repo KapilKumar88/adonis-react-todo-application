@@ -28,6 +28,7 @@ export default Object.freeze({
   USER: {
     PROFILE: '/api/v1/profile',
     UPDATE_PROFILE: '/api/v1/profile',
+    CHANGE_PASSWORD: '/api/v1/profile/change-password',
 
     AUTH: {
       LOGIN: '/api/v1/auth/login',

@@ -18,4 +18,9 @@ export const userProfileService = {
     updateProfile: async (formData: FormData): Promise<UserDetails> => {
         return apiClient.put<UserDetails>(apiConstant.USER.UPDATE_PROFILE, formData);
     },
+
+    /** PUT /api/v1/profile/change-password */
+    changePassword: async (payload: { currentPassword: string; newPassword: string; confirmPassword: string }): Promise<{ message: string }> => {
+        return apiClient.put<{ message: string }>(apiConstant.USER.CHANGE_PASSWORD, payload);
+    },
 };
