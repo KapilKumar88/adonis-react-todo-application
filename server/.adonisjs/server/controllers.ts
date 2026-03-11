@@ -4,10 +4,12 @@
  */
 
 export const controllers = {
-  AccessToken: () => import('#controllers/access_token_controller'),
   api: {
     v1: {
       admin: {
+        activityLogs: {
+          ActivityLogs: () => import('#controllers/api/v1/admin/activity_logs/activity_logs_controller'),
+        },
         auth: {
           Login: () => import('#controllers/api/v1/admin/auth/login_controller'),
         },
@@ -21,9 +23,21 @@ export const controllers = {
           User: () => import('#controllers/api/v1/admin/user_management/user_controller'),
         },
       },
+      user: {
+        auth: {
+          ForgotPasswords: () => import('#controllers/api/v1/user/auth/forgot_passwords_controller'),
+          Login: () => import('#controllers/api/v1/user/auth/login_controller'),
+          NewAccount: () => import('#controllers/api/v1/user/auth/new_account_controller'),
+        },
+        Profile: () => import('#controllers/api/v1/user/profile_controller'),
+        tagManagement: {
+          Tags: () => import('#controllers/api/v1/user/tag_management/tags_controller'),
+        },
+        todoManagement: {
+          Todos: () => import('#controllers/api/v1/user/todo_management/todos_controller'),
+        },
+      },
     },
   },
   Docs: () => import('#controllers/docs_controller'),
-  NewAccount: () => import('#controllers/new_account_controller'),
-  Profile: () => import('#controllers/profile_controller'),
 }

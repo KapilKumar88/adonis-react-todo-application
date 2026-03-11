@@ -21,6 +21,7 @@ const AccessTokenController = () => import('#controllers/api/v1/user/auth/login_
 const ForgotPasswordsController = () => import('#controllers/api/v1/user/auth/forgot_passwords_controller')
 const TagsController = () => import('#controllers/api/v1/user/tag_management/tags_controller')
 const TodosController = () => import('#controllers/api/v1/user/todo_management/todos_controller')
+const ProfileController = () => import('#controllers/api/v1/user/profile_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -95,13 +96,15 @@ router
       .prefix('auth')
       .as('auth')
 
-    // router
-    //   .group(() => {
-    //     router.get('/profile', [controllers.Profile, 'show'])
-    //   })
-    //   .prefix('account')
-    //   .as('profile')
-    //   .use(middleware.auth())
+    // Profile — protected
+    router
+      .group(() => {
+        router.get('/', [ProfileController, 'show'])
+        router.put('/', [ProfileController, 'update'])
+      })
+      .prefix('profile')
+      .as('profile')
+      .use(middleware.auth())
 
     // Tags management — protected
     router

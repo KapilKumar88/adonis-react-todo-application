@@ -22,6 +22,23 @@ export type ScannedRoutes = {
     'admin.user.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'auth.new_account.store': { paramsTuple?: []; params?: {} }
+    'auth.access_token.store': { paramsTuple?: []; params?: {} }
+    'auth.access_token.destroy': { paramsTuple?: []; params?: {} }
+    'auth.forgot_passwords.store': { paramsTuple?: []; params?: {} }
+    'auth.forgot_passwords.update': { paramsTuple?: []; params?: {} }
+    'profile.profile.show': { paramsTuple?: []; params?: {} }
+    'profile.profile.update': { paramsTuple?: []; params?: {} }
+    'tags.tags.index': { paramsTuple?: []; params?: {} }
+    'tags.tags.store': { paramsTuple?: []; params?: {} }
+    'tags.tags.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'tags.tags.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'tags.tags.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.todos.index': { paramsTuple?: []; params?: {} }
+    'todos.todos.store': { paramsTuple?: []; params?: {} }
+    'todos.todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.todos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.todos.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'docs.ui': { paramsTuple?: []; params?: {} }
@@ -32,6 +49,11 @@ export type ScannedRoutes = {
     'admin.permission.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.index': { paramsTuple?: []; params?: {} }
     'admin.user.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'profile.profile.show': { paramsTuple?: []; params?: {} }
+    'tags.tags.index': { paramsTuple?: []; params?: {} }
+    'tags.tags.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.todos.index': { paramsTuple?: []; params?: {} }
+    'todos.todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'docs.ui': { paramsTuple?: []; params?: {} }
@@ -42,22 +64,39 @@ export type ScannedRoutes = {
     'admin.permission.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.index': { paramsTuple?: []; params?: {} }
     'admin.user.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'profile.profile.show': { paramsTuple?: []; params?: {} }
+    'tags.tags.index': { paramsTuple?: []; params?: {} }
+    'tags.tags.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.todos.index': { paramsTuple?: []; params?: {} }
+    'todos.todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'admin.login.login': { paramsTuple?: []; params?: {} }
     'admin.roles.store': { paramsTuple?: []; params?: {} }
     'admin.permission.store': { paramsTuple?: []; params?: {} }
     'admin.user.store': { paramsTuple?: []; params?: {} }
+    'auth.new_account.store': { paramsTuple?: []; params?: {} }
+    'auth.access_token.store': { paramsTuple?: []; params?: {} }
+    'auth.access_token.destroy': { paramsTuple?: []; params?: {} }
+    'auth.forgot_passwords.store': { paramsTuple?: []; params?: {} }
+    'auth.forgot_passwords.update': { paramsTuple?: []; params?: {} }
+    'tags.tags.store': { paramsTuple?: []; params?: {} }
+    'todos.todos.store': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'admin.roles.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.permission.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'profile.profile.update': { paramsTuple?: []; params?: {} }
+    'tags.tags.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.todos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'admin.roles.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.permission.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'tags.tags.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.todos.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

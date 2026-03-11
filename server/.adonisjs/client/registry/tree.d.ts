@@ -32,4 +32,41 @@ export interface ApiDefinition {
       destroy: typeof routes['admin.user.destroy']
     }
   }
+  auth: {
+    newAccount: {
+      store: typeof routes['auth.new_account.store']
+    }
+    accessToken: {
+      store: typeof routes['auth.access_token.store']
+      destroy: typeof routes['auth.access_token.destroy']
+    }
+    forgotPasswords: {
+      store: typeof routes['auth.forgot_passwords.store']
+      update: typeof routes['auth.forgot_passwords.update']
+    }
+  }
+  profile: {
+    profile: {
+      show: typeof routes['profile.profile.show']
+      update: typeof routes['profile.profile.update']
+    }
+  }
+  tags: {
+    tags: {
+      index: typeof routes['tags.tags.index']
+      store: typeof routes['tags.tags.store']
+      show: typeof routes['tags.tags.show']
+      update: typeof routes['tags.tags.update']
+      destroy: typeof routes['tags.tags.destroy']
+    }
+  }
+  todos: {
+    todos: {
+      index: typeof routes['todos.todos.index']
+      store: typeof routes['todos.todos.store']
+      show: typeof routes['todos.todos.show']
+      update: typeof routes['todos.todos.update']
+      destroy: typeof routes['todos.todos.destroy']
+    }
+  }
 }
