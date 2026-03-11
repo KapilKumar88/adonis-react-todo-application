@@ -12,15 +12,22 @@ export interface User {
   lastLogin?: string;
 }
 
+export interface TodoTag {
+  id: string;
+  name: string;
+  color: string | null;
+  type: string;
+  createdAt: string;
+}
+
 export interface Todo {
   id: string;
-  userId: string;
   title: string;
-  description?: string;
-  status: 'pending' | 'in-progress' | 'completed';
+  description: string | null;
+  status: 'pending' | 'in_progress' | 'completed' | 'backlog' | 'icebox';
   priority: 'low' | 'medium' | 'high';
-  dueDate?: string;
-  tags?: string[];
+  dueDate: string | null;
+  tags: TodoTag[];
   createdAt: string;
   updatedAt: string;
 }
