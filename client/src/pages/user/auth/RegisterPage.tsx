@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import AppLogo from '@/components/common/AppLogo';
 import { tokenStorage } from '@/lib/api-client';
 import { useUserProfile } from '@/context/UserProfileContext';
+import LoadingButton from '@/components/common/LoadingButton';
 
 type SignupFormValues = InferType<typeof signupSchema>;
 
@@ -83,12 +84,12 @@ const RegisterPage: React.FC = () => {
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name</Label>
               <Input id="fullName" placeholder="John Doe" {...register('fullName')} />
-              {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
+              {errors?.fullName && <p className="text-sm text-destructive">{errors?.fullName?.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="you@example.com" {...register('email')} />
-              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+              {errors?.email && <p className="text-sm text-destructive">{errors?.email?.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -98,7 +99,7 @@ const RegisterPage: React.FC = () => {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+              {errors?.password && <p className="text-sm text-destructive">{errors?.password?.message}</p>}
               {strength && (
                 <div className="space-y-1">
                   <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -111,20 +112,19 @@ const RegisterPage: React.FC = () => {
             <div className="space-y-2">
               <Label htmlFor="passwordConfirmation">Confirm Password</Label>
               <Input id="passwordConfirmation" type="password" placeholder="••••••••" {...register('passwordConfirmation')} />
-              {errors.passwordConfirmation && <p className="text-sm text-destructive">{errors.passwordConfirmation.message}</p>}
+              {errors?.passwordConfirmation && <p className="text-sm text-destructive">{errors?.passwordConfirmation?.message}</p>}
             </div>
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
                 <Checkbox id="terms" checked={termsValue} onCheckedChange={v => setValue('terms', v === true, { shouldValidate: true })} />
                 <Label htmlFor="terms" className="text-sm font-normal">I agree to the Terms & Conditions</Label>
               </div>
-              {errors.terms && <p className="text-sm text-destructive">{errors.terms.message}</p>}
+              {errors?.terms && <p className="text-sm text-destructive">{errors?.terms?.message}</p>}
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? 'Creating account...' : 'Create Account'}
-            </Button>
+            <LoadingButton type="submit" className="w-full" isLoading={isPending} disabled={isPending} label={isPending ? 'Creating account...' : 'Create Account'} />
+
             <p className="text-sm text-muted-foreground">
               Already have an account?{' '}
               <Link to="/login" className="text-primary hover:underline">Sign in</Link>

@@ -1,6 +1,5 @@
+import REGEX from '@/constants/regex.constant';
 import * as yup from 'yup';
-
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
 
 export const loginSchema = yup.object({
   email: yup
@@ -32,8 +31,8 @@ export const signupSchema = yup.object({
     .min(8, 'Password must be at least 8 characters.')
     .max(32, 'Password must be at most 32 characters.')
     .matches(
-      passwordRegex,
-      'Password must contain uppercase, lowercase, number, and special character.'
+      REGEX.PASSWORD_REGEX.PATTERN,
+      REGEX.PASSWORD_REGEX.MESSAGE
     )
     .required('Password is required.'),
   passwordConfirmation: yup

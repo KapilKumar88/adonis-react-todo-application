@@ -17,6 +17,7 @@ import { ApiLoginResponse } from '@/types/api.types';
 import AppLogo from '@/components/common/AppLogo';
 import { tokenStorage } from '@/lib/api-client';
 import { useUserProfile } from '@/context/UserProfileContext';
+import LoadingButton from '@/components/common/LoadingButton';
 
 type LoginFormValues = InferType<typeof loginSchema>;
 
@@ -68,7 +69,7 @@ const LoginPage: React.FC = () => {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="you@example.com" {...register('email')} />
-              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+              {errors?.email && <p className="text-sm text-destructive">{errors?.email?.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -78,7 +79,7 @@ const LoginPage: React.FC = () => {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+              {errors?.password && <p className="text-sm text-destructive">{errors?.password?.message}</p>}
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -89,9 +90,7 @@ const LoginPage: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? 'Signing in...' : 'Sign In'}
-            </Button>
+            <LoadingButton type="submit" className="w-full" isLoading={isPending} disabled={isPending} label={isPending ? 'Signing in...' : 'Sign In'} />
             <p className="text-sm text-muted-foreground">
               Don't have an account?{' '}
               <Link to="/register" className="text-primary hover:underline">Sign up</Link>
