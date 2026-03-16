@@ -1,6 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Todo from '#models/todo'
-import TodoTransformer from '#transformers/todo_transformer'
 import db from '@adonisjs/lucid/services/db'
 
 export default class DashboardController {
@@ -25,11 +24,11 @@ export default class DashboardController {
 
       Todo.query()
         .where('userId', user.id)
-        .preload('tags')
+        .select('id', 'title', 'priority', 'status', 'updated_at')
         .orderBy('updated_at', 'desc')
         .limit(5),
     ])
-
+    
     return response.ok({
       stats: {
         total: statsResult?.total ?? 0,
