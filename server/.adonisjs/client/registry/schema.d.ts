@@ -273,7 +273,7 @@ export interface Registry {
   }
   'auth.forgot_passwords.store': {
     methods: ["POST"]
-    pattern: '/api/v1/auth/forgot-password'
+    pattern: '/api/v1/auth/forgot-creds'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/api/v1/user/auth').forgotPasswordValidator)>>
       paramsTuple: []
@@ -284,7 +284,7 @@ export interface Registry {
   }
   'auth.forgot_passwords.update': {
     methods: ["POST"]
-    pattern: '/api/v1/auth/reset-password'
+    pattern: '/api/v1/auth/reset-creds'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/api/v1/user/auth').resetPasswordValidator)>>
       paramsTuple: []

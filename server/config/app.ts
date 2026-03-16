@@ -10,6 +10,7 @@ import { defineConfig } from '@adonisjs/core/http'
  * changed. Therefore it is recommended to keep the app key secure.
  */
 export const appKey = env.get('APP_KEY')
+export const appName = env.get('APP_NAME')
 
 /**
  * The app URL can be used in various places where you want to create absolute

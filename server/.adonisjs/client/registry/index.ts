@@ -152,14 +152,14 @@ const routes = {
   },
   'auth.forgot_passwords.store': {
     methods: ["POST"],
-    pattern: '/api/v1/auth/forgot-password',
-    tokens: [{"old":"/api/v1/auth/forgot-password","type":0,"val":"api","end":""},{"old":"/api/v1/auth/forgot-password","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/forgot-password","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/forgot-password","type":0,"val":"forgot-password","end":""}],
+    pattern: '/api/v1/auth/forgot-creds',
+    tokens: [{"old":"/api/v1/auth/forgot-creds","type":0,"val":"api","end":""},{"old":"/api/v1/auth/forgot-creds","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/forgot-creds","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/forgot-creds","type":0,"val":"forgot-creds","end":""}],
     types: placeholder as Registry['auth.forgot_passwords.store']['types'],
   },
   'auth.forgot_passwords.update': {
     methods: ["POST"],
-    pattern: '/api/v1/auth/reset-password',
-    tokens: [{"old":"/api/v1/auth/reset-password","type":0,"val":"api","end":""},{"old":"/api/v1/auth/reset-password","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/reset-password","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/reset-password","type":0,"val":"reset-password","end":""}],
+    pattern: '/api/v1/auth/reset-creds',
+    tokens: [{"old":"/api/v1/auth/reset-creds","type":0,"val":"api","end":""},{"old":"/api/v1/auth/reset-creds","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/reset-creds","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/reset-creds","type":0,"val":"reset-creds","end":""}],
     types: placeholder as Registry['auth.forgot_passwords.update']['types'],
   },
   'profile.profile.show': {

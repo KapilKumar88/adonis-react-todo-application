@@ -13,6 +13,9 @@ export const controllers = {
         auth: {
           Login: () => import('#controllers/api/v1/admin/auth/login_controller'),
         },
+        dashboard: {
+          Dashboard: () => import('#controllers/api/v1/admin/dashboard/dashboard_controller'),
+        },
         permissionManagement: {
           Permission: () => import('#controllers/api/v1/admin/permission_management/permission_controller'),
         },
@@ -22,15 +25,15 @@ export const controllers = {
         userManagement: {
           User: () => import('#controllers/api/v1/admin/user_management/user_controller'),
         },
-        dashboard: {
-          Dashboard: () => import('#controllers/api/v1/admin/dashboard/dashboard_controller'),
-        },
       },
       user: {
         auth: {
           ForgotPasswords: () => import('#controllers/api/v1/user/auth/forgot_passwords_controller'),
           Login: () => import('#controllers/api/v1/user/auth/login_controller'),
           NewAccount: () => import('#controllers/api/v1/user/auth/new_account_controller'),
+        },
+        dashboard: {
+          Dashboard: () => import('#controllers/api/v1/user/dashboard/dashboard_controller'),
         },
         profile: {
           ChangePasswords: () => import('#controllers/api/v1/user/profile/change_passwords_controller'),
@@ -41,9 +44,6 @@ export const controllers = {
         },
         todoManagement: {
           Todos: () => import('#controllers/api/v1/user/todo_management/todos_controller'),
-        },
-        dashboard: {
-          Dashboard: () => import('#controllers/api/v1/user/dashboard/dashboard_controller'),
         },
       },
     },

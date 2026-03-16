@@ -4,8 +4,9 @@ import { DateTime } from 'luxon'
 import User from '#models/user'
 import PasswordResetToken from '#models/password_reset_token'
 import hash from '@adonisjs/core/services/hash'
+import mail from '@adonisjs/mail/services/main'
 import { forgotPasswordValidator, resetPasswordValidator } from '#validators/api/v1/user/auth'
-import logger from '@adonisjs/core/services/logger'
+import ResetPasswordNotification from '#mails/reset_password_notification'
 
 export default class ForgotPasswordsController {
   /**
@@ -32,10 +33,13 @@ export default class ForgotPasswordsController {
         expiresAt: DateTime.now().plus({ hours: 1 }),
       })
 
-      // TODO: Replace with actual email sending (e.g. @adonisjs/mail)
-      logger.info(
-        { email, token: plainToken },
-        'Password reset token generated. Use this token to reset password.'
+      // Send password reset email
+      mail.send(
+        new ResetPasswordNotification({
+          email,
+          token: plainToken,
+          userName: user?.fullName,
+        })
       )
     }
 

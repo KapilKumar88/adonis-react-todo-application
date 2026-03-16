@@ -5,8 +5,8 @@
 
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
-import type AdminUserForAdminTransformer from '#transformers/admin/user_for_admin_transformer'
 import type AdminActivityLogTransformer from '#transformers/admin/activity_log_transformer'
+import type AdminUserForAdminTransformer from '#transformers/admin/user_for_admin_transformer'
 import type RoleTransformer from '#transformers/role_transformer'
 import type TagTransformer from '#transformers/tag_transformer'
 import type TodoTransformer from '#transformers/todo_transformer'
@@ -14,13 +14,13 @@ import type UserTransformer from '#transformers/user_transformer'
 
 export namespace Data {
   export namespace Admin {
-    export type UserForAdmin = InferData<AdminUserForAdminTransformer>
-    export namespace UserForAdmin {
-      export type Variants = InferVariants<AdminUserForAdminTransformer>
-    }
     export type ActivityLog = InferData<AdminActivityLogTransformer>
     export namespace ActivityLog {
       export type Variants = InferVariants<AdminActivityLogTransformer>
+    }
+    export type UserForAdmin = InferData<AdminUserForAdminTransformer>
+    export namespace UserForAdmin {
+      export type Variants = InferVariants<AdminUserForAdminTransformer>
     }
   }
   export type Role = InferData<RoleTransformer>
