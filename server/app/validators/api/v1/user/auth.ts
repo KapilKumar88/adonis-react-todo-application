@@ -38,7 +38,6 @@ export const forgotPasswordValidator = vine.create({
  */
 export const resetPasswordValidator = vine.create({
     token: vine.string().trim(),
-    email: email(),
     password: password(),
     passwordConfirmation: password().sameAs('password'),
 })

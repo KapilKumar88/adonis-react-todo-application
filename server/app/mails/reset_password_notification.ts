@@ -24,7 +24,7 @@ export default class ResetPasswordNotification extends BaseMail {
    */
   prepare() {
     const frontendUrl = env.get('FRONTEND_URL')
-    const resetUrl = `${frontendUrl}/reset-password?token=${encodeURIComponent(this.data.token)}&email=${encodeURIComponent(this.data.email)}`
+    const resetUrl = `${frontendUrl}/reset-password?token=${encodeURIComponent(this.data.token)}`
     const displayName = this.data.userName ?? 'there'
 
     this.message

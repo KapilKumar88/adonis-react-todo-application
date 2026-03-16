@@ -7,6 +7,7 @@ import hash from '@adonisjs/core/services/hash'
 import mail from '@adonisjs/mail/services/main'
 import { forgotPasswordValidator, resetPasswordValidator } from '#validators/api/v1/user/auth'
 import ResetPasswordNotification from '#mails/reset_password_notification'
+import encryption from '@adonisjs/core/services/encryption'
 
 export default class ForgotPasswordsController {
   /**
@@ -27,17 +28,25 @@ export default class ForgotPasswordsController {
       const plainToken = randomBytes(32).toString('hex')
       const hashedToken = await hash.make(plainToken)
 
+      const encryptedToken = encryption.encrypt({
+        email,
+        token: hashedToken,
+      }, {
+        expiresIn: '1h',
+        purpose: 'password-reset',
+      })
+
       await PasswordResetToken.create({
         email,
         token: hashedToken,
-        expiresAt: DateTime.now().plus({ hours: 1 }),
+        expiresAt: DateTime.now().plus({ hours: 1 })
       })
 
       // Send password reset email
       mail.send(
         new ResetPasswordNotification({
           email,
-          token: plainToken,
+          token: encryptedToken,
           userName: user?.fullName,
         })
       )
@@ -54,7 +63,16 @@ export default class ForgotPasswordsController {
    * Verifies the token and updates the user's password.
    */
   async update({ request, response }: HttpContext) {
-    const { token, email, password } = await request.validateUsing(resetPasswordValidator)
+    const { token, password } = await request.validateUsing(resetPasswordValidator)
+    const decrypted = encryption.decrypt<{ email: string; token: string }>(token, 'password-reset')
+
+    if (!decrypted) {
+      return response.unprocessableEntity({
+        message: 'Invalid or expired reset token.',
+      })
+    }
+
+    const { email, token: hashedToken } = decrypted
 
     const resetToken = await PasswordResetToken.query()
       .where('email', email)
@@ -75,9 +93,8 @@ export default class ForgotPasswordsController {
       })
     }
 
-    // Verify the token
-    const isValid = await hash.verify(resetToken.token, token)
-    if (!isValid) {
+    // Verify the token matches the one stored in DB
+    if (resetToken.token !== hashedToken) {
       return response.unprocessableEntity({
         message: 'Invalid or expired reset token.',
       })
