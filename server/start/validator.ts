@@ -30,6 +30,8 @@ vine.messagesProvider = new SimpleMessagesProvider({
   // Field-specific messages override global messages
   'password.regex': '{{ field }} must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
   'passwordConfirmation.regex': '{{ field }} must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+  'newPassword.regex': '{{ field }} must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+  'confirmPassword.regex': '{{ field }} must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
 })
 
 VineDate.transform((value) => DateTime.fromJSDate(value))

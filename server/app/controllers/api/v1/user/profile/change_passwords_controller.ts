@@ -19,7 +19,7 @@ export default class ChangePasswordsController {
     user.password = newPassword
     await user.save()
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Changed password',
       description: `${user.fullName} changed password`,
       status: 'success',

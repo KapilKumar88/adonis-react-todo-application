@@ -4,7 +4,7 @@ import vine from '@vinejs/vine'
  * Shared rules for email and password.
  */
 const email = () => vine.string().trim().email().maxLength(254);
-const password = () => vine.string().trim().minLength(8).maxLength(32)
+export const passwordRules = () => vine.string().trim().minLength(8).maxLength(32)
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/); //'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
 
 /**
@@ -13,8 +13,8 @@ const password = () => vine.string().trim().minLength(8).maxLength(32)
 export const signupValidator = vine.create({
     fullName: vine.string().trim().alphaNumeric({ allowDashes: true, allowSpaces: true }).minLength(3).maxLength(100),
     email: email().unique({ table: 'users', column: 'email' }),
-    password: password(),
-    passwordConfirmation: password().sameAs('password'),
+    password: passwordRules(),
+    passwordConfirmation: passwordRules().sameAs('password'),
 })
 
 /**
@@ -38,6 +38,6 @@ export const forgotPasswordValidator = vine.create({
  */
 export const resetPasswordValidator = vine.create({
     token: vine.string().trim(),
-    password: password(),
-    passwordConfirmation: password().sameAs('password'),
+    password: passwordRules(),
+    passwordConfirmation: passwordRules().sameAs('password'),
 })

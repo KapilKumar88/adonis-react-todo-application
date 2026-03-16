@@ -1231,6 +1231,64 @@ paths:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
 
+  /profile/change-creds:
+    put:
+      tags:
+        - Profile
+      summary: User can change password
+      operationId: changePassword
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+                - confirmPassword
+              properties:
+                currentPassword:
+                  type: string
+                  example: OldSecret@123
+                newPassword:
+                  type: string
+                  minLength: 8
+                  maxLength: 32
+                  example: NewSecret@123
+                confirmPassword:
+                  type: string
+                  minLength: 8
+                  maxLength: 32
+                  example: NewSecret@123
+      responses:
+        "200":
+          description: Password Changed Successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          description: Something went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
   # ─── Tags ──────────────────────────────────────────────────────────────────────
 
   /tags:
