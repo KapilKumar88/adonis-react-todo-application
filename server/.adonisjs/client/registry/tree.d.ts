@@ -73,7 +73,6 @@ export interface ApiDefinition {
     tags: {
       index: typeof routes['tags.tags.index']
       store: typeof routes['tags.tags.store']
-      show: typeof routes['tags.tags.show']
       update: typeof routes['tags.tags.update']
       destroy: typeof routes['tags.tags.destroy']
     }

@@ -7,6 +7,8 @@ import Role from '#models/role'
 import db from '@adonisjs/lucid/services/db'
 import mail from '@adonisjs/mail/services/main'
 import WelcomeNotification from '#mails/welcome_notification'
+import SystemDefaultTags from '#constants/defaultTags.constants'
+import Tag from '#models/tag'
 
 export default class NewAccountController {
   async store({ request, serialize, response }: HttpContext) {
@@ -19,6 +21,7 @@ export default class NewAccountController {
       })
       const role = await Role.query({ client: trx }).where('name', DefaultSystemRoles.USER).preload('permissions', (qb) => qb.select('name')).firstOrFail()
       await user.related('roles').attach([role.id]) // Assign default 'user' role to the new account
+      await Tag.createMany(SystemDefaultTags.map(tag => ({ ...tag, userId: user.id })), { client: trx })
 
       await trx.commit()
 

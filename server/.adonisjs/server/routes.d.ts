@@ -37,8 +37,7 @@ export type ScannedRoutes = {
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'tags.tags.index': { paramsTuple?: []; params?: {} }
     'tags.tags.store': { paramsTuple?: []; params?: {} }
-    'tags.tags.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'tags.tags.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'tags.tags.update': { paramsTuple?: []; params?: {} }
     'tags.tags.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.todos.index': { paramsTuple?: []; params?: {} }
     'todos.todos.store': { paramsTuple?: []; params?: {} }
@@ -62,7 +61,6 @@ export type ScannedRoutes = {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'tags.tags.index': { paramsTuple?: []; params?: {} }
-    'tags.tags.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.todos.index': { paramsTuple?: []; params?: {} }
     'todos.todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
@@ -82,7 +80,6 @@ export type ScannedRoutes = {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'tags.tags.index': { paramsTuple?: []; params?: {} }
-    'tags.tags.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.todos.index': { paramsTuple?: []; params?: {} }
     'todos.todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
@@ -105,7 +102,7 @@ export type ScannedRoutes = {
     'admin.user.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.profile.update': { paramsTuple?: []; params?: {} }
     'profile.change_passwords.update': { paramsTuple?: []; params?: {} }
-    'tags.tags.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'tags.tags.update': { paramsTuple?: []; params?: {} }
     'todos.todos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {

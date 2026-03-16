@@ -134,9 +134,8 @@ router
       router
         .group(() => {
           router.get('/', [TagsController, 'index'])
-          router.post('/', [TagsController, 'store'])
-          router.get('/:id', [TagsController, 'show'])
-          router.put('/:id', [TagsController, 'update'])
+          router.post('/create', [TagsController, 'store'])
+          router.put('/update', [TagsController, 'update'])
           router.delete('/:id', [TagsController, 'destroy'])
         })
         .prefix('tags')

@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Tag from '#models/tag'
 import { createTagValidator, updateTagValidator } from '#validators/api/v1/user/tag'
-import TagTransformer from '#transformers/tag_transformer'
 
 export default class TagsController {
   /**
@@ -14,16 +13,23 @@ export default class TagsController {
       .where('userId', user.id)
       .orderBy('name', 'asc')
 
-    return response.ok(tags.map((tag) => TagTransformer.transform(tag)))
+    return response.ok({
+      data: tags,
+      message: 'Tags retrieved successfully'
+    })
   }
 
   /**
-   * POST /api/v1/tags
+   * POST /api/v1/tags/create
    * Create a new tag
    */
   async store({ auth, request, response }: HttpContext) {
     const user = auth.getUserOrFail()
-    const payload = await request.validateUsing(createTagValidator)
+    const payload = await request.validateUsing(createTagValidator, {
+      meta: {
+        userId: user.id,
+      }
+    })
 
     const tag = await Tag.create({
       ...payload,
@@ -31,39 +37,51 @@ export default class TagsController {
       userId: user.id,
     })
 
-    return response.created(TagTransformer.transform(tag))
+    return response.created({
+      data: tag,
+      message: 'Tag created successfully'
+    })
   }
 
   /**
-   * GET /api/v1/tags/:id
-   * Show a single tag
-   */
-  async show({ auth, params, response }: HttpContext) {
-    const user = auth.getUserOrFail()
-    const tag = await Tag.query()
-      .where('id', params.id)
-      .where('userId', user.id)
-      .firstOrFail()
-
-    return response.ok(TagTransformer.transform(tag))
-  }
-
-  /**
-   * PUT /api/v1/tags/:id
+   * PUT /api/v1/tags/update
    * Update a tag
    */
-  async update({ auth, params, request, response }: HttpContext) {
+  async update({ auth, request, response }: HttpContext) {
     const user = auth.getUserOrFail()
+    const payload = await request.validateUsing(updateTagValidator, {
+      meta: {
+        userId: user.id,
+      }
+    });
+
+
+
     const tag = await Tag.query()
-      .where('id', params.id)
+      .where('id', payload.id)
       .where('userId', user.id)
       .firstOrFail()
 
-    const payload = await request.validateUsing(updateTagValidator)
+    if (tag?.type === 'system') {
+      return response.badRequest({
+        message: 'System tags cannot be updated'
+      })
+    }
+
     tag.merge(payload)
     await tag.save()
 
-    return response.ok(TagTransformer.transform(tag))
+    return response.ok({
+      data: {
+        id: tag.id,
+        name: tag.name,
+        color: tag.color,
+        type: tag.type,
+        createdAt: tag.createdAt,
+        updatedAt: tag.updatedAt,
+      },
+      message: 'Tag updated successfully'
+    })
   }
 
   /**
@@ -75,6 +93,7 @@ export default class TagsController {
     const tag = await Tag.query()
       .where('id', params.id)
       .where('userId', user.id)
+      .where('type', 'custom') // Only allow deletion of custom tags
       .firstOrFail()
 
     await tag.delete()

@@ -352,6 +352,10 @@ components:
           nullable: true
           pattern: "^#[0-9a-fA-F]{6}$"
           example: "#ef4444"
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
 
     Todo:
       type: object
@@ -1289,7 +1293,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
 
-
   # ─── Dashboard ─────────────────────────────────────────────────────────────────────
 
   /dashboard:
@@ -1344,8 +1347,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
-  
-  
+
   # ─── Tags ──────────────────────────────────────────────────────────────────────
 
   /tags:
@@ -1362,11 +1364,34 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Tag"
+                type: Object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Tag"
+                  message:
+                    type: string
+                    example: Tags retrieved successfully
+        "400":
+          description: Something went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /tags/create:
     post:
       tags:
         - Tags
@@ -1386,43 +1411,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Tag"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Tag"
+                  message:
+                    type: string
+                    example: Tag created successfully
+        "400":
+          description: Something went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "422":
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
-
-  /tags/{id}:
-    parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-          format: uuid
-        example: 550e8400-e29b-41d4-a716-446655440000
-    get:
-      tags:
-        - Tags
-      summary: Get a single tag
-      operationId: getTag
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: Tag details
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Tag"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Tag not found
+                $ref: "#/components/schemas/InternalServerError"
+  /tags/update:
     put:
       tags:
         - Tags
@@ -1442,17 +1462,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Tag"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Tag"
+                  message:
+                    type: string
+                    example: Tag updated successfully
+        "400":
+          description: Something went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Tag not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "422":
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /tags/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
     delete:
       tags:
         - Tags
@@ -1469,8 +1524,22 @@ paths:
                 $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Tag not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   # ─── Todos ─────────────────────────────────────────────────────────────────────
 

@@ -200,20 +200,14 @@ const routes = {
   },
   'tags.tags.store': {
     methods: ["POST"],
-    pattern: '/api/v1/tags',
-    tokens: [{"old":"/api/v1/tags","type":0,"val":"api","end":""},{"old":"/api/v1/tags","type":0,"val":"v1","end":""},{"old":"/api/v1/tags","type":0,"val":"tags","end":""}],
+    pattern: '/api/v1/tags/create',
+    tokens: [{"old":"/api/v1/tags/create","type":0,"val":"api","end":""},{"old":"/api/v1/tags/create","type":0,"val":"v1","end":""},{"old":"/api/v1/tags/create","type":0,"val":"tags","end":""},{"old":"/api/v1/tags/create","type":0,"val":"create","end":""}],
     types: placeholder as Registry['tags.tags.store']['types'],
-  },
-  'tags.tags.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/api/v1/tags/:id',
-    tokens: [{"old":"/api/v1/tags/:id","type":0,"val":"api","end":""},{"old":"/api/v1/tags/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/tags/:id","type":0,"val":"tags","end":""},{"old":"/api/v1/tags/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['tags.tags.show']['types'],
   },
   'tags.tags.update': {
     methods: ["PUT"],
-    pattern: '/api/v1/tags/:id',
-    tokens: [{"old":"/api/v1/tags/:id","type":0,"val":"api","end":""},{"old":"/api/v1/tags/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/tags/:id","type":0,"val":"tags","end":""},{"old":"/api/v1/tags/:id","type":1,"val":"id","end":""}],
+    pattern: '/api/v1/tags/update',
+    tokens: [{"old":"/api/v1/tags/update","type":0,"val":"api","end":""},{"old":"/api/v1/tags/update","type":0,"val":"v1","end":""},{"old":"/api/v1/tags/update","type":0,"val":"tags","end":""},{"old":"/api/v1/tags/update","type":0,"val":"update","end":""}],
     types: placeholder as Registry['tags.tags.update']['types'],
   },
   'tags.tags.destroy': {

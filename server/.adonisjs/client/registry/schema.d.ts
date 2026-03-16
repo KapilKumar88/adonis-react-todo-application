@@ -361,7 +361,7 @@ export interface Registry {
   }
   'tags.tags.store': {
     methods: ["POST"]
-    pattern: '/api/v1/tags'
+    pattern: '/api/v1/tags/create'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/api/v1/user/tag').createTagValidator)>>
       paramsTuple: []
@@ -370,24 +370,13 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/tag_management/tags_controller').default['store']>>>
     }
   }
-  'tags.tags.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v1/tags/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/tag_management/tags_controller').default['show']>>>
-    }
-  }
   'tags.tags.update': {
     methods: ["PUT"]
-    pattern: '/api/v1/tags/:id'
+    pattern: '/api/v1/tags/update'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/api/v1/user/tag').updateTagValidator)>>
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
+      paramsTuple: []
+      params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/user/tag').updateTagValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/tag_management/tags_controller').default['update']>>>
     }
