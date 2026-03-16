@@ -1,23 +1,39 @@
-import UserTransformer from '#transformers/user_transformer'
 import { userProfileValidator } from '#validators/api/v1/user/profile'
 import type { HttpContext } from '@adonisjs/core/http'
-import app from '@adonisjs/core/services/app'
-import { randomUUID } from 'node:crypto'
-import { mkdir } from 'node:fs/promises'
-import { extname } from 'node:path'
+import string from '@adonisjs/core/helpers/string'
+import drive from '@adonisjs/drive/services/main'
 import { logFromContext } from '#helpers/common.helper'
+import { FOLDER_KEYS } from '#config/drive'
 
-const UPLOAD_DIR = 'public/uploads/profiles'
 const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp']
 const MAX_FILE_SIZE = '5mb'
 
+async function resolveProfileImageUrl(key: string, request: HttpContext['request']): Promise<string> {
+  const relativeUrl = await drive.use().getUrl(key)
+  return `${request.protocol()}://${request.host()}${relativeUrl}`
+}
+
 export default class ProfileController {
-  async show({ auth, serialize }: HttpContext) {
-    return serialize(UserTransformer.transform(auth.getUserOrFail()))
+  async show({ auth, request, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+
+    if (user?.profileImage) {
+      user.profileImage = await resolveProfileImageUrl(user.profileImage, request)
+    }
+
+    return response.ok({
+      data: {
+        "fullName": user?.fullName,
+        "email": user?.email,
+        "initials": user?.initials,
+        "bio": user?.bio,
+        "profileImage": user?.profileImage
+      }
+    })
   }
 
   async update(ctx: HttpContext) {
-    const { auth, request, response, serialize } = ctx
+    const { auth, request, response, } = ctx
     const user = auth.getUserOrFail()
     const { fullName, bio } = await request.validateUsing(userProfileValidator)
 
@@ -40,24 +56,34 @@ export default class ProfileController {
         })
       }
 
-      const uploadPath = app.makePath(UPLOAD_DIR)
-      await mkdir(uploadPath, { recursive: true })
+      const key = `${FOLDER_KEYS.PROFILES}/${string.uuid()}.${profileImage.extname ?? 'jpg'}`
+      await profileImage.moveToDisk(key)
 
-      const fileName = `${randomUUID()}${extname(profileImage.clientName)}`
-      await profileImage.move(uploadPath, { name: fileName })
-
-      user.profileImage = `/uploads/profiles/${fileName}`
+      user.profileImage = key
     }
 
     await user.save()
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Updated profile',
       description: `${user.fullName} updated profile`,
       status: 'success',
       resource: 'Profile',
     })
 
-    return serialize(UserTransformer.transform(user))
+
+    if (user?.profileImage) {
+      user.profileImage = await resolveProfileImageUrl(user.profileImage, request)
+    }
+
+    return response.ok({
+      data: {
+        "fullName": user?.fullName,
+        "email": user?.email,
+        "initials": user?.initials,
+        "bio": user?.bio,
+        "profileImage": user?.profileImage
+      }
+    })
   }
 }

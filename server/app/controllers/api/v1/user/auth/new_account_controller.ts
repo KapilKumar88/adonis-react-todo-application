@@ -5,12 +5,14 @@ import UserTransformer from '#transformers/user_transformer'
 import { DefaultSystemRoles } from '#constants/role.contants'
 import Role from '#models/role'
 import db from '@adonisjs/lucid/services/db'
+import mail from '@adonisjs/mail/services/main'
+import WelcomeNotification from '#mails/welcome_notification'
 
 export default class NewAccountController {
   async store({ request, serialize, response }: HttpContext) {
     const trx = await db.transaction();
+    const { fullName, email, password } = await request.validateUsing(signupValidator)
     try {
-      const { fullName, email, password } = await request.validateUsing(signupValidator)
 
       const user = await User.create({ fullName, email, password }, {
         client: trx,
@@ -23,6 +25,9 @@ export default class NewAccountController {
       // Access token must be created after commit — DbAccessTokensProvider
       // doesn't support transactions, so the user row must be visible first.
       const token = await User.accessTokens.create(user, role.permissions.map((p) => p.name))
+
+      // Send welcome email (fire-and-forget)
+      mail.send(new WelcomeNotification({ email, userName: fullName }))
 
       return serialize({
         user: UserTransformer.transform(user),

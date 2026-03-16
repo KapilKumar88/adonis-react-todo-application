@@ -7,7 +7,6 @@ import { column, beforeCreate, manyToMany } from '@adonisjs/lucid/orm'
 import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import { randomUUID } from 'node:crypto'
 import Role from '#models/role'
-import env from '#start/env'
 
 export default class User extends compose(UserSchema, withAuthFinder(hash)) {
   static readonly accessTokens = DbAccessTokensProvider.forModel(User)
@@ -43,12 +42,5 @@ export default class User extends compose(UserSchema, withAuthFinder(hash)) {
     }
     return `${first.slice(0, 2)}`.toUpperCase()
   }
-
-  @column({
-    serialize: (value: string | null) => {
-      return value ? `${env.get('APP_URL')}${value}` : null
-    },
-  })
-  declare profileImage: string | null
   // ------------------------------- model getters & setters -------------------------------
 }

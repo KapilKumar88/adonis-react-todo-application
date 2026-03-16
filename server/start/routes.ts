@@ -112,45 +112,50 @@ router
       .prefix('auth')
       .as('auth')
 
-    // Profile — protected
-    router
-      .group(() => {
-        router.get('/', [ProfileController, 'show'])
-        router.put('/', [ProfileController, 'update'])
-        router.put('/change-password', [ChangePasswordsController, 'update'])
-      })
-      .prefix('profile')
-      .as('profile')
-      .use(middleware.auth())
 
-    // Dashboard — protected
-    router.get('dashboard', [DashboardController, 'index']).use(middleware.auth())
+    // protected routes
+    router.group(() => {
 
-    // Tags management — protected
-    router
-      .group(() => {
-        router.get('/', [TagsController, 'index'])
-        router.post('/', [TagsController, 'store'])
-        router.get('/:id', [TagsController, 'show'])
-        router.put('/:id', [TagsController, 'update'])
-        router.delete('/:id', [TagsController, 'destroy'])
-      })
-      .prefix('tags')
-      .as('tags')
-      .use(middleware.auth())
+      // Profile
+      router
+        .group(() => {
+          router.get('/', [ProfileController, 'show'])
+          router.put('/', [ProfileController, 'update'])
+          router.put('/change-creds', [ChangePasswordsController, 'update'])
+        })
+        .prefix('profile')
+        .as('profile')
 
-    // Todo management — protected
-    router
-      .group(() => {
-        router.get('/', [TodosController, 'index'])
-        router.post('/', [TodosController, 'store'])
-        router.get('/:id', [TodosController, 'show'])
-        router.put('/:id', [TodosController, 'update'])
-        router.delete('/:id', [TodosController, 'destroy'])
-      })
-      .prefix('todos')
-      .as('todos')
-      .use(middleware.auth())
+
+      // Dashboard
+      router.get('dashboard', [DashboardController, 'index'])
+
+      // Tags management
+      router
+        .group(() => {
+          router.get('/', [TagsController, 'index'])
+          router.post('/', [TagsController, 'store'])
+          router.get('/:id', [TagsController, 'show'])
+          router.put('/:id', [TagsController, 'update'])
+          router.delete('/:id', [TagsController, 'destroy'])
+        })
+        .prefix('tags')
+        .as('tags')
+
+      // Todo management
+      router
+        .group(() => {
+          router.get('/', [TodosController, 'index'])
+          router.post('/', [TodosController, 'store'])
+          router.get('/:id', [TodosController, 'show'])
+          router.put('/:id', [TodosController, 'update'])
+          router.delete('/', [TodosController, 'destroy'])
+        })
+        .prefix('todos')
+        .as('todos')
+
+    }).use(middleware.auth())
+
 
     // ------------------------------------------- User Apis end-----------------------------------------------------------
   })

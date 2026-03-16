@@ -19,9 +19,6 @@ components:
     User:
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
         fullName:
           type: string
           nullable: true
@@ -40,22 +37,19 @@ components:
         profileImage:
           type: string
           nullable: true
-          example: /uploads/profiles/abc-123.jpg
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
+          example: http://localhost:3333/uploads/profiles/fa174c7b-f13e-421a-9402-6e414aadd787.png
 
     AuthResponse:
       type: object
       properties:
-        user:
-          $ref: "#/components/schemas/User"
-        token:
-          type: string
-          example: oat_XXXXXXXXXX
+        data:
+          type: object
+          properties:
+            user:
+              $ref: "#/components/schemas/User"
+            token:
+              type: string
+              example: oat_XXXXXXXXXX
 
     MessageResponse:
       type: object
@@ -66,9 +60,24 @@ components:
     ValidationError:
       type: object
       properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+              rule:
+                type: string
+              field:
+                type: string
+
+    InternalServerError:
+      type: object
+      properties:
         message:
           type: string
-          example: Validation failed
+          example: Internal server error
         errors:
           type: array
           items:
@@ -276,18 +285,12 @@ components:
       type: object
       required:
         - token
-        - email
         - password
         - passwordConfirmation
       properties:
         token:
           type: string
           example: a1b2c3d4e5f6...
-        email:
-          type: string
-          format: email
-          maxLength: 254
-          example: john@example.com
         password:
           type: string
           minLength: 8
@@ -457,6 +460,7 @@ components:
           example: []
 
 paths:
+  # ─── admin authentication ──────────────────────────────────────────────────────────────────────
   /admin/login:
     post:
       tags:
@@ -500,192 +504,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ValidationError"
 
-  /auth/signup:
-    post:
-      tags:
-        - Authentication
-      summary: Register a new account
-      operationId: signup
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-                - password
-                - passwordConfirmation
-              properties:
-                fullName:
-                  type: string
-                  nullable: true
-                  example: John Doe
-                email:
-                  type: string
-                  format: email
-                  maxLength: 254
-                  example: john@example.com
-                password:
-                  type: string
-                  minLength: 8
-                  maxLength: 32
-                  example: secret123
-                passwordConfirmation:
-                  type: string
-                  minLength: 8
-                  maxLength: 32
-                  example: secret123
-      responses:
-        "200":
-          description: Account created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthResponse"
-        "422":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ValidationError"
-
-  /auth/login:
-    post:
-      tags:
-        - Authentication
-      summary: Login with email and password
-      operationId: authLogin
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  format: email
-                  example: john@example.com
-                password:
-                  type: string
-                  example: secret123
-      responses:
-        "200":
-          description: Logged in successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthResponse"
-        "400":
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "422":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ValidationError"
-
-  /auth/logout:
-    post:
-      tags:
-        - Authentication
-      summary: Logout and revoke current access token
-      operationId: logout
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: Logged out successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "401":
-          description: Unauthorized
-
-  /auth/forgot-password:
-    post:
-      tags:
-        - Authentication
-      summary: Request a password reset link
-      operationId: forgotPassword
-      description: >
-        Sends a password-reset token for the given email.
-        Always returns success to prevent email enumeration.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ForgotPasswordBody"
-      responses:
-        "200":
-          description: Reset link sent (if account exists)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "422":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ValidationError"
-
-  /auth/reset-password:
-    post:
-      tags:
-        - Authentication
-      summary: Reset password using a token
-      operationId: resetPassword
-      description: >
-        Verifies the reset token and updates the user's password.
-        Revokes all existing access tokens for security.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ResetPasswordBody"
-      responses:
-        "200":
-          description: Password reset successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "422":
-          description: Invalid or expired token / Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-
-  /account/profile:
-    get:
-      tags:
-        - Account
-      summary: Get the authenticated user profile
-      operationId: getProfile
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: User profile
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "401":
-          description: Unauthorized
+  # ─── admin roles management ──────────────────────────────────────────────────────────────────────
 
   /admin/roles:
     get:
@@ -775,6 +594,10 @@ paths:
                 $ref: "#/components/schemas/Role"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Role not found
     put:
@@ -825,6 +648,8 @@ paths:
           description: Unauthorized
         "404":
           description: Role not found
+
+  # ─── admin permission management ──────────────────────────────────────────────────────────────────────
 
   /admin/permissions:
     get:
@@ -965,6 +790,8 @@ paths:
         "404":
           description: Permission not found
 
+  # ─── admin user management ──────────────────────────────────────────────────────────────────────
+
   /admin/users:
     get:
       tags:
@@ -1104,6 +931,305 @@ paths:
           description: Unauthorized
         "404":
           description: User not found
+
+  # ─── authentication ──────────────────────────────────────────────────────────────────────
+  /auth/signup:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new account
+      operationId: signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - passwordConfirmation
+              properties:
+                fullName:
+                  type: string
+                  nullable: true
+                  example: John Doe
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                  example: john@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 32
+                  example: secret123
+                passwordConfirmation:
+                  type: string
+                  minLength: 8
+                  maxLength: 32
+                  example: secret123
+      responses:
+        "200":
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login with email and password
+      operationId: authLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+                password:
+                  type: string
+                  example: secret123
+      responses:
+        "200":
+          description: Logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Something went wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout and revoke current access token
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /auth/forgot-creds:
+    post:
+      tags:
+        - Authentication
+      summary: Request a password reset link
+      operationId: forgotPassword
+      description: >
+        Sends a password-reset token for the given email.
+        Always returns success to prevent email enumeration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordBody"
+      responses:
+        "200":
+          description: Reset link sent (if account exists)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /auth/reset-creds:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password using a token
+      operationId: resetPassword
+      description: >
+        Verifies the reset token and updates the user's password.
+        Revokes all existing access tokens for security.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordBody"
+      responses:
+        "200":
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Invalid or expired token / Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  # ─── user profile ─────────────────────────────────────────────────────────────────────
+
+  /profile:
+    get:
+      tags:
+        - Profile
+      summary: Get authenticated user profile
+      operationId: getProfile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/User"
+        "400":
+          description: Something went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+    put:
+      tags:
+        - Profile
+      summary: Update user profile (multipart/form-data)
+      operationId: updateProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                  example: John Doe
+                bio:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  example: Software developer from NYC
+                profileImage:
+                  type: string
+                  format: binary
+                  description: "Image file (jpg, jpeg, png, gif, webp). Max 5MB."
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/User"
+        "400":
+          description: Something went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   # ─── Tags ──────────────────────────────────────────────────────────────────────
 
@@ -1389,64 +1515,3 @@ paths:
           description: Unauthorized
         "404":
           description: Todo not found
-
-  /profile:
-    get:
-      tags:
-        - Profile
-      summary: Get authenticated user profile
-      operationId: getProfile
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: User profile
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "401":
-          description: Unauthorized
-    put:
-      tags:
-        - Profile
-      summary: Update user profile (multipart/form-data)
-      operationId: updateProfile
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                fullName:
-                  type: string
-                  minLength: 3
-                  maxLength: 100
-                  example: John Doe
-                bio:
-                  type: string
-                  maxLength: 500
-                  nullable: true
-                  example: Software developer from NYC
-                profileImage:
-                  type: string
-                  format: binary
-                  description: "Image file (jpg, jpeg, png, gif, webp). Max 5MB."
-      responses:
-        "200":
-          description: Profile updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "401":
-          description: Unauthorized
-        "422":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ValidationError"

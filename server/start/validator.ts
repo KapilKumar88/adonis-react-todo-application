@@ -12,7 +12,7 @@
 */
 
 import { DateTime } from 'luxon'
-import { VineDate } from '@vinejs/vine'
+import vine, { VineDate, SimpleMessagesProvider } from '@vinejs/vine'
 
 declare module '@vinejs/vine/types' {
   interface VineGlobalTransforms {
@@ -20,4 +20,17 @@ declare module '@vinejs/vine/types' {
   }
 }
 
+
+vine.messagesProvider = new SimpleMessagesProvider({
+  // Global messages applicable to all fields
+  // 'required': 'The {{ field }} field is required',
+  // 'string': 'The value of {{ field }} field must be a string',
+  // 'email': 'The value is not a valid email address',
+
+  // Field-specific messages override global messages
+  'password.regex': '{{ field }} must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+  'passwordConfirmation.regex': '{{ field }} must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+})
+
 VineDate.transform((value) => DateTime.fromJSDate(value))
+

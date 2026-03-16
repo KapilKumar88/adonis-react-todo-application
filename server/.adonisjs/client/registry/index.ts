@@ -6,6 +6,12 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
+  'drive.fs.serve': {
+    methods: ["GET","HEAD"],
+    pattern: '/uploads/*',
+    tokens: [{"old":"/uploads/*","type":0,"val":"uploads","end":""},{"old":"/uploads/*","type":2,"val":"*","end":""}],
+    types: placeholder as Registry['drive.fs.serve']['types'],
+  },
   'docs.ui': {
     methods: ["GET","HEAD"],
     pattern: '/docs',
@@ -176,8 +182,8 @@ const routes = {
   },
   'profile.change_passwords.update': {
     methods: ["PUT"],
-    pattern: '/api/v1/profile/change-password',
-    tokens: [{"old":"/api/v1/profile/change-password","type":0,"val":"api","end":""},{"old":"/api/v1/profile/change-password","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/change-password","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/change-password","type":0,"val":"change-password","end":""}],
+    pattern: '/api/v1/profile/change-creds',
+    tokens: [{"old":"/api/v1/profile/change-creds","type":0,"val":"api","end":""},{"old":"/api/v1/profile/change-creds","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/change-creds","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/change-creds","type":0,"val":"change-creds","end":""}],
     types: placeholder as Registry['profile.change_passwords.update']['types'],
   },
   'dashboard.index': {
@@ -242,8 +248,8 @@ const routes = {
   },
   'todos.todos.destroy': {
     methods: ["DELETE"],
-    pattern: '/api/v1/todos/:id',
-    tokens: [{"old":"/api/v1/todos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/todos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/todos/:id","type":0,"val":"todos","end":""},{"old":"/api/v1/todos/:id","type":1,"val":"id","end":""}],
+    pattern: '/api/v1/todos',
+    tokens: [{"old":"/api/v1/todos","type":0,"val":"api","end":""},{"old":"/api/v1/todos","type":0,"val":"v1","end":""},{"old":"/api/v1/todos","type":0,"val":"todos","end":""}],
     types: placeholder as Registry['todos.todos.destroy']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>

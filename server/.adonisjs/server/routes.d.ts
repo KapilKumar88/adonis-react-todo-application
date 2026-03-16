@@ -4,6 +4,7 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
+    'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'docs.ui': { paramsTuple?: []; params?: {} }
     'docs.spec': { paramsTuple?: []; params?: {} }
     'admin.login.login': { paramsTuple?: []; params?: {} }
@@ -43,9 +44,10 @@ export type ScannedRoutes = {
     'todos.todos.store': { paramsTuple?: []; params?: {} }
     'todos.todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.todos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'todos.todos.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.todos.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
+    'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'docs.ui': { paramsTuple?: []; params?: {} }
     'docs.spec': { paramsTuple?: []; params?: {} }
     'admin.admin_dashboard.index': { paramsTuple?: []; params?: {} }
@@ -65,6 +67,7 @@ export type ScannedRoutes = {
     'todos.todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
+    'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'docs.ui': { paramsTuple?: []; params?: {} }
     'docs.spec': { paramsTuple?: []; params?: {} }
     'admin.admin_dashboard.index': { paramsTuple?: []; params?: {} }
@@ -110,7 +113,7 @@ export type ScannedRoutes = {
     'admin.permission.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'tags.tags.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'todos.todos.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.todos.destroy': { paramsTuple?: []; params?: {} }
   }
 }
 declare module '@adonisjs/core/types/http' {

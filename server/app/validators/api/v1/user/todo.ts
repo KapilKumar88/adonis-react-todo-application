@@ -17,3 +17,11 @@ export const updateTodoValidator = vine.create({
   dueDate: vine.date().nullable().optional(),
   tagIds: vine.array(vine.string().uuid()).optional(),
 })
+
+
+export const deleteTodoValidator = vine.create({
+  ids: vine.unionOfTypes([
+    vine.array(vine.string().uuid()).minLength(1),
+    vine.string().uuid().transform((id) => [id]),
+  ]),
+})

@@ -11,7 +11,6 @@ export default class UserTransformer extends BaseTransformer<User> {
         'initials',
         'bio',
         'profileImage',
-        'createdAt',
       ]),
       role: RoleTransformer.transform(this.whenLoaded(this.resource?.roles?.[0])),
     }

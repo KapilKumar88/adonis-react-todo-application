@@ -11,7 +11,7 @@ export default class LoginController {
     const user = await User.verifyCredentials(email, password)
     const token = await User.accessTokens.create(user)
 
-    await logActivity({
+    logActivity({
       action: 'Logged in',
       description: `${user.fullName} logged in`,
       status: 'success',
@@ -30,7 +30,7 @@ export default class LoginController {
   async destroy({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
 
-    await logActivity({
+    logActivity({
       action: 'Logged out',
       description: `${user.fullName} logged out`,
       status: 'success',

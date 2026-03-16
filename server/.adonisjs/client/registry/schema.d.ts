@@ -7,6 +7,17 @@ import type { InferInput } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
+  'drive.fs.serve': {
+    methods: ["GET","HEAD"]
+    pattern: '/uploads/*'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+    }
+  }
   'docs.ui': {
     methods: ["GET","HEAD"]
     pattern: '/docs'
@@ -317,7 +328,7 @@ export interface Registry {
   }
   'profile.change_passwords.update': {
     methods: ["PUT"]
-    pattern: '/api/v1/profile/change-password'
+    pattern: '/api/v1/profile/change-creds'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/api/v1/user/change_password').changePasswordValidator)>>
       paramsTuple: []
@@ -438,12 +449,12 @@ export interface Registry {
   }
   'todos.todos.destroy': {
     methods: ["DELETE"]
-    pattern: '/api/v1/todos/:id'
+    pattern: '/api/v1/todos'
     types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/api/v1/user/todo').deleteTodoValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/user/todo').deleteTodoValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/todo_management/todos_controller').default['destroy']>>>
     }
   }

@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Todo from '#models/todo'
-import { createTodoValidator, updateTodoValidator } from '#validators/api/v1/user/todo'
+import { createTodoValidator, deleteTodoValidator, updateTodoValidator } from '#validators/api/v1/user/todo'
 import TodoTransformer from '#transformers/todo_transformer'
 import { logFromContext } from '#helpers/common.helper'
 
@@ -38,7 +38,7 @@ export default class TodosController {
 
     return response.ok({
       meta: todos.getMeta(),
-      data: todos,
+      data: todos?.all(),
     })
   }
 
@@ -125,23 +125,28 @@ export default class TodosController {
    * Delete a todo
    */
   async destroy(ctx: HttpContext) {
-    const { auth, params, response } = ctx
+    const { auth, request, response } = ctx
     const user = auth.getUserOrFail()
-    const todo = await Todo.query()
-      .where('id', params.id)
-      .where('userId', user.id)
-      .firstOrFail()
+    const { ids } = await request.validateUsing(deleteTodoValidator)
 
-    const todoTitle = todo.title
-    await todo.delete()
+    const deletedCount = await Todo.query()
+      .where('userId', user.id)
+      .whereIn('id', ids)
+      .delete()
+
+    if (!deletedCount[0]) {
+      return response.notFound({ message: 'No matching todos found' })
+    }
 
     await logFromContext(ctx, {
-      action: 'Deleted todo',
-      description: `${user.fullName} deleted todo — ${todoTitle}`,
+      action: deletedCount[0] === 1 ? 'Deleted todo' : 'Bulk deleted todos',
+      description: `${user.fullName} deleted ${deletedCount[0]} todo(s)`,
       status: 'success',
       resource: 'Todos',
     })
 
-    return response.ok({ message: 'Todo deleted successfully' })
+    return response.ok({
+      message: `${deletedCount[0]} todo(s) deleted successfully`,
+    })
   }
 }
