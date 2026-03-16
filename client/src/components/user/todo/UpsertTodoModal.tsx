@@ -9,8 +9,10 @@ import { Badge } from '@/components/ui/badge';
 import { X, Loader2 } from 'lucide-react';
 import { useCreateTodo, useUpdateTodo } from '@/hooks/useTodos';
 import { useTagsQuery } from '@/hooks/useTags';
-import { Todo } from '@/types';
 import { toast } from '@/hooks/use-toast';
+import { Todo } from '@/types/todo.types';
+import { useQueryClient } from '@tanstack/react-query';
+import { dashboardKeys } from '@/services/user/dashboard.service';
 
 interface TodoModalProps {
   open: boolean;
@@ -19,6 +21,7 @@ interface TodoModalProps {
 }
 
 const UpsertTodoModal: React.FC<TodoModalProps> = ({ open, onOpenChange, todo }) => {
+  const queryClient = useQueryClient();
   const createTodo = useCreateTodo();
   const updateTodo = useUpdateTodo();
   const { data: tags = [] } = useTagsQuery();
@@ -69,6 +72,7 @@ const UpsertTodoModal: React.FC<TodoModalProps> = ({ open, onOpenChange, todo })
         onSuccess: () => {
           toast({ title: 'Todo Updated' });
           onOpenChange(false);
+          queryClient.invalidateQueries({ queryKey: dashboardKeys.all }); // Invalidate dashboard data to reflect changes in recent todos
         },
         onError: (error) => {
           toast({ title: 'Error', description: error.message, variant: 'destructive' });
@@ -79,6 +83,7 @@ const UpsertTodoModal: React.FC<TodoModalProps> = ({ open, onOpenChange, todo })
         onSuccess: () => {
           toast({ title: 'Todo Created' });
           onOpenChange(false);
+          queryClient.invalidateQueries({ queryKey: dashboardKeys.all }); // Invalidate dashboard data to reflect changes in recent todos
         },
         onError: (error) => {
           toast({ title: 'Error', description: error.message, variant: 'destructive' });

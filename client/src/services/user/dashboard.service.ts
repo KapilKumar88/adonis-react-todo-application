@@ -1,13 +1,7 @@
 import apiConstant from '@/constants/api.constant';
 import { apiClient } from '@/lib/api-client';
-import type { Todo } from '@/types';
-
-export interface DashboardStats {
-    total: number;
-    completed: number;
-    inProgress: number;
-    pending: number;
-}
+import { DashboardStats } from '@/types/dashboard.types';
+import { Todo } from '@/types/todo.types';
 
 export interface DashboardResponse {
     stats: DashboardStats;

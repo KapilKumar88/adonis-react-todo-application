@@ -8,7 +8,7 @@ import StatCard from '@/components/common/StatCard';
 import { StatusBadge, PriorityBadge } from '@/components/common/StatusBadge';
 import { dashboardKeys, dashboardService } from '@/services/user/dashboard.service';
 import { formatRelativeTime } from '@/utils/helpers';
-import TodoModal from '@/components/user/todo/UpsertTodoModal';
+import UpsertTodoModal from '@/components/user/todo/UpsertTodoModal';
 
 const DashboardPage: React.FC = () => {
   const { data } = useQuery({
@@ -57,7 +57,7 @@ const DashboardPage: React.FC = () => {
           )}
         </CardContent>
       </Card>
-      <TodoModal open={modalOpen} onOpenChange={setModalOpen} />
+      <UpsertTodoModal open={modalOpen} onOpenChange={setModalOpen} />
     </div>
   );
 };

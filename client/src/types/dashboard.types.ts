@@ -39,3 +39,14 @@ export interface AdminDashboardResponse {
   recentActivity: AdminDashboardActivityLog[];
   topActiveUsers: AdminDashboardTopUser[];
 }
+
+
+
+// ------------------------------------------ user dashboard ------------------------------------------
+
+export interface DashboardStats {
+    total: number;
+    completed: number;
+    inProgress: number;
+    pending: number;
+}
