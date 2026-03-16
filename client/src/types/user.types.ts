@@ -1,4 +1,4 @@
-import { AdminRole, USER_ROLE } from "./role.types";
+import { AdminRole } from "./role.types";
 
 /** Shape returned by the server's UserTransformer */
 export interface UserDetails {

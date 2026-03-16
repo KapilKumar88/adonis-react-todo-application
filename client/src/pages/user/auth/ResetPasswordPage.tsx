@@ -13,7 +13,6 @@ const ResetPasswordPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get('token') ?? '';
-  const email = searchParams.get('email') ?? '';
 
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -23,14 +22,14 @@ const ResetPasswordPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!token || !email) {
+    if (!token) {
       toast({ title: 'Invalid Link', description: 'The reset link is invalid or incomplete.', variant: 'destructive' });
       return;
     }
 
     setLoading(true);
     try {
-      const result = await userAuthService.resetPassword({ token, email, password, passwordConfirmation });
+      const result = await userAuthService.resetPassword({ token, password, passwordConfirmation });
       toast({ title: 'Password Reset', description: result.message });
       navigate('/login');
     } catch (error) {
@@ -44,7 +43,7 @@ const ResetPasswordPage: React.FC = () => {
     }
   };
 
-  if (!token || !email) {
+  if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
         <Card className="w-full max-w-md">

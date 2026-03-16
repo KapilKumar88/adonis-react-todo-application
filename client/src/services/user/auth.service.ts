@@ -20,7 +20,6 @@ export interface ForgotPasswordPayload {
 
 export interface ResetPasswordPayload {
     token: string;
-    email: string;
     password: string;
     passwordConfirmation: string;
 }
@@ -47,11 +46,11 @@ export const userAuthService = {
 
     /** POST /api/v1/auth/forgot-password */
     forgotPassword: async (payload: ForgotPasswordPayload): Promise<MessageResponse> => {
-        return apiClient.post<MessageResponse>(apiConstant.USER.AUTH.FORGOT_PASSWORD, payload);
+        return apiClient.post<MessageResponse>(apiConstant.USER.AUTH.FORGOT_CREDS, payload);
     },
 
     /** POST /api/v1/auth/reset-password */
     resetPassword: async (payload: ResetPasswordPayload): Promise<MessageResponse> => {
-        return apiClient.post<MessageResponse>(apiConstant.USER.AUTH.RESET_PASSWORD, payload);
+        return apiClient.post<MessageResponse>(apiConstant.USER.AUTH.RESET_CREDS, payload);
     },
 };
