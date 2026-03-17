@@ -11,9 +11,10 @@ import SystemDefaultTags from '#constants/defaultTags.constants'
 import Tag from '#models/tag'
 
 export default class NewAccountController {
-  async store({ request, serialize, response }: HttpContext) {
+  async store({ request, response }: HttpContext) {
     const trx = await db.transaction();
     const { fullName, email, password } = await request.validateUsing(signupValidator)
+
     try {
 
       const user = await User.create({ fullName, email, password }, {
@@ -32,8 +33,16 @@ export default class NewAccountController {
       // Send welcome email (fire-and-forget)
       mail.send(new WelcomeNotification({ email, userName: fullName }))
 
-      return serialize({
-        user: UserTransformer.transform(user),
+      return response.created({
+        message: 'Account created successfully',
+        user: {
+          ...(new UserTransformer(user).toObject()),
+          roles: {
+            name: role.name,
+            displayName: role.displayName,
+            permissions: role.permissions.map((perm) => perm.name),
+          }, // Include role names in the response
+        },
         token: token.value!.release(),
       })
     } catch (error) {

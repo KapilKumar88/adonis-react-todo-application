@@ -38,7 +38,21 @@ components:
           type: string
           nullable: true
           example: http://localhost:3333/uploads/profiles/fa174c7b-f13e-421a-9402-6e414aadd787.png
-
+        roles:
+          type: object
+          properties:
+            name:
+              type: string
+              example: editor
+            displayName:
+              type: string
+              nullable: true
+              example: Editor
+            permissions:
+              type: array
+              items:
+                type: string
+              example: ["users:create", "todos:update"]
     AuthResponse:
       type: object
       properties:
@@ -50,6 +64,9 @@ components:
             token:
               type: string
               example: oat_XXXXXXXXXX
+            message:
+              type: string
+              example: Authentication successful
 
     MessageResponse:
       type: object

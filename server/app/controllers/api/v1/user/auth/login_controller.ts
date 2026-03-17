@@ -9,7 +9,12 @@ export default class LoginController {
     const { email, password } = await request.validateUsing(loginValidator)
 
     const user = await User.verifyCredentials(email, password)
-    const token = await User.accessTokens.create(user)
+    await user.load('roles', (rolesQuery) => {
+      rolesQuery.preload('permissions')
+    })
+
+    const permissionNames = user.roles.flatMap((role) => role.permissions.map((perm) => perm.name))
+    const token = await User.accessTokens.create(user, permissionNames)
 
     logActivity({
       action: 'Logged in',
