@@ -12,11 +12,18 @@
 */
 
 import { DateTime } from 'luxon'
-import vine, { VineDate, SimpleMessagesProvider } from '@vinejs/vine'
+import vine, { VineDate, SimpleMessagesProvider, VineString } from '@vinejs/vine'
+import { validateIdsRule } from '#validators/customRules/validateIds'
 
 declare module '@vinejs/vine/types' {
   interface VineGlobalTransforms {
     date: DateTime
+  }
+}
+
+declare module '@vinejs/vine' {
+  interface VineString {
+    validateIds(options: { table: string; column: string; userIdColumn?: string }): this
   }
 }
 
@@ -35,4 +42,8 @@ vine.messagesProvider = new SimpleMessagesProvider({
 })
 
 VineDate.transform((value) => DateTime.fromJSDate(value))
+
+VineString.macro('validateIds', function (this: any, options: { table: string; column: string; userIdColumn?: string }) {
+  return this.use(validateIdsRule(options))
+})
 

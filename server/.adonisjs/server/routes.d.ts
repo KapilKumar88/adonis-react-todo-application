@@ -95,6 +95,7 @@ export type ScannedRoutes = {
     'auth.forgot_passwords.update': { paramsTuple?: []; params?: {} }
     'tags.tags.store': { paramsTuple?: []; params?: {} }
     'todos.todos.store': { paramsTuple?: []; params?: {} }
+    'todos.todos.destroy': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'admin.roles.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -110,7 +111,6 @@ export type ScannedRoutes = {
     'admin.permission.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.user.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'tags.tags.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'todos.todos.destroy': { paramsTuple?: []; params?: {} }
   }
 }
 declare module '@adonisjs/core/types/http' {

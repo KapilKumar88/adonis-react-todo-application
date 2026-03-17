@@ -399,7 +399,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api/v1/user/todo').getTodosValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/user/todo_management/todos_controller').default['index']>>>
     }
   }
@@ -437,8 +437,8 @@ export interface Registry {
     }
   }
   'todos.todos.destroy': {
-    methods: ["DELETE"]
-    pattern: '/api/v1/todos'
+    methods: ["POST"]
+    pattern: '/api/v1/todos/delete'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/api/v1/user/todo').deleteTodoValidator)>>
       paramsTuple: []

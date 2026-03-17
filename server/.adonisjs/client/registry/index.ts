@@ -241,9 +241,9 @@ const routes = {
     types: placeholder as Registry['todos.todos.update']['types'],
   },
   'todos.todos.destroy': {
-    methods: ["DELETE"],
-    pattern: '/api/v1/todos',
-    tokens: [{"old":"/api/v1/todos","type":0,"val":"api","end":""},{"old":"/api/v1/todos","type":0,"val":"v1","end":""},{"old":"/api/v1/todos","type":0,"val":"todos","end":""}],
+    methods: ["POST"],
+    pattern: '/api/v1/todos/delete',
+    tokens: [{"old":"/api/v1/todos/delete","type":0,"val":"api","end":""},{"old":"/api/v1/todos/delete","type":0,"val":"v1","end":""},{"old":"/api/v1/todos/delete","type":0,"val":"todos","end":""},{"old":"/api/v1/todos/delete","type":0,"val":"delete","end":""}],
     types: placeholder as Registry['todos.todos.destroy']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>

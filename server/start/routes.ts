@@ -148,7 +148,7 @@ router
           router.post('/', [TodosController, 'store'])
           router.get('/:id', [TodosController, 'show'])
           router.put('/:id', [TodosController, 'update'])
-          router.delete('/', [TodosController, 'destroy'])
+          router.post('/delete', [TodosController, 'destroy'])
         })
         .prefix('todos')
         .as('todos')

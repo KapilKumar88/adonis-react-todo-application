@@ -1,8 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Todo from '#models/todo'
-import { createTodoValidator, deleteTodoValidator, updateTodoValidator } from '#validators/api/v1/user/todo'
+import { createTodoValidator, deleteTodoValidator, getTodosValidator, updateTodoValidator } from '#validators/api/v1/user/todo'
 import TodoTransformer from '#transformers/todo_transformer'
 import { logFromContext } from '#helpers/common.helper'
+import db from '@adonisjs/lucid/services/db'
 
 export default class TodosController {
   /**
@@ -11,15 +12,13 @@ export default class TodosController {
    */
   async index({ auth, request, response }: HttpContext) {
     const user = auth.getUserOrFail()
-    const page = request.input('page', 1)
-    const limit = request.input('limit', 20)
-    const status = request.input('status')
-    const priority = request.input('priority')
-    const search = request.input('search')
+    const payload = await request.validateUsing(getTodosValidator);
 
     const query = Todo.query()
       .where('userId', user.id)
       .preload('tags')
+
+    const { page, limit, status, priority, search } = payload
 
     if (status) {
       query.where('status', status)
@@ -38,7 +37,8 @@ export default class TodosController {
 
     return response.ok({
       meta: todos.getMeta(),
-      data: todos?.all(),
+      data: todos?.all().map((todo) => new TodoTransformer(todo).toObject()),
+      message: 'Todos retrieved successfully',
     })
   }
 
@@ -49,27 +49,46 @@ export default class TodosController {
   async store(ctx: HttpContext) {
     const { auth, request, response } = ctx
     const user = auth.getUserOrFail()
-    const { tagIds, ...payload } = await request.validateUsing(createTodoValidator)
-
-    const todo = await Todo.create({
-      ...payload,
-      userId: user.id,
+    const { tagIds, ...payload } = await request.validateUsing(createTodoValidator, {
+      meta: {
+        userId: user.id,
+      }
     })
+    const trx = await db.transaction();
+    try {
+      const todo = await Todo.create({
+        ...payload,
+        userId: user.id,
+      }, {
+        client: trx,
+      })
 
-    if (tagIds?.length) {
-      await todo.related('tags').attach(tagIds)
+      if (tagIds?.length) {
+        await todo.related('tags').attach(tagIds)
+      }
+
+      await todo.load('tags')
+
+      logFromContext(ctx, {
+        action: 'Created todo',
+        description: `${user.fullName} created todo — ${todo.title}`,
+        status: 'success',
+        resource: 'Todos',
+      })
+
+      await trx.commit();
+
+      return response.created({
+        data: new TodoTransformer(todo).toObject(),
+        message: 'Todo created successfully',
+      })
+    } catch (error) {
+      trx.rollback()
+      return response.internalServerError({
+        message: 'An error occurred while creating the todo',
+        errors: error.message || [{ message: 'Internal server error' }],
+      })
     }
-
-    await todo.load('tags')
-
-    await logFromContext(ctx, {
-      action: 'Created todo',
-      description: `${user.fullName} created todo — ${todo.title}`,
-      status: 'success',
-      resource: 'Todos',
-    })
-
-    return response.created(TodoTransformer.transform(todo))
   }
 
   /**
@@ -84,7 +103,10 @@ export default class TodosController {
       .preload('tags')
       .firstOrFail()
 
-    return response.ok(TodoTransformer.transform(todo))
+    return response.ok({
+      data: new TodoTransformer(todo).toObject(),
+      message: 'Todo retrieved successfully',
+    })
   }
 
   /**
@@ -94,12 +116,15 @@ export default class TodosController {
   async update(ctx: HttpContext) {
     const { auth, params, request, response } = ctx
     const user = auth.getUserOrFail()
+    const { tagIds, ...payload } = await request.validateUsing(updateTodoValidator, {
+      meta: { userId: user.id },
+    });
+
+
     const todo = await Todo.query()
       .where('id', params.id)
       .where('userId', user.id)
-      .firstOrFail()
-
-    const { tagIds, ...payload } = await request.validateUsing(updateTodoValidator)
+      .firstOrFail();
 
     todo.merge(payload)
     await todo.save()
@@ -110,14 +135,17 @@ export default class TodosController {
 
     await todo.load('tags')
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Updated todo',
       description: `${user.fullName} updated todo — ${todo.title}`,
       status: 'success',
       resource: 'Todos',
     })
 
-    return response.ok(TodoTransformer.transform(todo))
+    return response.ok({
+      data: new TodoTransformer(todo).toObject(),
+      message: 'Todo updated successfully',
+    })
   }
 
   /**
@@ -127,7 +155,8 @@ export default class TodosController {
   async destroy(ctx: HttpContext) {
     const { auth, request, response } = ctx
     const user = auth.getUserOrFail()
-    const { ids } = await request.validateUsing(deleteTodoValidator)
+    const { ids: rawIds } = await request.validateUsing(deleteTodoValidator)
+    const ids = Array.isArray(rawIds) ? rawIds : [rawIds]
 
     const deletedCount = await Todo.query()
       .where('userId', user.id)
@@ -138,7 +167,7 @@ export default class TodosController {
       return response.notFound({ message: 'No matching todos found' })
     }
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: deletedCount[0] === 1 ? 'Deleted todo' : 'Bulk deleted todos',
       description: `${user.fullName} deleted ${deletedCount[0]} todo(s)`,
       status: 'success',

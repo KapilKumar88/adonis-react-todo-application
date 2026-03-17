@@ -5,6 +5,21 @@ import { randomUUID } from 'node:crypto'
 import User from '#models/user'
 import Tag from '#models/tag'
 
+
+export enum TODO_STATUSES {
+  PENDING = 'pending',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+  BACKLOG = 'backlog',
+  ICEBOX = 'icebox',
+}
+
+export enum TODO_PRIORITIES {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+}
+
 export default class Todo extends TodoSchema {
   @column({ isPrimary: true })
   declare id: string
