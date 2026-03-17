@@ -29,8 +29,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { UserProfileProvider } from "./context/UserProfileContext";
 import AuthGuard from "@/guard/AuthGuard";
-import { DEFAULT_ROLES } from "./constants/role.constant";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
+import { SYSTEM_ROLES } from "./types/role.types";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,7 +79,7 @@ const App = () => (
 
 
               {/* Admin routes */}
-              <Route element={<AuthGuard requiredRole={DEFAULT_ROLES.SUPER_ADMIN}><AdminLayout /></AuthGuard>} >
+              <Route element={<AuthGuard requiredRole={SYSTEM_ROLES.SUPER_ADMIN}><AdminLayout /></AuthGuard>} >
                 <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                 <Route path="/admin/users" element={<UsersPage />} />
                 <Route path="/admin/roles" element={<RolesPage />} />

@@ -1,11 +1,11 @@
-import { AdminRole } from "./role.types";
+import { Role } from "./role.types";
 
 /** Shape returned by the server's UserTransformer */
 export interface UserDetails {
     fullName: string;
     email: string;
     initials: string;
-    role: AdminRole;
+    roles: Role;
     bio: string | null;
     profileImage: string | null;
     createdAt: string;
@@ -20,7 +20,7 @@ export interface AdminUser {
     roleId: number | null;
     createdAt: string;
     updatedAt: string | null;
-    role: AdminRole | null;
+    role: Role | null;
 }
 
 export interface AdminUserMeta {

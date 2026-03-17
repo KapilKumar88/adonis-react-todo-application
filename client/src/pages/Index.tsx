@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { CheckSquare, LayoutDashboard, User, ChevronRight, Sparkles } from "lucide-react";
+import { LayoutDashboard, User, ChevronRight } from "lucide-react";
 import AppLogo from "@/components/common/AppLogo";
 
 const Index = () => {

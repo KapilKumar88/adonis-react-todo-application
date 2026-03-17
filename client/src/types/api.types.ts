@@ -8,6 +8,7 @@ export interface ApiLoginResponse {
     data: {
         token: string;
         user: UserDetails;
+        message: string;
     }
 }
 
