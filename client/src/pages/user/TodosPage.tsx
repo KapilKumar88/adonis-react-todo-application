@@ -8,7 +8,7 @@ import { StatusBadge, PriorityBadge } from '@/components/common/StatusBadge';
 import EmptyState from '@/components/common/EmptyState';
 import { DataTable, SortableHeader } from '@/components/common/DataTable';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTodosQuery, useDeleteTodo, useUpdateTodo } from '@/hooks/useTodos';
+import { useTodosQuery, useDeleteTodo, useToggleTodo } from '@/hooks/useTodos';
 import { usePermission } from '@/hooks/usePermission';
 import { PERMISSIONS } from '@/constants/permission.constant';
 import { formatDate } from '@/utils/helpers';
@@ -169,14 +169,12 @@ const columnsDefination = ({
         return (
           <div className="flex items-center gap-1">
             {canUpdate && (
-              <Button
-                type="button"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
-                onClick={() => toggleComplete(todo)}
+              <Checkbox
+                checked={todo.status === TodoStatus.Completed}
+                onCheckedChange={() => toggleComplete(todo)}
                 title="Toggle complete"
-              >
-                <Checkbox checked={todo.status === TodoStatus.Completed} className="pointer-events-none" />
-              </Button>
+                aria-label="Toggle complete"
+              />
             )}
             {canUpdate && (
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditTodo(todo); setModalOpen(true); }}>
@@ -225,7 +223,7 @@ const TodosPage: React.FC = () => {
   });
 
   const deleteTodoMutation = useDeleteTodo();
-  const updateTodoMutation = useUpdateTodo();
+  const toggleTodoMutation = useToggleTodo();
 
   const can = usePermission();
   const canUpdate = can(PERMISSIONS.TODO_MANAGEMENT.UPDATE);
@@ -251,8 +249,8 @@ const TodosPage: React.FC = () => {
 
   const toggleComplete = (todo: Todo) => {
     const newStatus = todo.status === TodoStatus.Completed ? TodoStatus.Pending : TodoStatus.Completed;
-    updateTodoMutation.mutate(
-      { id: todo.id, payload: { status: newStatus } },
+    toggleTodoMutation.mutate(
+      { id: todo.id, newStatus },
       {
         onError: (error) => {
           toast({ title: 'Error', description: error.message, variant: 'destructive' });
