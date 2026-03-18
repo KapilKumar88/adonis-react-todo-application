@@ -7,6 +7,7 @@ import PageHeader from '@/components/common/PageHeader';
 import { StatusBadge, PriorityBadge } from '@/components/common/StatusBadge';
 import EmptyState from '@/components/common/EmptyState';
 import { DataTable, SortableHeader } from '@/components/common/DataTable';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTodosQuery, useDeleteTodo, useUpdateTodo } from '@/hooks/useTodos';
 import { formatDate } from '@/utils/helpers';
 import { toast } from '@/hooks/use-toast';
@@ -67,7 +68,6 @@ const columnsDefination = ({
     },
     {
       accessorKey: 'title',
-      header: ({ column }) => <SortableHeader column={column} title="Title" />,
       cell: ({ row }) => {
         const todo = row.original;
         return (
@@ -77,6 +77,56 @@ const columnsDefination = ({
           </div>
         );
       },
+      enableSorting: false,
+    },
+    {
+      accessorKey: 'description',
+      header: 'Description',
+      cell: ({ row }) => {
+        const description = row.original.description;
+        if (!description) return <span className="text-muted-foreground text-sm">—</span>;
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="text-sm text-muted-foreground truncate max-w-[200px] cursor-default">
+                  {description}
+                </p>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs whitespace-pre-wrap break-words">
+                {description}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      },
+      enableSorting: false,
+    },
+    {
+      accessorKey: 'tags',
+      header: 'Tags',
+      cell: ({ row }) => {
+        const tags = row.original.tags;
+        if (!tags?.length) return <span className="text-muted-foreground text-sm">—</span>;
+        return (
+          <div className="flex flex-wrap gap-1 max-w-[200px]">
+            {tags.map((tag) => (
+              <span
+                key={tag.id}
+                className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
+                style={
+                  tag.color
+                    ? { backgroundColor: `${tag.color}22`, color: tag.color }
+                    : undefined
+                }
+              >
+                {tag.name}
+              </span>
+            ))}
+          </div>
+        );
+      },
+      enableSorting: false,
     },
     {
       accessorKey: 'priority',
