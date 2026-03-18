@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { changePasswordSchema } from '@/validations/user/profile.validation';
 import { userProfileService } from '@/services/user/profile.service';
+import LoadingButton from '@/components/common/LoadingButton';
 
 type ChangePasswordFormValues = InferType<typeof changePasswordSchema>;
 
@@ -44,7 +45,11 @@ export default function ChangePassword() {
     });
 
     const onSubmit = (values: ChangePasswordFormValues) => {
-        changePassword(values);
+        changePassword({
+            currentPassword: values.currentPassword,
+            newPassword: values.newPassword,
+            confirmPassword: values.confirmPassword,
+        });
     };
 
     return (
@@ -79,10 +84,7 @@ export default function ChangePassword() {
                         <Input id="confirmPassword" type="password" {...register('confirmPassword')} />
                         {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
                     </div>
-
-                    <Button type="submit" disabled={isPending}>
-                        {isPending ? 'Updating...' : 'Update Password'}
-                    </Button>
+                    <LoadingButton type="submit" disabled={isPending} isLoading={isPending} label={isPending ? 'Updating...' : 'Update Password'} />
                 </form>
             </CardContent>
         </Card>
