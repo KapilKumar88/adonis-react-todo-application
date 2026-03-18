@@ -230,6 +230,7 @@ const TodosPage: React.FC = () => {
   const can = usePermission();
   const canUpdate = can(PERMISSIONS.TODO_MANAGEMENT.UPDATE);
   const canDelete = can(PERMISSIONS.TODO_MANAGEMENT.DELETE);
+  const canAdd = can(PERMISSIONS.TODO_MANAGEMENT.CREATE);
 
   const todos = data?.data ?? [];
   const meta = data?.meta;
@@ -284,6 +285,7 @@ const TodosPage: React.FC = () => {
   return (
     <div>
       <PageHeader title="My Todos" subtitle="Manage your tasks" actions={
+        canAdd &&
         <Button size="sm" onClick={() => { setEditTodo(null); setModalOpen(true); }}>
           <Plus className="h-4 w-4 mr-1" /> Add Todo
         </Button>

@@ -14,6 +14,8 @@ import { upsertTodoSchema, type UpsertTodoFormValues } from '@/validations/user/
 import TagMultiSelect from '@/components/common/TagMultiSelect';
 import DatePicker from '@/components/common/DatePicker';
 import LoadingButton from '@/components/common/LoadingButton';
+import { usePermission } from '@/hooks/usePermission';
+import { PERMISSIONS } from '@/constants/permission.constant';
 
 const statusOptions = [
   { value: TodoStatus.Pending, label: 'Pending' },
@@ -38,6 +40,8 @@ interface TodoModalProps {
 const UpsertTodoModal: React.FC<TodoModalProps> = ({ open, onOpenChange, todo }) => {
   const createTodo = useCreateTodo();
   const updateTodo = useUpdateTodo();
+  const can = usePermission();
+
 
   const {
     register,
@@ -69,6 +73,12 @@ const UpsertTodoModal: React.FC<TodoModalProps> = ({ open, onOpenChange, todo })
       });
     }
   }, [open, todo, reset]);
+
+  const canUpsert = can(PERMISSIONS.TODO_MANAGEMENT.CREATE) || can(PERMISSIONS.TODO_MANAGEMENT.UPDATE);
+
+  if (!canUpsert) {
+    return null; // Don't render the modal if user doesn't have permission
+  }
 
   const isPending = createTodo.isPending || updateTodo.isPending;
 
@@ -185,7 +195,9 @@ const UpsertTodoModal: React.FC<TodoModalProps> = ({ open, onOpenChange, todo })
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <LoadingButton type="submit" disabled={isPending} isLoading={isPending} label={todo ? 'Save Changes' : 'Add Todo'} />
+            {canUpsert && (
+              <LoadingButton type="submit" disabled={isPending} isLoading={isPending} label={todo ? 'Save Changes' : 'Add Todo'} />
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

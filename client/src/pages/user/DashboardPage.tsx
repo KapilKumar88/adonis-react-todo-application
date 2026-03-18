@@ -9,21 +9,25 @@ import { StatusBadge, PriorityBadge } from '@/components/common/StatusBadge';
 import { dashboardKeys, dashboardService } from '@/services/user/dashboard.service';
 import { formatRelativeTime } from '@/utils/helpers';
 import UpsertTodoModal from '@/components/user/todo/UpsertTodoModal';
+import { usePermission } from '@/hooks/usePermission';
+import { PERMISSIONS } from '@/constants/permission.constant';
 
 const DashboardPage: React.FC = () => {
   const { data } = useQuery({
     queryKey: dashboardKeys.all,
     queryFn: dashboardService.getDashboard,
   });
+    const can = usePermission();
   const [modalOpen, setModalOpen] = useState(false);
 
   const stats = data?.stats;
   const recentTodos = data?.recentTodos ?? [];
+   const canAdd = can(PERMISSIONS.TODO_MANAGEMENT.CREATE);
 
   return (
     <div>
       <PageHeader title="Dashboard" subtitle="Overview of your todos" actions={
-        <Button onClick={() => setModalOpen(true)}><Plus className="h-4 w-4 mr-1" /> Quick Add</Button>
+        canAdd && <Button onClick={() => setModalOpen(true)}><Plus className="h-4 w-4 mr-1" /> Quick Add</Button>
       } />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard title="Total Todos" value={stats?.total ?? 0} icon={ListTodo} color="primary" />
