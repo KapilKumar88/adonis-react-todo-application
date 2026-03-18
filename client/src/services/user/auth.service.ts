@@ -1,10 +1,18 @@
 import apiConstant from '@/constants/api.constant';
 import { apiClient } from '@/lib/api-client';
-import { ApiLoginResponse } from '@/types/api.types';
+import { UserDetails } from '@/types/user.types';
 
 export interface LoginPayload {
     email: string;
     password: string;
+}
+
+export interface ApiLoginResponse {
+    data: {
+        token: string;
+        user: UserDetails;
+        message: string;
+    }
 }
 
 export interface SignupPayload {

@@ -22,10 +22,10 @@ const ProfilePage: React.FC = () => {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <PersonalInfo userInfo={currentUser?.data} />
-          <ChangePassword />
+          {/* <ChangePassword /> */}
         </div>
         <div>
-          <AccountStats userInfo={currentUser?.data} />
+          {/* <AccountStats userInfo={currentUser?.data} /> */}
         </div>
       </div>
     </div>

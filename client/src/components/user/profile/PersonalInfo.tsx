@@ -12,7 +12,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from '@/hooks/use-toast';
 import { UserDetails } from '@/types/user.types';
 import { profileUpdateSchema } from '@/validations/user/profile.validation';
-import { userProfileKeys, userProfileService } from '@/services/user/profile.service';
+import { ApiUserProfileResponse, userProfileKeys, userProfileService } from '@/services/user/profile.service';
+import LoadingButton from '@/components/common/LoadingButton';
+import { useUserProfile } from '@/context/UserProfileContext';
 
 type ProfileFormValues = InferType<typeof profileUpdateSchema>;
 
@@ -21,6 +23,7 @@ export default function PersonalInfo({
 }: Readonly<{
     userInfo: UserDetails
 }>) {
+    const { setUserInfo } = useUserProfile();
     const queryClient = useQueryClient();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -38,12 +41,20 @@ export default function PersonalInfo({
         },
     });
 
-    const { mutate: updateProfile, isPending } = useMutation<UserDetails, Error, FormData>({
+    const { mutate: updateProfile, isPending } = useMutation<ApiUserProfileResponse, Error, FormData>({
         mutationFn: userProfileService.updateProfile,
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: userProfileKeys.profile });
             setSelectedFile(null);
             setImagePreview(null);
+            setUserInfo((previousState) => {
+                return {
+                    ...previousState,
+                    fullName: data.data.fullName,
+                    bio: data.data.bio,
+                    profileImage: data.data.profileImage,
+                }
+            });
             toast({ title: 'Profile updated', description: 'Your profile has been saved.' });
         },
         onError: (error) => {
@@ -118,9 +129,7 @@ export default function PersonalInfo({
                         {errors.bio && <p className="text-sm text-destructive">{errors.bio.message}</p>}
                     </div>
 
-                    <Button type="submit" disabled={isPending || (!isDirty && !selectedFile)}>
-                        {isPending ? 'Saving...' : 'Save Changes'}
-                    </Button>
+                    <LoadingButton type="submit" isLoading={isPending} disabled={isPending || (!isDirty && !selectedFile)} label={isPending ? 'Saving...' : 'Save Changes'} />
                 </form>
             </CardContent>
         </Card>

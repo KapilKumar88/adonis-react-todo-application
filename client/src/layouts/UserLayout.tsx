@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { CheckSquare, LayoutDashboard, ListTodo, UserCircle, Bell, Menu, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import ThemeToggle from '@/components/common/ThemeToggle';
-import { getInitials } from '@/utils/helpers';
 import { NavLink } from '@/components/NavLink';
 import { useUserProfile } from '@/context/UserProfileContext';
 import { PERMISSIONS } from '@/constants/permission.constant';
@@ -59,8 +58,12 @@ const UserLayout: React.FC = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={userInfo?.profileImage}
+                      alt={userInfo?.fullName ?? userInfo?.initials}
+                    />
                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                      {userInfo ? getInitials(userInfo?.fullName) : '?'}
+                      {userInfo ? userInfo?.initials : '?'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>

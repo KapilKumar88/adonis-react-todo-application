@@ -34,6 +34,7 @@ export default Object.freeze({
     DASHBOARD: '/api/v1/dashboard',
     PROFILE: '/api/v1/profile',
     UPDATE_PROFILE: '/api/v1/profile',
+    CHANGE_CREDS: '/api/v1/auth/change-creds',
 
     AUTH: {
       LOGIN: '/api/v1/auth/login',
@@ -41,7 +42,6 @@ export default Object.freeze({
       LOGOUT: '/api/v1/auth/logout',
       FORGOT_CREDS: '/api/v1/auth/forgot-creds',
       RESET_CREDS: '/api/v1/auth/reset-creds',
-      CHANGE_CREDS: '/api/v1/auth/change-creds',
     },
     TAGS: {
       LIST: '/api/v1/tags',
