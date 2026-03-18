@@ -22,7 +22,7 @@ const UserLayout: React.FC = () => {
   const { userInfo } = useUserProfile();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const userPermissions = userInfo?.roles?.permissions ?? [];
+  const userPermissions = userInfo?.role?.permissions ?? [];
   const visibleNavItems = navItems.filter(item => !item.permission || userPermissions.includes(item.permission));
 
   const handleLogout = () => {

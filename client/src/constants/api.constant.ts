@@ -44,12 +44,14 @@ export default Object.freeze({
       CHANGE_CREDS: '/api/v1/auth/change-creds',
     },
     TAGS: {
-      BASE: '/api/v1/tags',
-      BY_ID: '/api/v1/tags/{id}',
+      LIST: '/api/v1/tags',
+      CREATE: '/api/v1/tags/create',
+      UPDATE: '/api/v1/tags/update',
+      DELETE: '/api/v1/tags/{id}',
     },
     TODOS: {
       BASE: '/api/v1/todos',
-      BY_ID: '/api/v1/todos/{id}',
+      DELETE: '/api/v1/todos',
     },
   }
 });

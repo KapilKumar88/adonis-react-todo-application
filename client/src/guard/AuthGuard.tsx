@@ -16,8 +16,8 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requiredRole, requiredP
     return <Navigate to={requiredRole === SYSTEM_ROLES.SUPER_ADMIN ? '/admin/login' : '/login'} replace />;
   }
 
-  const userRole = userInfo?.roles?.name ?? SYSTEM_ROLES.USER;
-  const userPermissions = userInfo?.roles?.permissions ?? [];
+  const userRole = userInfo?.role?.name ?? SYSTEM_ROLES.USER;
+  const userPermissions = userInfo?.role?.permissions ?? [];
 
   // Non-admin trying to access an admin-only route
   if (requiredRole === SYSTEM_ROLES.SUPER_ADMIN && userRole !== SYSTEM_ROLES.SUPER_ADMIN) {

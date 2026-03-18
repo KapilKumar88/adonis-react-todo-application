@@ -1,18 +1,33 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { X, Loader2 } from 'lucide-react';
 import { useCreateTodo, useUpdateTodo } from '@/hooks/useTodos';
-import { useTagsQuery } from '@/hooks/useTags';
 import { toast } from '@/hooks/use-toast';
-import { Todo } from '@/types/todo.types';
-import { useQueryClient } from '@tanstack/react-query';
-import { dashboardKeys } from '@/services/user/dashboard.service';
+import { Todo, TodoPriority, TodoStatus } from '@/types/todo.types';
+import { upsertTodoSchema, type UpsertTodoFormValues } from '@/validations/user/todo.validation';
+import TagMultiSelect from '@/components/common/TagMultiSelect';
+import DatePicker from '@/components/common/DatePicker';
+import LoadingButton from '@/components/common/LoadingButton';
+
+const statusOptions = [
+  { value: TodoStatus.Pending, label: 'Pending' },
+  { value: TodoStatus.InProgress, label: 'In Progress' },
+  { value: TodoStatus.Completed, label: 'Completed' },
+  { value: TodoStatus.Backlog, label: 'Backlog' },
+  { value: TodoStatus.Icebox, label: 'Icebox' },
+];
+
+const priorityOptions = [
+  { value: TodoPriority.Low, label: 'Low' },
+  { value: TodoPriority.Medium, label: 'Medium' },
+  { value: TodoPriority.High, label: 'High' },
+];
 
 interface TodoModalProps {
   open: boolean;
@@ -21,74 +36,66 @@ interface TodoModalProps {
 }
 
 const UpsertTodoModal: React.FC<TodoModalProps> = ({ open, onOpenChange, todo }) => {
-  const queryClient = useQueryClient();
   const createTodo = useCreateTodo();
   const updateTodo = useUpdateTodo();
-  const { data: tags = [] } = useTagsQuery();
 
-  const [title, setTitle] = useState(todo?.title || '');
-  const [description, setDescription] = useState(todo?.description || '');
-  const [priority, setPriority] = useState<string>(todo?.priority || 'medium');
-  const [status, setStatus] = useState<string>(todo?.status || 'pending');
-  const [dueDate, setDueDate] = useState(todo?.dueDate?.slice(0, 10) || '');
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-    todo?.tags?.map(t => t.id) || []
-  );
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors },
+  } = useForm<UpsertTodoFormValues>({
+    resolver: yupResolver(upsertTodoSchema),
+    defaultValues: {
+      title: '',
+      description: null,
+      priority: TodoPriority.Medium,
+      status: TodoStatus.Pending,
+      dueDate: null,
+      tagIds: [],
+    },
+  });
 
   React.useEffect(() => {
     if (open) {
-      setTitle(todo?.title || '');
-      setDescription(todo?.description || '');
-      setPriority(todo?.priority || 'medium');
-      setStatus(todo?.status || 'pending');
-      setDueDate(todo?.dueDate?.slice(0, 10) || '');
-      setSelectedTagIds(todo?.tags?.map(t => t.id) || []);
+      reset({
+        title: todo?.title || '',
+        description: todo?.description || null,
+        priority: todo?.priority || TodoPriority.Medium,
+        status: todo?.status || TodoStatus.Pending,
+        dueDate: todo?.dueDate?.slice(0, 10) || null,
+        tagIds: todo?.tags?.map(t => t.id) || [],
+      });
     }
-  }, [open, todo]);
+  }, [open, todo, reset]);
 
   const isPending = createTodo.isPending || updateTodo.isPending;
 
-  const toggleTag = (tagId: string) => {
-    setSelectedTagIds(prev =>
-      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
-    );
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()) return;
-
+  const onSubmit = (values: UpsertTodoFormValues) => {
     const payload = {
-      title,
-      description: description || null,
-      priority: priority as 'low' | 'medium' | 'high',
-      status: status as 'pending' | 'in_progress' | 'completed',
-      dueDate: dueDate || null,
-      tagIds: selectedTagIds,
+      title: values.title,
+      description: values.description || null,
+      priority: values.priority,
+      status: values.status,
+      dueDate: values.dueDate || null,
+      tagIds: values.tagIds,
+    };
+
+    const mutationOptions = {
+      onSuccess: () => {
+        toast({ title: todo ? 'Todo Updated' : 'Todo Created' });
+        onOpenChange(false);
+      },
+      onError: (error: Error) => {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      },
     };
 
     if (todo) {
-      updateTodo.mutate({ id: todo.id, payload }, {
-        onSuccess: () => {
-          toast({ title: 'Todo Updated' });
-          onOpenChange(false);
-          queryClient.invalidateQueries({ queryKey: dashboardKeys.all }); // Invalidate dashboard data to reflect changes in recent todos
-        },
-        onError: (error) => {
-          toast({ title: 'Error', description: error.message, variant: 'destructive' });
-        },
-      });
+      updateTodo.mutate({ id: todo.id, payload }, mutationOptions);
     } else {
-      createTodo.mutate(payload, {
-        onSuccess: () => {
-          toast({ title: 'Todo Created' });
-          onOpenChange(false);
-          queryClient.invalidateQueries({ queryKey: dashboardKeys.all }); // Invalidate dashboard data to reflect changes in recent todos
-        },
-        onError: (error) => {
-          toast({ title: 'Error', description: error.message, variant: 'destructive' });
-        },
-      });
+      createTodo.mutate(payload, mutationOptions);
     }
   };
 
@@ -98,74 +105,87 @@ const UpsertTodoModal: React.FC<TodoModalProps> = ({ open, onOpenChange, todo })
         <DialogHeader>
           <DialogTitle>{todo ? 'Edit Todo' : 'Add Todo'}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">Title *</Label>
-            <Input id="title" value={title} onChange={e => setTitle(e.target.value)} required />
+            <Input id="title" {...register('title')} />
+            {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="desc">Description</Label>
-            <Textarea id="desc" value={description} onChange={e => setDescription(e.target.value)} rows={3} />
+            <Label htmlFor="description">Description</Label>
+            <Textarea id="description" {...register('description')} rows={3} />
+            {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Priority</Label>
-              <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                control={control}
+                name="priority"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {priorityOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.priority && <p className="text-sm text-destructive">{errors.priority.message}</p>}
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {statusOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.status && <p className="text-sm text-destructive">{errors.status.message}</p>}
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="due">Due Date</Label>
-            <Input id="due" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+            <Label>Due Date</Label>
+            <Controller
+              control={control}
+              name="dueDate"
+              render={({ field }) => (
+                <DatePicker
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                />
+              )}
+            />
           </div>
 
-          {/* Tag selection */}
-          {tags.length > 0 && (
-            <div className="space-y-2">
-              <Label>Tags</Label>
-              <div className="flex flex-wrap gap-2">
-                {tags.map(tag => {
-                  const isSelected = selectedTagIds.includes(tag.id);
-                  return (
-                    <Badge
-                      key={tag.id}
-                      variant={isSelected ? 'default' : 'outline'}
-                      className="cursor-pointer select-none"
-                      style={isSelected && tag.color ? { backgroundColor: tag.color } : undefined}
-                      onClick={() => toggleTag(tag.id)}
-                    >
-                      {tag.name}
-                      {isSelected && <X className="h-3 w-3 ml-1" />}
-                    </Badge>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          {/* Tags section */}
+          <div className="space-y-2">
+            <Label>Tags</Label>
+            <Controller
+              control={control}
+              name="tagIds"
+              render={({ field }) => (
+                <TagMultiSelect
+                  value={field.value ?? []}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
-              {todo ? 'Save Changes' : 'Add Todo'}
-            </Button>
+            <LoadingButton type="submit" disabled={isPending} isLoading={isPending} label={todo ? 'Save Changes' : 'Add Todo'} />
           </DialogFooter>
         </form>
       </DialogContent>

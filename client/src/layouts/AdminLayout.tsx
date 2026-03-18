@@ -29,7 +29,7 @@ function AdminSidebar() {
   const collapsed = state === 'collapsed';
   const { userInfo } = useUserProfile();
   const navigate = useNavigate();
-  const userPermissions = userInfo?.roles?.permissions ?? [];
+  const userPermissions = userInfo?.role?.permissions ?? [];
   const visibleNavItems = navItems.filter(item => !item.permission || userPermissions.includes(item.permission));
 
   const logout = () => {
