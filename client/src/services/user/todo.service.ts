@@ -77,6 +77,6 @@ export const todoService = {
 
   /** DELETE /api/v1/todos/:id */
   delete: async (ids: string | string[]): Promise<{ message: string }> => {
-    return apiClient.post<{ message: string }>(apiConstant.USER.TODOS.DELETE, ids);
+    return apiClient.post<{ message: string }>(apiConstant.USER.TODOS.DELETE, { ids });
   },
 };

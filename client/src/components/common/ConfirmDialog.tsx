@@ -3,6 +3,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import LoadingButton from './LoadingButton';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -25,9 +26,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       </DialogHeader>
       <DialogFooter>
         <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-        <Button variant="destructive" onClick={onConfirm} disabled={loading}>
-          {confirmText}
-        </Button>
+        <LoadingButton variant="destructive" onClick={onConfirm} isLoading={loading} label={confirmText} />
       </DialogFooter>
     </DialogContent>
   </Dialog>

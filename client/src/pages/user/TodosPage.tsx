@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { Plus, Trash2, Pencil, ListTodo } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
@@ -14,17 +14,20 @@ import { useDebounce } from '@/hooks/useDebounce';
 import UpsertTodoModal from '@/components/user/todo/UpsertTodoModal';
 import { Todo, TodoPriority, TodoStatus } from '@/types/todo.types';
 import TodoFilters from '@/components/user/todo/TodoFilters';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 
 const columnsDefination = ({
   toggleComplete,
   setEditTodo,
   setModalOpen,
   setDeleteConfirm,
+  setSelectedRows,
 }: Readonly<{
   toggleComplete: (todo: Todo) => void;
   setEditTodo: (todo: Todo | null) => void;
   setModalOpen: (open: boolean) => void;
   setDeleteConfirm: (id: string | null) => void;
+  setSelectedRows: Dispatch<SetStateAction<Todo[]>>
 }>): ColumnDef<Todo>[] => {
   return [
     {
@@ -32,14 +35,30 @@ const columnsDefination = ({
       header: ({ table }) => (
         <Checkbox
           checked={Boolean(table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate'))}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          onCheckedChange={(value) => {
+            table.toggleAllPageRowsSelected(!!value);
+            setSelectedRows(value ? table.getCoreRowModel().rows.map((r) => r.original) : []);
+          }}
           aria-label="Select all"
         />
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onCheckedChange={(value) => {
+            console.log(value, !!value)
+            row.toggleSelected(!!value);
+            setSelectedRows((previousState) => {
+              if (value) {
+                return [
+                  ...previousState,
+                  row.original
+                ]
+              } else {
+                return previousState.filter((r) => r.id !== row.original.id);
+              }
+            });
+          }}
           aria-label="Select row"
         />
       ),
@@ -129,6 +148,7 @@ const TodosPage: React.FC = () => {
   const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   const [selectedRows, setSelectedRows] = useState<Todo[]>([]);
 
+
   const debouncedSearch = useDebounce(search, 300);
 
   const { data, isLoading } = useTodosQuery({
@@ -151,6 +171,8 @@ const TodosPage: React.FC = () => {
     deleteTodoMutation.mutate(ids, {
       onSuccess: () => {
         setDeleteConfirm(null);
+        setBulkDeleteConfirm(false);
+        setSelectedRows([]);
         toast({ title: 'Todo Deleted' });
       },
       onError: (error) => {
@@ -201,7 +223,7 @@ const TodosPage: React.FC = () => {
       } />
 
       <DataTable
-        columns={columnsDefination({ toggleComplete, setEditTodo, setModalOpen, setDeleteConfirm })}
+        columns={columnsDefination({ toggleComplete, setEditTodo, setModalOpen, setDeleteConfirm, setSelectedRows })}
         data={todos}
         meta={meta}
         isLoading={isLoading}
@@ -220,7 +242,7 @@ const TodosPage: React.FC = () => {
         toolbar={<TodoFilters
           statusFilter={statusFilter}
           priorityFilter={priorityFilter}
-          selectedRowCount={selectedRows.length}
+          selectedRowCount={selectedRows?.length}
           onStatusChange={(v) => { setStatusFilter(v as TodoStatus | 'all'); setPage(1); }}
           onPriorityChange={(v) => { setPriorityFilter(v as TodoPriority | 'all'); setPage(1); }}
           onBulkDelete={() => setBulkDeleteConfirm(true)}
@@ -228,15 +250,22 @@ const TodosPage: React.FC = () => {
       />
 
       <UpsertTodoModal open={modalOpen} onOpenChange={setModalOpen} todo={editTodo} />
-      {/* <ConfirmDialog 
-      open={!!deleteConfirm} 
-      onOpenChange={() => setDeleteConfirm(null)} 
-      title="Delete Todo" 
-      description="Are you sure? This cannot be undone." 
-      onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)} 
-      loading={deleteTodoMutation.isPending} 
+      <ConfirmDialog
+        open={!!deleteConfirm}
+        onOpenChange={() => setDeleteConfirm(null)}
+        title="Delete Todo"
+        description="Are you sure? This cannot be undone."
+        onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
+        loading={deleteTodoMutation.isPending}
       />
-      <ConfirmDialog open={bulkDeleteConfirm} onOpenChange={setBulkDeleteConfirm} title="Delete Selected" description={`Delete ${selectedRows.length} selected todos?`} onConfirm={handleBulkDelete} loading={deleteTodoMutation.isPending} /> */}
+      <ConfirmDialog
+        open={bulkDeleteConfirm}
+        onOpenChange={setBulkDeleteConfirm}
+        title="Delete Selected"
+        description={`Delete ${selectedRows.length} selected todos?`}
+        onConfirm={() => bulkDeleteConfirm && handleDelete(selectedRows?.map((r) => r.id) ?? [])}
+        loading={deleteTodoMutation.isPending}
+      />
     </div>
   );
 };

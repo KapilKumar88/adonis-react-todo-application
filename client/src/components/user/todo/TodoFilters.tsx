@@ -38,6 +38,11 @@ export default function TodoFilters({
 }: Readonly<TodoFiltersProps>) {
     return (
         <div className="flex items-center gap-2">
+            {selectedRowCount > 0 && (
+                <Button variant="destructive" size="sm" onClick={onBulkDelete}>
+                    <Trash2 className="h-3 w-3 mr-1" /> Delete {selectedRowCount}
+                </Button>
+            )}
             <Select value={statusFilter} onValueChange={onStatusChange}>
                 <SelectTrigger className="w-[140px] h-8"><SelectValue placeholder="Status" /></SelectTrigger>
                 <SelectContent>
@@ -54,11 +59,6 @@ export default function TodoFilters({
                     ))}
                 </SelectContent>
             </Select>
-            {selectedRowCount > 0 && (
-                <Button variant="destructive" size="sm" onClick={onBulkDelete}>
-                    <Trash2 className="h-3 w-3 mr-1" /> Delete {selectedRowCount}
-                </Button>
-            )}
         </div>
     );
 }

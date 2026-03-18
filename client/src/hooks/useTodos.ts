@@ -14,7 +14,8 @@ export function useCreateTodo() {
   return useMutation({
     mutationFn: (payload: TodoPayload) => todoService.create(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...todoKeys.lists(), ...dashboardKeys.all] });
+      queryClient.invalidateQueries({ queryKey: todoKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
     },
   });
 }
@@ -25,7 +26,8 @@ export function useUpdateTodo() {
     mutationFn: ({ id, payload }: { id: string; payload: Partial<TodoPayload> }) =>
       todoService.update(id, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...todoKeys.lists(), ...dashboardKeys.all] });
+      queryClient.invalidateQueries({ queryKey: todoKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
     },
   });
 }
@@ -35,7 +37,8 @@ export function useDeleteTodo() {
   return useMutation({
     mutationFn: (ids: string | string[]) => todoService.delete(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...todoKeys.lists(), ...dashboardKeys.all] });
+      queryClient.invalidateQueries({ queryKey: todoKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
     },
   });
 }
