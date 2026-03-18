@@ -9,6 +9,8 @@ import EmptyState from '@/components/common/EmptyState';
 import { DataTable, SortableHeader } from '@/components/common/DataTable';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTodosQuery, useDeleteTodo, useUpdateTodo } from '@/hooks/useTodos';
+import { usePermission } from '@/hooks/usePermission';
+import { PERMISSIONS } from '@/constants/permission.constant';
 import { formatDate } from '@/utils/helpers';
 import { toast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -23,12 +25,16 @@ const columnsDefination = ({
   setModalOpen,
   setDeleteConfirm,
   setSelectedRows,
+  canUpdate,
+  canDelete,
 }: Readonly<{
   toggleComplete: (todo: Todo) => void;
   setEditTodo: (todo: Todo | null) => void;
   setModalOpen: (open: boolean) => void;
   setDeleteConfirm: (id: string | null) => void;
-  setSelectedRows: Dispatch<SetStateAction<Todo[]>>
+  setSelectedRows: Dispatch<SetStateAction<Todo[]>>;
+  canUpdate: boolean;
+  canDelete: boolean;
 }>): ColumnDef<Todo>[] => {
   return [
     {
@@ -68,6 +74,7 @@ const columnsDefination = ({
     },
     {
       accessorKey: 'title',
+      header: 'Title',
       cell: ({ row }) => {
         const todo = row.original;
         return (
@@ -161,20 +168,26 @@ const columnsDefination = ({
         const todo = row.original;
         return (
           <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
-              onClick={() => toggleComplete(todo)}
-              title="Toggle complete"
-            >
-              <Checkbox checked={todo.status === TodoStatus.Completed} className="pointer-events-none" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditTodo(todo); setModalOpen(true); }}>
-              <Pencil className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteConfirm(todo.id)}>
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
+            {canUpdate && (
+              <Button
+                type="button"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
+                onClick={() => toggleComplete(todo)}
+                title="Toggle complete"
+              >
+                <Checkbox checked={todo.status === TodoStatus.Completed} className="pointer-events-none" />
+              </Button>
+            )}
+            {canUpdate && (
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditTodo(todo); setModalOpen(true); }}>
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+            )}
+            {canDelete && (
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteConfirm(todo.id)}>
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            )}
           </div>
         );
       },
@@ -213,6 +226,10 @@ const TodosPage: React.FC = () => {
 
   const deleteTodoMutation = useDeleteTodo();
   const updateTodoMutation = useUpdateTodo();
+
+  const can = usePermission();
+  const canUpdate = can(PERMISSIONS.TODO_MANAGEMENT.UPDATE);
+  const canDelete = can(PERMISSIONS.TODO_MANAGEMENT.DELETE);
 
   const todos = data?.data ?? [];
   const meta = data?.meta;
@@ -273,13 +290,14 @@ const TodosPage: React.FC = () => {
       } />
 
       <DataTable
-        columns={columnsDefination({ toggleComplete, setEditTodo, setModalOpen, setDeleteConfirm, setSelectedRows })}
+        columns={columnsDefination({ toggleComplete, setEditTodo, setModalOpen, setDeleteConfirm, setSelectedRows, canUpdate, canDelete })}
         data={todos}
         meta={meta}
         isLoading={isLoading}
         page={page}
         pageSize={pageSize}
         onPaginationChange={handlePaginationChange}
+        pinnedColumns={{ right: ['actions'] }}
         defaultSortBy={sortBy || undefined}
         defaultSortDirection={sortDirection || 'desc'}
         searchPlaceholder="Search todos..."

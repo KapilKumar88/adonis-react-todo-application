@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
     ColumnDef,
+    ColumnPinningState,
     SortingState,
     VisibilityState,
     RowSelectionState,
@@ -84,6 +85,8 @@ export type DataTableProps<TData, TValue = unknown> = {
     // ── Extra toolbar content ─────────────────────────────────────────────────
     /** Renders to the right of the search input (e.g. an "Add" button) */
     readonly toolbar?: React.ReactNode;
+    /** Column ids to pin. e.g. { right: ['actions'] } */
+    readonly pinnedColumns?: { left?: string[]; right?: string[] };
 };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -147,11 +150,24 @@ function renderSkeletonRows(columnCount: number) {
 function renderDataRows<TData>(rows: ReturnType<ReturnType<typeof useReactTable<TData>>['getRowModel']>['rows']) {
     return rows.map((row) => (
         <TableRow key={row.id} data-state={row.getIsSelected() ? 'selected' : undefined}>
-            {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-            ))}
+            {row.getVisibleCells().map((cell) => {
+                const pinned = cell.column.getIsPinned();
+                return (
+                    <TableCell
+                        key={cell.id}
+                        className={pinned ? 'bg-background' : undefined}
+                        style={pinned ? {
+                            position: 'sticky',
+                            right: pinned === 'right' ? `${cell.column.getAfter('right')}px` : undefined,
+                            left: pinned === 'left' ? `${cell.column.getAfter('left')}px` : undefined,
+                            zIndex: 1,
+                            boxShadow: pinned === 'right' ? '-1px 0 0 hsl(var(--border))' : '1px 0 0 hsl(var(--border))',
+                        } : undefined}
+                    >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                );
+            })}
         </TableRow>
     ));
 }
@@ -194,12 +210,14 @@ export function DataTable<TData, TValue = unknown>({
     searchValue = '',
     onSearchChange,
     toolbar,
+    pinnedColumns,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>(
         defaultSortBy ? [{ id: defaultSortBy, desc: defaultSortDirection === 'desc' }] : []
     );
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+    const [columnPinning] = React.useState<ColumnPinningState>(pinnedColumns ?? {});
 
     const pageCount = meta?.lastPage ?? -1;
 
@@ -213,6 +231,7 @@ export function DataTable<TData, TValue = unknown>({
             sorting,
             columnVisibility,
             rowSelection,
+            columnPinning,
             pagination: {
                 pageIndex: page - 1, // TanStack Table is 0-based
                 pageSize,
@@ -283,13 +302,25 @@ export function DataTable<TData, TValue = unknown>({
             </div>
 
             {/* ── Table ───────────────────────────────────────────────────── */}
-            <div className="overflow-hidden rounded-md border">
+            <div className="overflow-x-auto rounded-md border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
+                                {headerGroup.headers.map((header) => {
+                                const pinned = header.column.getIsPinned();
+                                return (
+                                    <TableHead
+                                        key={header.id}
+                                        className={pinned ? 'bg-background' : undefined}
+                                        style={pinned ? {
+                                            position: 'sticky',
+                                            right: pinned === 'right' ? `${header.column.getAfter('right')}px` : undefined,
+                                            left: pinned === 'left' ? `${header.column.getAfter('left')}px` : undefined,
+                                            zIndex: 2,
+                                            boxShadow: pinned === 'right' ? '-1px 0 0 hsl(var(--border))' : '1px 0 0 hsl(var(--border))',
+                                        } : undefined}
+                                    >
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
@@ -297,7 +328,8 @@ export function DataTable<TData, TValue = unknown>({
                                                   header.getContext(),
                                               )}
                                     </TableHead>
-                                ))}
+                                );
+                            })}
                             </TableRow>
                         ))}
                     </TableHeader>
