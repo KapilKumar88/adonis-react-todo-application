@@ -1,4 +1,4 @@
-import { TODO_PRIORITIES, TODO_STATUSES } from '#models/todo'
+import Todo, { TODO_PRIORITIES, TODO_STATUSES } from '#models/todo'
 import vine from '@vinejs/vine'
 
 
@@ -8,6 +8,8 @@ export const getTodosValidator = vine.create({
   status: vine.enum(Object.values(TODO_STATUSES)).optional(),
   priority: vine.enum(Object.values(TODO_PRIORITIES)).optional(),
   search: vine.string().trim().maxLength(255).optional(),
+  sortBy: vine.enum(Todo.$columns).optional(),
+  sortDirection: vine.enum(['asc', 'desc'] as const).optional(),
 })
 
 

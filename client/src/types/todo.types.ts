@@ -1,23 +1,27 @@
-export interface TodoTag {
-    id: string;
-    name: string;
-    color: string | null;
-    type: string;
-    createdAt: string;
+import { Tag } from "./tags.types";
+
+export enum TodoStatus {
+    Pending = 'pending',
+    InProgress = 'in_progress',
+    Completed = 'completed',
+    Backlog = 'backlog',
+    Icebox = 'icebox',
+}
+
+export enum TodoPriority {
+    Low = 'low',
+    Medium = 'medium',
+    High = 'high',
 }
 
 export interface Todo {
     id: string;
     title: string;
     description: string | null;
-    status: 'pending' | 'in_progress' | 'completed' | 'backlog' | 'icebox';
-    priority: 'low' | 'medium' | 'high';
+    status: TodoStatus;
+    priority: TodoPriority;
     dueDate: string | null;
-    tags: TodoTag[];
+    tags: Tag[];
     createdAt: string;
     updatedAt: string;
 }
-
-
-export type TodoStatus = Todo['status'];
-export type TodoPriority = Todo['priority'];

@@ -51,7 +51,8 @@ export default Object.freeze({
     },
     TODOS: {
       BASE: '/api/v1/todos',
-      DELETE: '/api/v1/todos',
+      BY_ID: '/api/v1/todos/{id}',
+      DELETE: '/api/v1/todos/delete',
     },
   }
 });

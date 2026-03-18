@@ -68,6 +68,10 @@ export type DataTableProps<TData, TValue = unknown> = {
     // ── Server-side sorting ───────────────────────────────────────────────────
     /** Called with the column id and direction when the user clicks a sortable header */
     readonly onSortingChange?: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
+    /** Initial sort column id (reflects the default sort visually on first render) */
+    readonly defaultSortBy?: string;
+    /** Initial sort direction */
+    readonly defaultSortDirection?: 'asc' | 'desc';
 
     // ── Search ────────────────────────────────────────────────────────────────
     /** Placeholder text for the search input. Supplying this prop shows the input. */
@@ -184,12 +188,16 @@ export function DataTable<TData, TValue = unknown>({
     pageSize = 10,
     onPaginationChange,
     onSortingChange,
+    defaultSortBy,
+    defaultSortDirection,
     searchPlaceholder = 'Search...',
     searchValue = '',
     onSearchChange,
     toolbar,
 }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [sorting, setSorting] = React.useState<SortingState>(
+        defaultSortBy ? [{ id: defaultSortBy, desc: defaultSortDirection === 'desc' }] : []
+    );
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 

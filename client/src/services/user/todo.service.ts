@@ -1,12 +1,21 @@
 import apiConstant from '@/constants/api.constant';
 import { apiClient } from '@/lib/api-client';
-import type { Todo, PAGINATION_META_DATA } from '@/types';
+import type { PAGINATION_META_DATA } from '@/types';
+import { Todo, TodoPriority, TodoStatus } from '@/types/todo.types';
+
+
+export const todoKeys = {
+  all: ['todos'] as const,
+  lists: () => [...todoKeys.all, 'list'] as const,
+  list: (params?: TodoListParams) => [...todoKeys.lists(), params] as const,
+  detail: (id: string) => [...todoKeys.all, 'detail', id] as const,
+};
 
 export interface TodoPayload {
   title: string;
   description?: string | null;
-  priority?: 'low' | 'medium' | 'high';
-  status?: Todo['status'];
+  priority?: TodoPriority;
+  status?: TodoStatus;
   dueDate?: string | null;
   tagIds?: string[];
 }
@@ -21,9 +30,11 @@ export interface TodoListResponse {
 export interface TodoListParams {
   page?: number;
   limit?: number;
-  status?: string;
-  priority?: string;
+  status?: TodoStatus;
+  priority?: TodoPriority;
   search?: string;
+  sortBy?: keyof Todo;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export const todoService = {
@@ -35,9 +46,17 @@ export const todoService = {
     if (params?.status) searchParams.set('status', params.status);
     if (params?.priority) searchParams.set('priority', params.priority);
     if (params?.search) searchParams.set('search', params.search);
+    if (params?.sortBy) searchParams.set('sortBy', params.sortBy);
+    if (params?.sortDirection) searchParams.set('sortDirection', params.sortDirection);
 
     const query = searchParams.toString();
-    const url = `${apiConstant.USER.TODOS.BASE}${query ? `?${query}` : ''}`;
+    let apiUrl = apiConstant.USER.TODOS.BASE;
+
+    if (query) {
+      apiUrl += `?${query}`;
+    }
+
+    const url = apiUrl;
     return apiClient.get<TodoListResponse>(url);
   },
 
@@ -57,7 +76,7 @@ export const todoService = {
   },
 
   /** DELETE /api/v1/todos/:id */
-  delete: async (id: string): Promise<{ message: string }> => {
-    return apiClient.delete<{ message: string }>(apiConstant.USER.TODOS.BY_ID.replace('{id}', id));
+  delete: async (ids: string | string[]): Promise<{ message: string }> => {
+    return apiClient.post<{ message: string }>(apiConstant.USER.TODOS.DELETE, ids);
   },
 };

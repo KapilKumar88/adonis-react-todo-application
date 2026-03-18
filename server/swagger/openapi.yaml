@@ -1189,6 +1189,9 @@ paths:
                 properties:
                   data:
                     $ref: "#/components/schemas/User"
+                  message:
+                    type: string
+                    example: Profile retrieved successfully
         "400":
           description: Something went Wrong
           content:
@@ -1245,6 +1248,9 @@ paths:
                 properties:
                   data:
                     $ref: "#/components/schemas/User"
+                  message:
+                    type: string
+                    example: Profile retrieved successfully
         "400":
           description: Something went Wrong
           content:
@@ -1608,6 +1614,18 @@ paths:
           schema:
             type: string
           description: Search in title and description
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [title, description, priority, status, dueDate, createdAt]
+          description: Sort by field
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction
       responses:
         "200":
           description: Paginated list of todos

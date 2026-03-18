@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { adminRoleService } from '@/services/admin/role.service';
-import { AdminRole, USER_ROLE } from '@/types/role.types';
+import { Role, SYSTEM_ROLES } from '@/types/role.types';
 import { firstLetterUpperCase } from '@/utils/helpers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -14,7 +14,7 @@ export default function RoleCard({
     role,
     onEdit
 }: Readonly<{
-    role: AdminRole,
+    role: Role,
     onEdit: () => void;
 }>) {
     const queryClient = useQueryClient();
@@ -64,7 +64,7 @@ export default function RoleCard({
                     </p>
                 </CardContent>
                 <CardFooter className="gap-2">
-                    {role.name !== USER_ROLE.SUPER_ADMIN && (
+                    {role.name !== SYSTEM_ROLES.SUPER_ADMIN && (
                         <>
                             <Button variant="outline" size="sm" onClick={() => onEdit()}>
                                 <Pencil className="h-3 w-3 mr-1" /> Edit

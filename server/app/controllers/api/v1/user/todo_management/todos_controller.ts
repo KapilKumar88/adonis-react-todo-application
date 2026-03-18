@@ -18,7 +18,7 @@ export default class TodosController {
       .where('userId', user.id)
       .preload('tags')
 
-    const { page, limit, status, priority, search } = payload
+    const { page, limit, status, priority, search, sortBy, sortDirection } = payload
 
     if (status) {
       query.where('status', status)
@@ -33,7 +33,7 @@ export default class TodosController {
       })
     }
 
-    const todos = await query.orderBy('created_at', 'desc').paginate(page, limit)
+    const todos = await query.orderBy(sortBy ?? 'created_at', sortDirection ?? 'desc').paginate(page, limit)
 
     return response.ok({
       meta: todos.getMeta(),
