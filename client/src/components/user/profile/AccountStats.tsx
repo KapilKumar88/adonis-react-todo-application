@@ -19,7 +19,17 @@ export default function AccountStats({
                 <Separator />
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Role</span>
-                    <span className="capitalize">{userInfo?.role ?? '—'}</span>
+                    <span className="capitalize">{userInfo?.role?.displayName ?? '—'}</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Total Todos</span>
+                    <span>{userInfo?.totalTodos ?? 0}</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Completed Todos</span>
+                    <span>{userInfo?.completedTodos ?? 0}</span>
                 </div>
             </CardContent>
         </Card>

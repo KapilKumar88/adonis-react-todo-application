@@ -25,7 +25,7 @@ const ProfilePage: React.FC = () => {
           <ChangePassword />
         </div>
         <div>
-          {/* <AccountStats userInfo={currentUser?.data} /> */}
+          <AccountStats userInfo={currentUser?.data} />
         </div>
       </div>
     </div>

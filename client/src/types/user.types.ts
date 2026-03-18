@@ -9,6 +9,8 @@ export interface UserDetails {
     bio: string | null;
     profileImage: string | null;
     createdAt: string;
+    totalTodos?: number;
+    completedTodos?: number;
 }
 
 // ─── Admin User Management ────────────────────────────────────────────────────
