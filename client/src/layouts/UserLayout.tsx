@@ -10,17 +10,20 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 import { getInitials } from '@/utils/helpers';
 import { NavLink } from '@/components/NavLink';
 import { useUserProfile } from '@/context/UserProfileContext';
+import { PERMISSIONS } from '@/constants/permission.constant';
 
 const navItems = [
-  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'My Todos', to: '/todos', icon: ListTodo },
-  { label: 'Profile', to: '/profile', icon: UserCircle },
+  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard, permission: PERMISSIONS.USER_DASHBOARD.VIEW },
+  { label: 'My Todos', to: '/todos', icon: ListTodo, permission: PERMISSIONS.TODO_MANAGEMENT.VIEW },
+  { label: 'Profile', to: '/profile', icon: UserCircle, permission: null },
 ];
 
 const UserLayout: React.FC = () => {
   const { userInfo } = useUserProfile();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const userPermissions = userInfo?.roles?.permissions ?? [];
+  const visibleNavItems = navItems.filter(item => !item.permission || userPermissions.includes(item.permission));
 
   const handleLogout = () => {
     navigate('/login');
@@ -38,7 +41,7 @@ const UserLayout: React.FC = () => {
               <span className="hidden sm:inline">TodoApp</span>
             </Link>
             <nav className="hidden md:flex items-center gap-1">
-              {navItems.map(item => (
+              {visibleNavItems.map(item => (
                 <NavLink key={item.to} to={item.to} className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" activeClassName="text-foreground bg-muted">
                   <item.icon className="h-4 w-4 mr-1.5 inline" />
                   {item.label}
@@ -82,7 +85,7 @@ const UserLayout: React.FC = () => {
         </div>
         {mobileOpen && (
           <nav className="md:hidden border-t px-4 py-2 space-y-1">
-            {navItems.map(item => (
+            {visibleNavItems.map(item => (
               <NavLink key={item.to} to={item.to} className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-muted" activeClassName="text-foreground bg-muted" onClick={() => setMobileOpen(false)}>
                 <item.icon className="h-4 w-4" />
                 {item.label}

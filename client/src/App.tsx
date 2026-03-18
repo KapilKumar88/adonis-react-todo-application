@@ -31,6 +31,7 @@ import { UserProfileProvider } from "./context/UserProfileContext";
 import AuthGuard from "@/guard/AuthGuard";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import { SYSTEM_ROLES } from "./types/role.types";
+import { PERMISSIONS } from "@/constants/permission.constant";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,9 +67,9 @@ const App = () => (
 
 
               {/* User protected routes */}
-              <Route element={<AuthGuard><UserLayout /></AuthGuard>}>
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/todos" element={<TodosPage />} />
+              <Route element={<AuthGuard requiredRole={SYSTEM_ROLES.USER}><UserLayout /></AuthGuard>}>
+                <Route path="/dashboard" element={<AuthGuard requiredPermission={PERMISSIONS.USER_DASHBOARD.VIEW}><DashboardPage /></AuthGuard>} />
+                <Route path="/todos" element={<AuthGuard requiredPermission={PERMISSIONS.TODO_MANAGEMENT.VIEW}><TodosPage /></AuthGuard>} />
                 <Route path="/profile" element={<ProfilePage />} />
               </Route>
 
@@ -80,11 +81,11 @@ const App = () => (
 
               {/* Admin routes */}
               <Route element={<AuthGuard requiredRole={SYSTEM_ROLES.SUPER_ADMIN}><AdminLayout /></AuthGuard>} >
-                <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-                <Route path="/admin/users" element={<UsersPage />} />
-                <Route path="/admin/roles" element={<RolesPage />} />
-                <Route path="/admin/permissions" element={<PermissionsPage />} />
-                <Route path="/admin/logs" element={<ActivityLogsPage />} />
+                <Route path="/admin/dashboard" element={<AuthGuard requiredPermission={PERMISSIONS.ADMIN_DASHBOARD.VIEW}><AdminDashboardPage /></AuthGuard>} />
+                <Route path="/admin/users" element={<AuthGuard requiredPermission={PERMISSIONS.USER_MANAGEMENT.VIEW}><UsersPage /></AuthGuard>} />
+                <Route path="/admin/roles" element={<AuthGuard requiredPermission={PERMISSIONS.ROLES_MANAGEMENT.VIEW}><RolesPage /></AuthGuard>} />
+                <Route path="/admin/permissions" element={<AuthGuard requiredPermission={PERMISSIONS.PERMISSION_MANAGEMENT.VIEW}><PermissionsPage /></AuthGuard>} />
+                <Route path="/admin/logs" element={<AuthGuard requiredPermission={PERMISSIONS.ACTIVITY_LOGS.VIEW}><ActivityLogsPage /></AuthGuard>} />
                 {/* <Route path="/admin/settings" element={<SettingsPage />} /> */}
               </Route>
 

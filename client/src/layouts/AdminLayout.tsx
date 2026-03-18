@@ -13,14 +13,15 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 import { NavLink } from '@/components/NavLink';
 import { getInitials } from '@/utils/helpers';
 import { useUserProfile } from '@/context/UserProfileContext';
+import { PERMISSIONS } from '@/constants/permission.constant';
 
 const navItems = [
-  { title: 'Dashboard', url: '/admin/dashboard', icon: LayoutDashboard },
-  { title: 'Users', url: '/admin/users', icon: Users },
-  { title: 'Roles', url: '/admin/roles', icon: KeyRound },
-  { title: 'Permissions', url: '/admin/permissions', icon: ShieldCheck },
-  { title: 'Activity Logs', url: '/admin/logs', icon: ScrollText },
-  { title: 'Settings', url: '/admin/settings', icon: Settings },
+  { title: 'Dashboard', url: '/admin/dashboard', icon: LayoutDashboard, permission: PERMISSIONS.ADMIN_DASHBOARD.VIEW },
+  { title: 'Users', url: '/admin/users', icon: Users, permission: PERMISSIONS.USER_MANAGEMENT.VIEW },
+  { title: 'Roles', url: '/admin/roles', icon: KeyRound, permission: PERMISSIONS.ROLES_MANAGEMENT.VIEW },
+  { title: 'Permissions', url: '/admin/permissions', icon: ShieldCheck, permission: PERMISSIONS.PERMISSION_MANAGEMENT.VIEW },
+  { title: 'Activity Logs', url: '/admin/logs', icon: ScrollText, permission: PERMISSIONS.ACTIVITY_LOGS.VIEW },
+  { title: 'Settings', url: '/admin/settings', icon: Settings, permission: null },
 ];
 
 function AdminSidebar() {
@@ -28,6 +29,8 @@ function AdminSidebar() {
   const collapsed = state === 'collapsed';
   const { userInfo } = useUserProfile();
   const navigate = useNavigate();
+  const userPermissions = userInfo?.roles?.permissions ?? [];
+  const visibleNavItems = navItems.filter(item => !item.permission || userPermissions.includes(item.permission));
 
   const logout = () => {
     localStorage.removeItem('user_profile');
@@ -54,7 +57,7 @@ function AdminSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map(item => (
+              {visibleNavItems.map(item => (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className="hover:bg-muted/50" activeClassName="bg-muted text-primary font-medium">
