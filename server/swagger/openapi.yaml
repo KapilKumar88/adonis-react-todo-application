@@ -536,6 +536,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   # ─── admin roles management ──────────────────────────────────────────────────────────────────────
 
@@ -1750,9 +1756,9 @@ paths:
         "401":
           description: Unauthorized
           content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/MessageResponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Todo not found
           content:
@@ -1806,9 +1812,9 @@ paths:
         "401":
           description: Unauthorized
           content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/MessageResponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Todo not found
           content:
@@ -1827,64 +1833,64 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
-  /todos/delete: 
-      post:
-        tags:
-          - Todos
-        summary: Delete a todo
-        operationId: deleteTodo
-        security:
-          - bearerAuth: []
-        requestBody:
-          required: true
+  /todos/delete:
+    post:
+      tags:
+        - Todos
+      summary: Delete a todo
+      operationId: deleteTodo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+              properties:
+                ids:
+                  oneOf:
+                    - type: string
+                      format: uuid
+                      example: 550e8400-e29b-41d4-a716-446655440000
+                    - type: array
+                      items:
+                        type: string
+                        format: uuid
+                      minItems: 1
+                      example:
+                        - 550e8400-e29b-41d4-a716-446655440000
+                        - 661f9511-f3ac-52e5-b827-557766551111
+      responses:
+        "200":
+          description: Todo deleted
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - ids
-                properties:
-                  ids:
-                    oneOf:
-                      - type: string
-                        format: uuid
-                        example: 550e8400-e29b-41d4-a716-446655440000
-                      - type: array
-                        items:
-                          type: string
-                          format: uuid
-                        minItems: 1
-                        example:
-                          - 550e8400-e29b-41d4-a716-446655440000
-                          - 661f9511-f3ac-52e5-b827-557766551111
-        responses:
-          "200":
-            description: Todo deleted
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/MessageResponse"
-          "401":
-            description: Unauthorized
-            content:
-                application/json:
-                  schema:
-                    $ref: "#/components/schemas/MessageResponse"
-          "404":
-            description: Todo not found
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/MessageResponse"
-          "422":
-            description: Validation error
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/ValidationError"
-          "500":
-            description: Internal Server Error
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/InternalServerError"
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "404":
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"

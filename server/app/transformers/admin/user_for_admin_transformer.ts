@@ -6,10 +6,11 @@ export default class UserForAdminTransformer extends BaseTransformer<User> {
   toObject() {
     return {
       ...this.pick(this.resource, [
-        'id',
         'fullName',
         'email',
         'initials',
+        'bio',
+        'profileImage',
         'createdAt',
       ]),
       role: RoleTransformer.transform(this.whenLoaded(this.resource.roles[0])),

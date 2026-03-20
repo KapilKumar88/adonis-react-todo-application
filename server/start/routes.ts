@@ -141,7 +141,7 @@ router
         .prefix('tags')
         .as('tags')
 
-      // Todo management
+      // Task management apis
       router
         .group(() => {
           router.get('/', [TodosController, 'index'])

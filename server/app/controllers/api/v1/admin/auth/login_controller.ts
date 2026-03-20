@@ -12,7 +12,7 @@ export default class LoginController {
         await user.load('roles', (q) => q.preload('permissions'));
         const token = await User.accessTokens.create(user, user.roles.flatMap((r) => r.permissions.map((p) => p.name)))
 
-        await logActivity({
+        logActivity({
             action: 'Logged in',
             description: `${user.fullName} logged in — item admin panel`,
             status: 'success',
@@ -25,6 +25,7 @@ export default class LoginController {
         return serialize({
             user: UserForAdminTransformer.transform(user),
             token: token.value!.release(),
+            message: 'Login successful',
         })
     }
 }
