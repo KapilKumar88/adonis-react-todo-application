@@ -10,6 +10,10 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 import { NavLink } from '@/components/NavLink';
 import { useUserProfile } from '@/context/UserProfileContext';
 import { PERMISSIONS } from '@/constants/permission.constant';
+import { tokenStorage } from '@/lib/api-client';
+import { useMutation } from '@tanstack/react-query';
+import { MessageResponse, userAuthService } from '@/services/user/auth.service';
+import { toast } from '@/hooks/use-toast';
 
 const navItems = [
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard, permission: PERMISSIONS.USER_DASHBOARD.VIEW },
@@ -18,14 +22,30 @@ const navItems = [
 ];
 
 const UserLayout: React.FC = () => {
-  const { userInfo } = useUserProfile();
+  const { userInfo, setUserInfo } = useUserProfile();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const userPermissions = userInfo?.role?.permissions ?? [];
   const visibleNavItems = navItems.filter(item => !item.permission || userPermissions.includes(item.permission));
 
+  const { mutate: logoutMutate } = useMutation<MessageResponse, Error, void>({
+    mutationFn: userAuthService.logout,
+    onSuccess: () => {
+      setUserInfo(null);
+      tokenStorage.remove();
+      navigate('/login');
+      toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
+    },
+    onError: () => {
+      setUserInfo(null);
+      tokenStorage.remove();
+      navigate('/login');
+      toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
+    },
+  });
+
   const handleLogout = () => {
-    navigate('/login');
+    logoutMutate();
   };
 
   return (
