@@ -16,9 +16,6 @@ export interface Role {
     updatedAt: string;
 }
 
-
-
-
 export interface AdminRoleListResponse {
     meta: PAGINATION_META_DATA;
     data: Role[];

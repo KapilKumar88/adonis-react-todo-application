@@ -22,11 +22,14 @@ export default class DashboardController {
     ])
 
     return response.ok({
-      userStats,
-      todoStats,
-      priorityBreakdown,
-      recentActivity,
-      topActiveUsers,
+      data: {
+        userStats,
+        todoStats,
+        priorityBreakdown,
+        recentActivity,
+        topActiveUsers,
+      },
+      message: 'Dashboard stats retrieved successfully',
     })
   }
 

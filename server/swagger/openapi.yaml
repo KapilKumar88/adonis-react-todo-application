@@ -543,6 +543,123 @@ paths:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
 
+  # ─── admin Dashboard ──────────────────────────────────────────────────────────────────────
+  /admin/dashboard:
+    get:
+      tags:
+        - Admin_Dashboard
+      summary: Get admin dashboard data
+      operationId: getDashboard
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard stats retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      priorityBreakdown:
+                        type: object
+                        properties:
+                          low:
+                            type: integer
+                          medium:
+                            type: integer
+                          high:
+                            type: integer
+                      recentActivity:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            action:
+                              type: string
+                              example: "User John Doe created a new todo"
+                            createdAt:
+                              type: string
+                              format: date-time
+                            description:
+                              type: string
+                              example: "Super Admin logged in — item admin panel"
+                            id:
+                              type: string
+                              format: uuid
+                              example: "437d5033-01ff-4b7e-9451-6e71fdf0e1ad"
+                            resource:
+                              type: string
+                              example: "Auth"
+                            status:
+                              type: string
+                              example: "success"
+                            userName:
+                              type: string
+                              example: "Super Admin"
+                      todoStats:
+                        type: object
+                        properties:
+                          completed:
+                            type: integer
+                          inProgress:
+                            type: integer
+                          pending:
+                            type: integer
+                          total:
+                            type: integer
+                      topActiveUsers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                              example: "550e8400-e29b-41d4-a716-446655440000"
+                            fullName:
+                              type: string
+                              example: "John Doe"
+                            todoCount:
+                              type: integer
+                              example: 42
+                      userStats:
+                        type: object
+                        properties:
+                          activeUsers:
+                            type: integer
+                          totalUsers:
+                            type: integer
+                  message:
+                    type: string
+                    example: Dashboard stats retrieved successfully
+        "400":
+          description: Something Went wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
   # ─── admin roles management ──────────────────────────────────────────────────────────────────────
 
   /admin/roles:
