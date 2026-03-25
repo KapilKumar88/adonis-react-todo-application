@@ -131,6 +131,25 @@ components:
         updatedAt:
           type: string
           format: date-time
+        permissions:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
+              name:
+                type: string
+                example: users:create
+              displayName:
+                type: string
+                nullable: true
+                example: Create Users
+              description:
+                type: string
+                nullable: true
+                example: Allows creating new users
 
     RoleBody:
       type: object
@@ -834,7 +853,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Role"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Role"
+                  message:
+                    type: string
+                    example: Role details retrieved successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
           content:
@@ -878,7 +909,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Role"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Role"
+                  message:
+                    type: string
+                    example: Role updated successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
           content:
@@ -897,6 +940,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     delete:
       tags:
         - Admin_Roles
@@ -911,10 +960,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   # ─── admin permission management ──────────────────────────────────────────────────────────────────────
 

@@ -35,20 +35,24 @@ export default class RolesController {
     const { request, response } = ctx
     const { permissions, ...payload } = await request.validateUsing(createRoleValidator)
 
-    const role = await Role.create(payload)
+    const data = await Role.create(payload)
     if (permissions && permissions.length > 0) {
-      await role.related('permissions').sync(permissions)
+      await data.related('permissions').sync(permissions)
     }
 
     logFromContext(ctx, {
       action: 'Created role',
-      description: `${ctx.auth.user!.fullName} created role — ${role.displayName ?? role.name}`,
+      description: `${ctx.auth.user!.fullName} created role — ${data.displayName ?? data.name}`,
       status: 'success',
       resource: 'Roles',
     })
 
+    await data.load('permissions', (permQuery) => {
+      permQuery.select(['id', 'name', 'displayName', 'description'])
+    });
+
     return response.created({
-      data: { role, permissions: permissions || [] },
+      data: data,
       message: 'Role created successfully'
     })
   }
@@ -59,6 +63,9 @@ export default class RolesController {
    */
   async show({ params, response }: HttpContext) {
     const role = await Role.findOrFail(params.id)
+    await role.load('permissions', (permQuery) => {
+      permQuery.select(['id', 'name', 'displayName', 'description'])
+    })
 
     return response.ok({ data: role, message: 'Role retrieved successfully' })
   }
@@ -74,6 +81,7 @@ export default class RolesController {
 
     role.merge(payload)
     await role.save()
+    await role.related('permissions').sync(payload?.permissions ?? [])
 
     logFromContext(ctx, {
       action: 'Updated role',
@@ -82,7 +90,14 @@ export default class RolesController {
       resource: 'Roles',
     })
 
-    return response.ok({ data: role, message: 'Role updated successfully' })
+    await role.load('permissions', (permQuery) => {
+      permQuery.select(['id', 'name', 'displayName', 'description'])
+    });
+
+    return response.ok({
+      data: role,
+      message: 'Role updated successfully'
+    })
   }
 
   /**
