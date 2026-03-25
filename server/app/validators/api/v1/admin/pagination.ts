@@ -8,3 +8,9 @@ export const userPaginationValidator = vine.create({
     search: vine.string().trim().optional(),
     role: vine.string().uuid().validateIds({ table: 'roles', column: 'id' }).trim().optional(),
 });
+
+
+export const rolePaginationValidator = vine.create({
+    page: vine.number().min(1).optional(),
+    limit: vine.number().min(1).max(100).optional(),
+});

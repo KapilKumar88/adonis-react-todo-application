@@ -1,5 +1,6 @@
 import Role from '#models/role'
 import { createRoleValidator } from '#validators/api/v1/admin/role'
+import { rolePaginationValidator } from '#validators/api/v1/admin/pagination'
 import type { HttpContext } from '@adonisjs/core/http'
 import { logFromContext } from '#helpers/common.helper'
 
@@ -9,11 +10,10 @@ export default class RolesController {
    * Return paginated list of roles
    */
   async index({ request, response }: HttpContext) {
-    const page = request.input('page', 1)
-    const limit = request.input('limit', 10)
+    const { page = 1, limit = 100 } = await request.validateUsing(rolePaginationValidator)
 
     const roles = await Role.query()
-      .select(['id', 'name', 'display_name', 'description'])
+      .withCount('users')
       .preload('permissions', (permQuery) => {
         permQuery.select(['id', 'name', 'displayName', 'description'])
       })
@@ -21,7 +21,15 @@ export default class RolesController {
       .paginate(page, limit)
 
     return response.ok({
-      data: roles.all(),
+      data: roles.all().map(role => ({
+        id: role.id,
+        name: role.name,
+        type: role.type,
+        displayName: role.displayName,
+        description: role.description,
+        permissions: role.permissions.map(p => ({ id: p.id, name: p.name, displayName: p.displayName, description: p.description })),
+        usersCount: role?.$extras?.users_count // Accessing the count of related users
+      })),
       metaData: roles.getMeta(),
       message: 'Roles retrieved successfully'
     });

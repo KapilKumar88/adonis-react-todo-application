@@ -80,7 +80,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api/v1/admin/pagination').rolePaginationValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/role_management/roles_controller').default['index']>>>
     }
   }
