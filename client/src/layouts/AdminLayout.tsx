@@ -14,6 +14,10 @@ import { NavLink } from '@/components/NavLink';
 import { getInitials } from '@/utils/helpers';
 import { useUserProfile } from '@/context/UserProfileContext';
 import { PERMISSIONS } from '@/constants/permission.constant';
+import { useMutation } from '@tanstack/react-query';
+import { MessageResponse, userAuthService } from '@/services/user/auth.service';
+import { tokenStorage } from '@/lib/api-client';
+import { toast } from '@/hooks/use-toast';
 
 const navItems = [
   { title: 'Dashboard', url: '/admin/dashboard', icon: LayoutDashboard, permission: PERMISSIONS.ADMIN_DASHBOARD.VIEW },
@@ -27,17 +31,30 @@ const navItems = [
 function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
-  const { userInfo } = useUserProfile();
+  const { userInfo, setUserInfo } = useUserProfile();
   const navigate = useNavigate();
   const userPermissions = userInfo?.role?.permissions ?? [];
   const visibleNavItems = navItems.filter(item => !item.permission || userPermissions.includes(item.permission));
 
-  const logout = () => {
-    localStorage.removeItem('user_profile');
-    localStorage.removeItem('todo-current-user');
-    localStorage.removeItem('todo-users');
-    localStorage.removeItem('api_token');
-  }
+  const { mutate: logoutMutate } = useMutation<MessageResponse, Error, void>({
+    mutationFn: userAuthService.logout,
+    onSuccess: () => {
+      setUserInfo(null);
+      tokenStorage.remove();
+      navigate('/admin/login');
+      toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
+    },
+    onError: () => {
+      setUserInfo(null);
+      tokenStorage.remove();
+      navigate('/admin/login');
+      toast({ title: 'Logged out', description: 'You have been logged out successfully.' });
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutate();
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -85,7 +102,7 @@ function AdminSidebar() {
               </div>
             )}
             {!collapsed && (
-              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => { logout(); navigate('/admin/login'); }}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => { handleLogout(); }}>
                 <LogOut className="h-4 w-4" />
               </Button>
             )}
