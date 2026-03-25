@@ -262,12 +262,6 @@ components:
         initials:
           type: string
           example: JD
-        roleId:
-          type: integer
-          nullable: true
-          example: 1
-        role:
-          $ref: "#/components/schemas/Role"
         createdAt:
           type: string
           format: date-time
@@ -291,15 +285,10 @@ components:
           format: email
           maxLength: 254
           example: john@example.com
-        password:
-          type: string
-          minLength: 8
-          maxLength: 32
-          example: Secret@123
         roleId:
-          type: integer
-          nullable: true
-          example: 1
+          type: string
+          format: uuid
+          example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
 
     UpdateUserBody:
       type: object
@@ -1283,8 +1272,30 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/AdminUser"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     post:
       tags:
         - Admin_Users
@@ -1304,15 +1315,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AdminUser"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/AdminUser"
+                  message:
+                    type: string
+                    example: User created successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "422":
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   /admin/users/{id}:
     parameters:

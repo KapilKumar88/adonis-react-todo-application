@@ -4,19 +4,22 @@ import { createUserValidator, updateUserValidator } from '#validators/api/v1/adm
 import stringHelpers from '@adonisjs/core/helpers/string'
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import mail from '@adonisjs/mail/services/main'
+import AdminWelcomeNotification from '#mails/admin_welcome_notification'
 import { logFromContext } from '#helpers/common.helper'
+import { DefaultSystemRoles } from '#constants/role.contants'
 
 export default class UserController {
   /**
    * GET /api/v1/admin/users
    * Return paginated list of users with their role
    */
-  async index({ serialize, request }: HttpContext) {
+  async index({ request, serialize }: HttpContext) {
     const page = request.input('page', 1)
     const limit = request.input('limit', 10)
 
     const users = await User.query()
-      .whereDoesntHave('roles', (qb) => qb.where('name', 'super_admin'))
+      .whereDoesntHave('roles', (qb) => qb.where('name', DefaultSystemRoles.SUPER_ADMIN))
       .preload('roles', (qb) => qb.select('id', 'name', 'displayName'))
       .orderBy('created_at', 'desc')
       .paginate(page, limit)
@@ -31,12 +34,13 @@ export default class UserController {
   async store(ctx: HttpContext) {
     const { request, response } = ctx
     const trx = await db.transaction()
+    const payload = await request.validateUsing(createUserValidator)
     try {
-      const payload = await request.validateUsing(createUserValidator)
+      const password = stringHelpers.random(32)
       const user = await User.create({
         fullName: payload.fullName,
         email: payload.email,
-        password: stringHelpers.random(32)
+        password: password
       }, {
         client: trx,
       });
@@ -44,14 +48,24 @@ export default class UserController {
       await user.related('roles').attach([payload.roleId])
       await trx.commit()
 
-      await logFromContext(ctx, {
+      // Send welcome email with credentials
+      mail.send(new AdminWelcomeNotification({
+        email: user.email,
+        password: password,
+        userName: user.fullName
+      }))
+
+      logFromContext(ctx, {
         action: 'Created user',
         description: `${ctx.auth.user!.fullName} created user — ${user.fullName}`,
         status: 'success',
         resource: 'Users',
       })
 
-      return response.created(UserForAdminTransformer.transform(user))
+      return response.created({
+        data: (new UserForAdminTransformer(user)).toObject(),
+        message: 'User created successfully. Credentials sent to email.'
+      })
     } catch (error) {
       await trx.rollback()
       return response.internalServerError({

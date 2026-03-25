@@ -13,7 +13,7 @@ export default class UserForAdminTransformer extends BaseTransformer<User> {
         'profileImage',
         'createdAt',
       ]),
-      role: RoleTransformer.transform(this.whenLoaded(this.resource.roles[0])),
+      role: RoleTransformer.transform(this.whenLoaded(this.resource?.roles?.[0])),
     }
   }
 }

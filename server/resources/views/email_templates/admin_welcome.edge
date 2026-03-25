@@ -1,0 +1,118 @@
+@mjml()
+    <mjml>
+        <mj-head>
+            <mj-attributes>
+            <mj-all font-family="'DM Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" />
+            <mj-text font-size="15px" color="#0F172A" line-height="1.6" />
+            <mj-button font-size="16px" font-weight="600" />
+            </mj-attributes>
+            <mj-style>
+            .footer-text a { color: #64748B !important; text-decoration: underline; }
+            </mj-style>
+        </mj-head>
+
+        <mj-body background-color="#F1F5F9">
+            <!-- Spacer -->
+            <mj-section padding="20px 0 0 0"></mj-section>
+
+            <!-- Header -->
+            <mj-section background-color="#6366F1" border-radius="12px 12px 0 0" padding="32px 40px 24px 40px">
+            <mj-column>
+                <mj-text align="center" color="#FFFFFF" font-size="28px" font-weight="700" letter-spacing="-0.5px">
+                {{appName}}
+                </mj-text>
+            </mj-column>
+            </mj-section>
+
+            <!-- Body -->
+            <mj-section background-color="#FFFFFF" padding="40px 40px 16px 40px">
+            <mj-column>
+                <mj-text font-size="22px" font-weight="700" color="#0F172A" padding-bottom="8px">
+                Welcome to the team! 👋
+                </mj-text>
+                <mj-text color="#64748B" padding-bottom="24px">
+                Hi {{displayName}},
+                </mj-text>
+                <mj-text color="#0F172A" padding-bottom="16px">
+                You've been added to {{appName}} by our admin team. Your account has been created and you're ready to get started.
+                </mj-text>
+                <mj-text color="#0F172A" padding-bottom="16px">
+                Below are your login credentials. You can use them to access your account immediately.
+                </mj-text>
+            </mj-column>
+            </mj-section>
+
+            <!-- Credentials Box -->
+            <mj-section background-color="#F8FAFC" padding="24px 40px" border="1px solid #E2E8F0">
+            <mj-column>
+                <mj-text font-size="14px" font-weight="600" color="#0F172A" padding-bottom="12px">
+                Your Login Credentials:
+                </mj-text>
+                <mj-text color="#0F172A" padding-bottom="8px" font-size="14px">
+                <strong>Email:</strong> {{email}}
+                </mj-text>
+                <mj-text color="#0F172A" padding-bottom="4px" font-size="14px">
+                <strong>Password:</strong> {{password}}
+                </mj-text>
+            </mj-column>
+            </mj-section>
+
+            <!-- CTA Button -->
+            <mj-section background-color="#FFFFFF" padding="24px 40px 8px 40px">
+            <mj-column>
+                <mj-button background-color="#6366F1" color="#FFFFFF" border-radius="8px" inner-padding="14px 32px" href="{{dashboardUrl}}">
+                Go to Dashboard
+                </mj-button>
+            </mj-column>
+            </mj-section>
+
+            <!-- Tips section -->
+            <mj-section background-color="#FFFFFF" padding="16px 40px 8px 40px">
+            <mj-column>
+                <mj-text font-size="16px" font-weight="600" color="#0F172A" padding-bottom="8px">
+                Here's what you can do:
+                </mj-text>
+            </mj-column>
+            </mj-section>
+
+            <mj-section background-color="#FFFFFF" padding="0 40px">
+            <mj-column>
+                <mj-text color="#0F172A" padding-bottom="8px">
+                ✅ &nbsp; Create and manage your todos
+                </mj-text>
+                <mj-text color="#0F172A" padding-bottom="8px">
+                🏷️ &nbsp; Organize with tags and priorities
+                </mj-text>
+                <mj-text color="#0F172A" padding-bottom="8px">
+                📊 &nbsp; Track your progress on the dashboard
+                </mj-text>
+            </mj-column>
+            </mj-section>
+
+            <!-- Divider -->
+            <mj-section background-color="#FFFFFF" padding="16px 40px 0 40px">
+            <mj-column>
+                <mj-divider border-color="#E2E8F0" border-width="1px" />
+            </mj-column>
+            </mj-section>
+
+            <!-- Security note -->
+            <mj-section background-color="#FFFFFF" padding="16px 40px 32px 40px" border-radius="0 0 12px 12px">
+            <mj-column>
+                <mj-text font-size="13px" color="#64748B">
+                For security reasons, we recommend changing your password after your first login. If you didn't expect to be added to {{appName}}, please contact your administrator.
+                </mj-text>
+            </mj-column>
+            </mj-section>
+
+            <!-- Footer -->
+            <mj-section padding="24px 40px 32px 40px">
+            <mj-column>
+                <mj-text align="center" font-size="12px" color="#64748B" css-class="footer-text">
+                &copy; {{date}} {{appName}}. All rights reserved.
+                </mj-text>
+            </mj-column>
+            </mj-section>
+        </mj-body>
+    </mjml>
+@end
