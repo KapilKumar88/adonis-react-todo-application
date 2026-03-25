@@ -79,10 +79,19 @@ export default class UserController {
    * GET /api/v1/admin/users/:id
    * Return a single user with role
    */
-  async show({ params, response }: HttpContext) {
-    const user = await User.query().where('id', params.id).preload('roles').firstOrFail()
+  async show({ params, response, serialize }: HttpContext) {
+    const user = await User
+      .query()
+      .where('id', params.id)
+      .preload('roles', (qb) => qb.select('id', 'name', 'displayName').preload('permissions'))
+      .firstOrFail()
 
-    return response.ok(UserForAdminTransformer.transform(user))
+    const data = await serialize(UserForAdminTransformer.transform(user))
+
+    return response.ok({
+      data: data.data,
+      message: 'User retrieved successfully'
+    })
   }
 
   /**
@@ -90,7 +99,7 @@ export default class UserController {
    * Update an existing user
    */
   async update(ctx: HttpContext) {
-    const { params, request, response } = ctx
+    const { params, request, response, serialize } = ctx
     const user = await User.findOrFail(params.id)
     const { roleId, ...payload } = await request.validateUsing(updateUserValidator)
 
@@ -112,14 +121,19 @@ export default class UserController {
     await user.save()
     await user.related('roles').sync([roleId])
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Updated user',
       description: `${ctx.auth.user!.fullName} updated user — ${user.fullName}`,
       status: 'success',
       resource: 'Users',
     })
 
-    return response.ok(UserForAdminTransformer.transform(user))
+    const data = await serialize(UserForAdminTransformer.transform(user))
+
+    return response.ok({
+      data: data.data,
+      message: 'User updated successfully'
+    })
   }
 
   /**
@@ -132,7 +146,7 @@ export default class UserController {
     const userName = user.fullName
     await user.delete()
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Deleted user',
       description: `${ctx.auth.user!.fullName} deleted user — ${userName}`,
       status: 'success',

@@ -268,6 +268,21 @@ components:
         updatedAt:
           type: string
           format: date-time
+        role:
+          type: object
+          properties:
+            name:
+              type: string
+              example: editor
+            displayName:
+              type: string
+              nullable: true
+              example: Editor
+            permissions:
+              type: array
+              items:
+                type: string
+              example: ["users:create", "todos:update"]
 
     CreateUserBody:
       type: object
@@ -304,9 +319,9 @@ components:
           maxLength: 254
           example: john@example.com
         roleId:
-          type: integer
-          nullable: true
-          example: 1
+          type: string
+          format: uuid
+          example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
 
     ForgotPasswordBody:
       type: object
@@ -1369,11 +1384,43 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AdminUser"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/AdminUser"
+                  message:
+                    type: string
+                    example: User details retrieved successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
-          description: User not found
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     put:
       tags:
         - Admin_Users
@@ -1393,17 +1440,43 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AdminUser"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/AdminUser"
+                  message:
+                    type: string
+                    example: User updated successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
-          description: User not found
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "422":
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     delete:
       tags:
         - Admin_Users
@@ -1418,10 +1491,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
-          description: User not found
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   # ─── authentication ──────────────────────────────────────────────────────────────────────
   /auth/signup:
