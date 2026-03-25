@@ -33,14 +33,14 @@ export default class PermissionController {
 
     const permission = await Permission.create(payload)
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Created permission',
       description: `${ctx.auth.user!.fullName} created permission — ${permission.displayName ?? permission.name}`,
       status: 'success',
       resource: 'Permissions',
     })
 
-    return response.created(permission)
+    return response.created({ data: permission, message: 'Permission created successfully' })
   }
 
   /**
@@ -50,7 +50,7 @@ export default class PermissionController {
   async show({ params, response }: HttpContext) {
     const permission = await Permission.findOrFail(params.id)
 
-    return response.ok(permission)
+    return response.ok({ data: permission, message: 'Permission retrieved successfully' })
   }
 
   /**
@@ -65,14 +65,14 @@ export default class PermissionController {
     permission.merge(payload)
     await permission.save()
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Updated permission',
       description: `${ctx.auth.user!.fullName} updated permission — ${permission.displayName ?? permission.name}`,
       status: 'success',
       resource: 'Permissions',
     })
 
-    return response.ok(permission)
+    return response.ok({ data: permission, message: 'Permission updated successfully' })
   }
 
   /**
@@ -85,7 +85,7 @@ export default class PermissionController {
     const permName = permission.displayName ?? permission.name
     await permission.delete()
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Deleted permission',
       description: `${ctx.auth.user!.fullName} deleted permission — ${permName}`,
       status: 'success',

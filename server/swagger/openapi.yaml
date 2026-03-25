@@ -138,6 +138,7 @@ components:
             properties:
               id:
                 type: string
+                format: uuid
                 example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
               name:
                 type: string
@@ -200,8 +201,9 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          example: 1
+          type: string
+          format: uuid
+          example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
         name:
           type: string
           example: users:create
@@ -1066,15 +1068,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Permission"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Permission"
+                  message:
+                    type: string
+                    example: Permission created successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "422":
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   /admin/permissions/{id}:
     parameters:
@@ -1082,8 +1106,9 @@ paths:
         name: id
         required: true
         schema:
-          type: integer
-        example: 1
+          type: string
+          format: uuid
+        example: 1b362ce1-cb56-4c2d-8449-cff8edf022a7
     get:
       tags:
         - Admin_Permissions
@@ -1097,11 +1122,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Permission"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Permission"
+                  message:
+                    type: string
+                    example: Permission details retrieved successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
-        "404":
-          description: Permission not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     put:
       tags:
         - Admin_Permissions
@@ -1121,17 +1172,43 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Permission"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Permission"
+                  message:
+                    type: string
+                    example: Permission updated successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Permission not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "422":
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     delete:
       tags:
         - Admin_Permissions
@@ -1146,10 +1223,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Permission not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   # ─── admin user management ──────────────────────────────────────────────────────────────────────
 

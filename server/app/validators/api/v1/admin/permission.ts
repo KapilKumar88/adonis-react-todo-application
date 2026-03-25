@@ -5,7 +5,8 @@ export const createPermissionValidator = vine.create({
     .string()
     .trim()
     .maxLength(100)
-    .regex(/^[a-z0-9_:]+$/),
+    .regex(/^[a-z0-9_:]+$/)
+    .unique({ table: 'permissions', column: 'name' }),
   displayName: vine
     .string()
     .trim()
