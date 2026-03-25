@@ -92,7 +92,6 @@ export type DataTableProps<TData, TValue = unknown> = {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE_OPTIONS = [10, 20, 30, 50] as const;
-const SKELETON_ROW_COUNT = 5;
 
 // ─── Sortable header helper ───────────────────────────────────────────────────
 
@@ -135,8 +134,8 @@ export function SortableHeader({ column, title }: SortableHeaderProps) {
 
 // ─── Body renderer (extracted to avoid nested ternaries) ────────────────────
 
-function renderSkeletonRows(columnCount: number) {
-    return Array.from({ length: SKELETON_ROW_COUNT }, (_, i) => (
+function renderSkeletonRows(columnCount: number, rowCount: number) {
+    return Array.from({ length: rowCount }, (_, i) => (
         <TableRow key={`skel-row-${i}`}>
             {Array.from({ length: columnCount }, (__, j) => (
                 <TableCell key={`skel-cell-${i}-${j}`}>
@@ -186,8 +185,9 @@ function renderTableBody<TData>(
     table: ReturnType<typeof useReactTable<TData>>,
     columns: ColumnDef<TData>[],
     isLoading: boolean,
+    rowPerPage: number,
 ) {
-    if (isLoading) return renderSkeletonRows(columns.length);
+    if (isLoading) return renderSkeletonRows(columns.length, rowPerPage);
     const rows = table.getRowModel().rows;
     if (rows.length > 0) return renderDataRows(rows);
     return renderEmptyRow(columns.length);
@@ -308,34 +308,34 @@ export function DataTable<TData, TValue = unknown>({
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
-                                const pinned = header.column.getIsPinned();
-                                return (
-                                    <TableHead
-                                        key={header.id}
-                                        className={pinned ? 'bg-background' : undefined}
-                                        style={pinned ? {
-                                            position: 'sticky',
-                                            right: pinned === 'right' ? `${header.column.getAfter('right')}px` : undefined,
-                                            left: pinned === 'left' ? `${header.column.getAfter('left')}px` : undefined,
-                                            zIndex: 2,
-                                            boxShadow: pinned === 'right' ? '-1px 0 0 hsl(var(--border))' : '1px 0 0 hsl(var(--border))',
-                                        } : undefined}
-                                    >
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef.header,
-                                                  header.getContext(),
-                                              )}
-                                    </TableHead>
-                                );
-                            })}
+                                    const pinned = header.column.getIsPinned();
+                                    return (
+                                        <TableHead
+                                            key={header.id}
+                                            className={pinned ? 'bg-background' : undefined}
+                                            style={pinned ? {
+                                                position: 'sticky',
+                                                right: pinned === 'right' ? `${header.column.getAfter('right')}px` : undefined,
+                                                left: pinned === 'left' ? `${header.column.getAfter('left')}px` : undefined,
+                                                zIndex: 2,
+                                                boxShadow: pinned === 'right' ? '-1px 0 0 hsl(var(--border))' : '1px 0 0 hsl(var(--border))',
+                                            } : undefined}
+                                        >
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext(),
+                                                )}
+                                        </TableHead>
+                                    );
+                                })}
                             </TableRow>
                         ))}
                     </TableHeader>
 
                     <TableBody>
-                        {renderTableBody(table, columns, isLoading)}
+                        {renderTableBody(table, columns, isLoading, pageSize)}
                     </TableBody>
                 </Table>
             </div>

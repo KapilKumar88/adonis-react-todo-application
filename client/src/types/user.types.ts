@@ -1,3 +1,4 @@
+import { PAGINATION_META_DATA } from ".";
 import { Role } from "./role.types";
 
 /** Shape returned by the server's UserTransformer */
@@ -19,26 +20,15 @@ export interface AdminUser {
     id: string;
     fullName: string | null;
     email: string;
-    roleId: number | null;
+    profileImage: string | null;
+    initials: string;
     createdAt: string;
     updatedAt: string | null;
     role: Role | null;
 }
 
-export interface AdminUserMeta {
-    total: number;
-    perPage: number;
-    currentPage: number;
-    lastPage: number;
-    firstPage: number;
-    firstPageUrl: string;
-    lastPageUrl: string;
-    nextPageUrl: string | null;
-    previousPageUrl: string | null;
-}
-
 export interface AdminUserListResponse {
-    meta: AdminUserMeta;
+    metadata: PAGINATION_META_DATA;
     data: AdminUser[];
 }
 

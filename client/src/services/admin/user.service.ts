@@ -12,7 +12,21 @@ export interface UserListParams {
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    search?: string;
+    role?: string;
 }
+
+
+
+// ─── Query key factories ──────────────────────────────────────────────────────
+export const userKeys = {
+    all: ['admin', 'users'] as const,
+    list: (params: object) => ['admin', 'users', params] as const,
+};
+export const roleKeys = {
+    all: ['admin', 'roles'] as const,
+};
+
 
 const resolveId = (template: string, id: string) => template.replace('{id}', id);
 
@@ -20,10 +34,13 @@ export const adminUserService = {
     /** GET /api/v1/admin/users?page=&limit= */
     list: (params: UserListParams = {}): Promise<AdminUserListResponse> => {
         const query = new URLSearchParams();
-        if (params.page)      query.set('page',      String(params.page));
-        if (params.limit)     query.set('limit',     String(params.limit));
-        if (params.sortBy)    query.set('sortBy',    params.sortBy);
+        if (params.page) query.set('page', String(params.page));
+        if (params.limit) query.set('limit', String(params.limit));
+        if (params.sortBy) query.set('sortBy', params.sortBy);
         if (params.sortOrder) query.set('sortOrder', params.sortOrder);
+        if (params.search) query.set('search', params.search);
+        if (params.role) query.set('role', params.role);
+        
         const qs = query.toString();
         const suffix = qs ? '?'.concat(qs) : '';
         return apiClient.get<AdminUserListResponse>(

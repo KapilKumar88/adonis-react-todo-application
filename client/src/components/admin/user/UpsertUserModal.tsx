@@ -2,20 +2,19 @@ import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { SaveIcon } from 'lucide-react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { adminUserService } from '@/services/admin/user.service';
-import { adminRoleService } from '@/services/admin/role.service';
 import type { AdminUser, CreateUserPayload, UpdateUserPayload } from '@/types/user.types';
 import { toast } from '@/hooks/use-toast';
-import { roleKeys } from '@/pages/admin/UsersPage';
 import { UpsertUserFormValues, upsertUserSchema } from '@/validations/admin/user.validation';
 import { firstLetterUpperCase } from '@/utils/helpers';
 import LoadingButton from '@/components/common/LoadingButton';
+import { useRoles } from '@/hooks/useRole';
 
 export default function UpsertUserModal({
     modalOpen,
@@ -57,11 +56,7 @@ export default function UpsertUserModal({
         }
     }, [modalOpen, editUser, reset]);
 
-    const { data: rolesData } = useQuery({
-        queryKey: roleKeys.all,
-        queryFn: () => adminRoleService.list(),
-        staleTime: 5 * 60_000,
-    });
+    const { data: rolesData } = useRoles();
 
     const createMutation = useMutation({
         mutationFn: (payload: CreateUserPayload) => adminUserService.create(payload),

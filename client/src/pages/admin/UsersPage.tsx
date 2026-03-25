@@ -1,28 +1,24 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { ColumnDef, CellContext } from '@tanstack/react-table';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, ChevronDown } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import PageHeader from '@/components/common/PageHeader';
 import { RoleBadge } from '@/components/common/StatusBadge';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { DataTable, SortableHeader } from '@/components/common/DataTable';
-import { adminUserService } from '@/services/admin/user.service';
+import { adminUserService, userKeys } from '@/services/admin/user.service';
 import type { AdminUser } from '@/types/user.types';
-import { getInitials, formatDate } from '@/utils/helpers';
+import type { Role } from '@/types/role.types';
+import { formatDate } from '@/utils/helpers';
 import { toast } from '@/hooks/use-toast';
-import type { PAGINATION_META_DATA } from '@/types';
 import UpsertUserModal from '@/components/admin/user/UpsertUserModal';
+import { useDebounce } from '@/hooks/useDebounce';
+import { SYSTEM_ROLES } from '@/types/role.types';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useRoles } from '@/hooks/useRole';
 
-// ─── Query key factories ──────────────────────────────────────────────────────
-export const userKeys = {
-  all: ['admin', 'users'] as const,
-  list: (params: object) => ['admin', 'users', params] as const,
-};
-export const roleKeys = {
-  all: ['admin', 'roles'] as const,
-};
 
 // ─── Standalone cell renderers ────────────────────────────────────────────────
 
@@ -31,8 +27,12 @@ function UserCell({ row }: Readonly<CellContext<AdminUser, unknown>>) {
   return (
     <div className="flex items-center gap-3">
       <Avatar className="h-8 w-8">
-        <AvatarFallback className="text-xs bg-muted">
-          {getInitials(user.fullName ?? user.email)}
+        <AvatarImage
+          src={user?.profileImage}
+          alt={user?.fullName ?? user?.initials}
+        />
+        <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+          {user ? user?.initials : '?'}
         </AvatarFallback>
       </Avatar>
       <div>
@@ -46,7 +46,7 @@ function UserCell({ row }: Readonly<CellContext<AdminUser, unknown>>) {
 function RoleCell({ row }: Readonly<CellContext<AdminUser, unknown>>) {
   const role = row.original.role;
   return role ? (
-    <RoleBadge role={role.name as 'admin' | 'moderator' | 'user'} />
+    <RoleBadge role={role.name as SYSTEM_ROLES} />
   ) : (
     <span className="text-xs text-muted-foreground">No Role</span>
   );
@@ -106,7 +106,10 @@ function buildColumns(
       header: ({ column }) => <SortableHeader column={column} title="Joined" />,
       cell: CreatedAtCell,
     },
-    { accessorKey: 'updatedAt', header: 'Updated', cell: UpdatedAtCell },
+    {
+      accessorKey: 'updatedAt',
+      header: ({ column }) => <SortableHeader column={column} title="Updated" />, cell: UpdatedAtCell
+    },
     {
       id: 'actions',
       header: 'Actions',
@@ -126,6 +129,11 @@ const UsersPage: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [role, setRole] = useState<Role | null>(null);
+
+  // ── Fetch roles for dropdown ─────────────────────────────────────────────
+  const { data: rolesData } = useRoles();
+  const roles: Role[] = rolesData?.data ?? [];
 
   // ── Modal state ──────────────────────────────────────────────────────────
   const [modalOpen, setModalOpen] = useState(false);
@@ -133,9 +141,10 @@ const UsersPage: React.FC = () => {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   // ── Data queries ─────────────────────────────────────────────────────────
+  const debouncedSearch = useDebounce(search, 400);
   const queryParams = useMemo(
-    () => ({ page, limit: pageSize, ...(sortBy && { sortBy, sortOrder }) }),
-    [page, pageSize, sortBy, sortOrder],
+    () => ({ page, limit: pageSize, ...(sortBy && { sortBy, sortOrder }), ...(debouncedSearch && { search: debouncedSearch }), ...(role && { role: role.id }) }),
+    [page, pageSize, sortBy, sortOrder, debouncedSearch, role],
   );
 
   const { data: usersData, isLoading: usersLoading } = useQuery({
@@ -162,18 +171,6 @@ const UsersPage: React.FC = () => {
       toast({ title: 'Error', description: err.message, variant: 'destructive' }),
   });
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
-  const openModal = (user?: AdminUser) => {
-    if (user) {
-      setEditUser(user);
-    } else {
-      setEditUser(null);
-    }
-    setModalOpen(true);
-  };
-
-
-
   const handlePaginationChange = (newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
@@ -190,13 +187,21 @@ const UsersPage: React.FC = () => {
     setPage(1);
   };
 
-  const stableOpenModal = useCallback(openModal, []);
+  const stableOpenModal = useCallback((user?: AdminUser) => {
+    if (user) {
+      setEditUser(user);
+    } else {
+      setEditUser(null);
+    }
+    setModalOpen(true);
+  }, []);
+
   const columns = useMemo(
     () => buildColumns(stableOpenModal, setDeleteConfirm),
     [stableOpenModal],
   );
 
-  const meta = usersData?.meta as PAGINATION_META_DATA | undefined;
+  const meta = usersData?.metadata;
   const users = usersData?.data ?? [];
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -206,7 +211,7 @@ const UsersPage: React.FC = () => {
         title="User Management"
         subtitle={`${meta?.total ?? 0} users`}
         actions={
-          <Button onClick={() => openModal()}>
+          <Button onClick={() => stableOpenModal()}>
             <Plus className="h-4 w-4 mr-1" /> Add User
           </Button>
         }
@@ -224,6 +229,30 @@ const UsersPage: React.FC = () => {
         searchPlaceholder="Search users..."
         searchValue={search}
         onSearchChange={handleSearchChange}
+        toolbar={
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                {role ? role.displayName : 'Role'} <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {roles
+                .map((col) => (
+                  <DropdownMenuCheckboxItem
+                    key={col.id}
+                    className="capitalize"
+                    checked={role?.id === String(col.id)}
+                    onCheckedChange={(value) =>
+                      setRole(value ? col : null)
+                    }
+                  >
+                    {col.displayName}
+                  </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
       />
 
       {/* Create / Edit dialog */}
