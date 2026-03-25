@@ -32,12 +32,17 @@ export interface AdminDashboardTopUser {
   todoCount: number;
 }
 
-export interface AdminDashboardResponse {
+export interface AdminDashboardData {
   userStats: AdminDashboardUserStats;
   todoStats: AdminDashboardTodoStats;
   priorityBreakdown: AdminDashboardPriorityBreakdown;
   recentActivity: AdminDashboardActivityLog[];
   topActiveUsers: AdminDashboardTopUser[];
+}
+
+export interface AdminDashboardResponse {
+  data: AdminDashboardData;
+  message: string;
 }
 
 
