@@ -69,7 +69,6 @@ const RolesPage: React.FC = () => {
         modalOpen={openUpsertModal}
         setModalOpen={setOpenUpsertModal}
         editRole={roleDetails}
-        isEdit={roleDetails !== null}
       />
     </div>
   );

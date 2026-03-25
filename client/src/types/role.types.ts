@@ -45,10 +45,12 @@ export interface CreateRolePayload {
     name: string;
     displayName: string;
     description?: string | null;
+    permissions: string[];
 }
 
 export interface UpdateRolePayload {
     name?: string | null;
     displayName?: string | null;
     description?: string | null;
+    permissions?: string[];
 }

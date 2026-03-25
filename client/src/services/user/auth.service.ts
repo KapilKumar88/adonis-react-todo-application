@@ -8,11 +8,9 @@ export interface LoginPayload {
 }
 
 export interface ApiLoginResponse {
-    data: {
-        token: string;
-        user: UserDetails;
-        message: string;
-    }
+    token: string;
+    user: UserDetails;
+    message: string;
 }
 
 export interface SignupPayload {

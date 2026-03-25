@@ -1,4 +1,5 @@
 import apiConfig from "@/config/api.config";
+import { forceLogout } from "@/lib/force-logout";
 
 export const tokenStorage = {
     get: (): string | null => localStorage.getItem(apiConfig.API_TOKEN_STORAGE_KEY),
@@ -25,13 +26,28 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
         headers['Authorization'] = `Bearer ${token}`;
     }
 
+    let requestBody: BodyInit | undefined;
+    if (body === undefined) {
+        requestBody = undefined;
+    } else if (isFormData) {
+        requestBody = body;
+    } else {
+        requestBody = JSON.stringify(body);
+    }
+
     const response = await fetch(`${apiConfig.API_BASE_URL}${path}`, {
         ...rest,
         headers,
-        body: body === undefined ? undefined : isFormData ? body as FormData : JSON.stringify(body),
+        body: requestBody,
     });
 
     const data = await response.json().catch(() => null);
+
+    if (response.status === 401) {
+        forceLogout();
+        // Optionally, throw to stop further processing
+        throw new Error('Unauthorized. You have been logged out.');
+    }
 
     if (!response.ok) {
         const message =

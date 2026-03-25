@@ -12,8 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
 import { signupSchema } from '@/validations/user/auth.validation';
-import { userAuthService, SignupPayload } from '@/services/user/auth.service';
-import { ApiLoginResponse } from '@/types/api.types';
+import { userAuthService, SignupPayload, ApiLoginResponse } from '@/services/user/auth.service';
 import { getPasswordStrength } from '@/utils/helpers';
 import { cn } from '@/lib/utils';
 import AppLogo from '@/components/common/AppLogo';
@@ -47,7 +46,7 @@ const RegisterPage: React.FC = () => {
 
   const { mutate: signupMutate, isPending } = useMutation<ApiLoginResponse, Error, SignupPayload>({
     mutationFn: userAuthService.signup,
-    onSuccess: ({ data: { token, user } }) => {
+    onSuccess: ({ token, user }) => {
       tokenStorage.set(token);
       setUserInfo(user);
       toast({ title: 'Account Created', description: 'Welcome! Your account has been created.' });

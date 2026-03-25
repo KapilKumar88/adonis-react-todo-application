@@ -9,6 +9,7 @@ export interface AdminPermission {
     description: string | null;
     createdAt: string;
     updatedAt: string;
+    source: string;
 }
 
 export interface AdminPermissionListResponse {

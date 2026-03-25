@@ -18,6 +18,10 @@ export const upsertRoleSchema = yup.object({
     .max(255, 'Description must be at most 255 characters.')
     .nullable()
     .optional(),
+  permissions: yup
+    .array()
+    .of(yup.string().uuid('Invalid permission ID format.'))
+    .min(1, 'At least one permission must be selected.')
 });
 
 export type UpsertRoleFormValues = yup.InferType<typeof upsertRoleSchema>;
