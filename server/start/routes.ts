@@ -48,6 +48,7 @@ router
     // -------------------------------------- admin apis start ------------------------------------------------------
     router.group(() => {
       router.post('login', [LoginController, 'login'])
+      router.post('logout', [LoginController, 'destroy']).use(middleware.auth())
 
       // Dashboard — protected
       router.get('dashboard', [AdminDashboardController, 'index']).use(middleware.auth())

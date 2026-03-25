@@ -8,6 +8,7 @@ export type ScannedRoutes = {
     'docs.ui': { paramsTuple?: []; params?: {} }
     'docs.spec': { paramsTuple?: []; params?: {} }
     'admin.login.login': { paramsTuple?: []; params?: {} }
+    'admin.login.destroy': { paramsTuple?: []; params?: {} }
     'admin.admin_dashboard.index': { paramsTuple?: []; params?: {} }
     'admin.roles.index': { paramsTuple?: []; params?: {} }
     'admin.roles.store': { paramsTuple?: []; params?: {} }
@@ -85,6 +86,7 @@ export type ScannedRoutes = {
   }
   POST: {
     'admin.login.login': { paramsTuple?: []; params?: {} }
+    'admin.login.destroy': { paramsTuple?: []; params?: {} }
     'admin.roles.store': { paramsTuple?: []; params?: {} }
     'admin.permission.store': { paramsTuple?: []; params?: {} }
     'admin.user.store': { paramsTuple?: []; params?: {} }

@@ -14,6 +14,7 @@ export interface ApiDefinition {
   admin: {
     login: {
       login: typeof routes['admin.login.login']
+      destroy: typeof routes['admin.login.destroy']
     }
     adminDashboard: {
       index: typeof routes['admin.admin_dashboard.index']

@@ -28,4 +28,27 @@ export default class LoginController {
             message: 'Login successful',
         })
     }
+
+
+    async destroy({ auth, request }: HttpContext) {
+        const user = auth.getUserOrFail()
+
+        logActivity({
+            action: 'Logged out',
+            description: `${user.fullName} logged out`,
+            status: 'success',
+            resource: 'Auth',
+            userId: user.id,
+            ip: request.ip(),
+            userAgent: request.header('user-agent'),
+        })
+
+        if (user.currentAccessToken) {
+            await User.accessTokens.delete(user, user.currentAccessToken.identifier)
+        }
+
+        return {
+            message: 'Logged out successfully',
+        }
+    }
 }

@@ -51,6 +51,17 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/auth/login_controller').default['login']>>>
     }
   }
+  'admin.login.destroy': {
+    methods: ["POST"]
+    pattern: '/api/v1/admin/logout'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/auth/login_controller').default['destroy']>>>
+    }
+  }
   'admin.admin_dashboard.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/admin/dashboard'
