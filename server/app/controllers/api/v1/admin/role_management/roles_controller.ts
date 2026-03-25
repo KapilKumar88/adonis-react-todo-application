@@ -1,5 +1,5 @@
 import Role from '#models/role'
-import { createRoleValidator } from '#validators/api/v1/admin/role'
+import { upsertRoleValidator } from '#validators/api/v1/admin/role'
 import { rolePaginationValidator } from '#validators/api/v1/admin/pagination'
 import type { HttpContext } from '@adonisjs/core/http'
 import { logFromContext } from '#helpers/common.helper'
@@ -41,7 +41,9 @@ export default class RolesController {
    */
   async store(ctx: HttpContext) {
     const { request, response } = ctx
-    const { permissions, ...payload } = await request.validateUsing(createRoleValidator)
+    const { permissions, ...payload } = await request.validateUsing(upsertRoleValidator, {
+      meta: { roleId: undefined }
+    })
 
     const data = await Role.create(payload)
     if (permissions && permissions.length > 0) {
@@ -85,7 +87,9 @@ export default class RolesController {
   async update(ctx: HttpContext) {
     const { params, request, response } = ctx
     const role = await Role.findOrFail(params.id)
-    const payload = await request.validateUsing(createRoleValidator)
+    const payload = await request.validateUsing(upsertRoleValidator, {
+      meta: { roleId: params.id } // Pass the current role id for uniqueness check in the validator
+    })
 
     role.merge(payload)
     await role.save()

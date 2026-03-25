@@ -75,12 +75,14 @@ export class PasswordResetTokenSchema extends BaseModel {
 }
 
 export class PermissionSchema extends BaseModel {
-  static $columns = ['id', 'name', 'displayName', 'description', 'createdAt', 'updatedAt'] as const
+  static $columns = ['id', 'name', 'source', 'displayName', 'description', 'createdAt', 'updatedAt'] as const
   $columns = PermissionSchema.$columns
   @column({ isPrimary: true })
   declare id: string
   @column()
   declare name: string
+  @column()
+  declare source: string
   @column()
   declare displayName: string | null
   @column()

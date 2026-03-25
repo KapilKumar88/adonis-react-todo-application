@@ -14,8 +14,9 @@ export default class UserForAdminTransformer extends BaseTransformer<User> {
         'createdAt',
         'updatedAt'
       ]),
-      role: this.resource?.roles?.[0] &&{
+      role: this.resource?.roles?.[0] && {
         ...this.pick(this.resource?.roles?.[0], ['name', 'displayName', 'id']),
+        permissions: this.resource?.roles?.[0]?.permissions && this.resource.roles[0].permissions.map((p) => p.name)
       },
     }
   }

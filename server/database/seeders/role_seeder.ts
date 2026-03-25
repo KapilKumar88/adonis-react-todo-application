@@ -20,16 +20,16 @@ export default class extends BaseSeeder {
     }
 
     const superAdmin = await Role.findByOrFail('name', DefaultSystemRoles.SUPER_ADMIN)
-    const todoPermissionNames = Object.values({ ...DefaultSystemPermissions.TODO_MANAGEMENT, ...DefaultSystemPermissions.USER_DASHBOARD })
+    const todoPermissionNames = Object.values({ ...DefaultSystemPermissions.TODO_MANAGEMENT.PERMISSIONS, ...DefaultSystemPermissions.USER_DASHBOARD.PERMISSIONS })
     const superAdminPermissions = await Permission.query().whereNotIn('name', todoPermissionNames)
     await superAdmin.related('permissions').sync(superAdminPermissions.map((p) => p.id))
 
     const userRole = await Role.findByOrFail('name', DefaultSystemRoles.USER)
     const userPermissionNames = [
-      ...Object.values(DefaultSystemPermissions.TODO_MANAGEMENT),
-      ...Object.values(DefaultSystemPermissions.USER_DASHBOARD),
+      ...Object.values(DefaultSystemPermissions.TODO_MANAGEMENT.PERMISSIONS),
+      ...Object.values(DefaultSystemPermissions.USER_DASHBOARD.PERMISSIONS),
     ]
-    
+
     const userPermissions = await Permission.query().whereIn('name', userPermissionNames)
     await userRole.related('permissions').sync(userPermissions.map((p) => p.id))
   }

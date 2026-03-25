@@ -14,3 +14,8 @@ export const rolePaginationValidator = vine.create({
     page: vine.number().min(1).optional(),
     limit: vine.number().min(1).max(100).optional(),
 });
+
+export const permissionPaginationValidator = vine.create({
+    page: vine.number().min(1).optional(),
+    limit: vine.number().min(1).max(100).optional(),
+});

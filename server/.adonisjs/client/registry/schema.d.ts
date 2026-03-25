@@ -88,10 +88,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/api/v1/admin/roles'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api/v1/admin/role').createRoleValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/api/v1/admin/role').upsertRoleValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/admin/role').createRoleValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/admin/role').upsertRoleValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/role_management/roles_controller').default['store']>>>
     }
   }
@@ -110,10 +110,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/api/v1/admin/roles/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api/v1/admin/role').createRoleValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/api/v1/admin/role').upsertRoleValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/admin/role').createRoleValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/admin/role').upsertRoleValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/role_management/roles_controller').default['update']>>>
     }
   }
@@ -135,7 +135,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api/v1/admin/pagination').paginationValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api/v1/admin/pagination').permissionPaginationValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/permission_management/permission_controller').default['index']>>>
     }
   }
