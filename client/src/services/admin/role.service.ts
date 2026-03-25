@@ -1,6 +1,6 @@
 import apiConstant from '@/constants/api.constant';
 import { apiClient } from '@/lib/api-client';
-import { AdminRole, AdminRoleListResponse, CreateRolePayload, UpdateRolePayload } from '@/types/role.types';
+import { AdminRoleListResponse, CreateRolePayload, Role, UpdateRolePayload } from '@/types/role.types';
 
 
 export interface RoleListParams {
@@ -26,16 +26,16 @@ export const adminRoleService = {
     },
 
     /** GET /admin/roles/:id */
-    get: (id: string): Promise<AdminRole> =>
-        apiClient.get<AdminRole>(apiConstant.ADMIN.ROLE.GET_ROLE_BY_ID.replace('{id}', id)),
+    get: (id: string): Promise<Role> =>
+        apiClient.get<Role>(apiConstant.ADMIN.ROLE.GET_ROLE_BY_ID.replace('{id}', id)),
 
     /** POST /admin/roles */
-    create: (payload: CreateRolePayload): Promise<AdminRole> =>
-        apiClient.post<AdminRole>(apiConstant.ADMIN.ROLE.CREATE_ROLE, payload),
+    create: (payload: CreateRolePayload): Promise<Role> =>
+        apiClient.post<Role>(apiConstant.ADMIN.ROLE.CREATE_ROLE, payload),
 
     /** PUT /admin/roles/:id */
-    update: (id: string, payload: UpdateRolePayload): Promise<AdminRole> =>
-        apiClient.put<AdminRole>(apiConstant.ADMIN.ROLE.UPDATE_ROLE.replace('{id}', id), payload),
+    update: (id: string, payload: UpdateRolePayload): Promise<Role> =>
+        apiClient.put<Role>(apiConstant.ADMIN.ROLE.UPDATE_ROLE.replace('{id}', id), payload),
 
     /** DELETE /admin/roles/:id */
     remove: (id: string): Promise<void> =>

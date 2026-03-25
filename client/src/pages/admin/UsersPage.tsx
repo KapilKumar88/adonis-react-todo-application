@@ -10,7 +10,7 @@ import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { DataTable, SortableHeader } from '@/components/common/DataTable';
 import { adminUserService, userKeys } from '@/services/admin/user.service';
 import type { AdminUser } from '@/types/user.types';
-import type { Role } from '@/types/role.types';
+import type { AdminSideRoleType } from '@/types/role.types';
 import { formatDate } from '@/utils/helpers';
 import { toast } from '@/hooks/use-toast';
 import UpsertUserModal from '@/components/admin/user/UpsertUserModal';
@@ -18,6 +18,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { SYSTEM_ROLES } from '@/types/role.types';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useRoles } from '@/hooks/useRole';
+import ErrorState from '@/components/common/ErrorState';
 
 
 // ─── Standalone cell renderers ────────────────────────────────────────────────
@@ -129,11 +130,11 @@ const UsersPage: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [role, setRole] = useState<Role | null>(null);
+  const [role, setRole] = useState<AdminSideRoleType | null>(null);
 
   // ── Fetch roles for dropdown ─────────────────────────────────────────────
   const { data: rolesData } = useRoles();
-  const roles: Role[] = rolesData?.data ?? [];
+  const roles: AdminSideRoleType[] = rolesData?.data ?? [];
 
   // ── Modal state ──────────────────────────────────────────────────────────
   const [modalOpen, setModalOpen] = useState(false);
@@ -147,7 +148,7 @@ const UsersPage: React.FC = () => {
     [page, pageSize, sortBy, sortOrder, debouncedSearch, role],
   );
 
-  const { data: usersData, isLoading: usersLoading } = useQuery({
+  const { data: usersData, isLoading: usersLoading, isError, error, refetch } = useQuery({
     queryKey: userKeys.list(queryParams),
     queryFn: () => adminUserService.list(queryParams),
     staleTime: 30_000,
@@ -203,6 +204,12 @@ const UsersPage: React.FC = () => {
 
   const meta = usersData?.metadata;
   const users = usersData?.data ?? [];
+
+
+  if (isError) {
+    return <ErrorState message={error?.message} onRetry={refetch} />
+  }
+
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (

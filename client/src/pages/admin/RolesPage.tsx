@@ -3,21 +3,17 @@ import { Plus, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PageHeader from '@/components/common/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
-import { useQuery } from '@tanstack/react-query';
-import { adminRoleService } from '@/services/admin/role.service';
-import { AdminRole } from '@/types/role.types';
 import RoleCard from '@/components/admin/role/RoleCard';
 import UpsertRoleModal from '@/components/admin/role/UpsertRoleModal';
 import ErrorState from '@/components/common/ErrorState';
+import { useRoles } from '@/hooks/useRole';
+import { AdminSideRoleType } from '@/types/role.types';
 
 const RolesPage: React.FC = () => {
   const [openUpsertModal, setOpenUpsertModal] = useState(false);
-  const [roleDetails, setRoleDetails] = useState<AdminRole | null>(null); // For edit functionality, if needed
+  const [roleDetails, setRoleDetails] = useState<AdminSideRoleType | null>(null); // For edit functionality, if needed
 
-  const { isPending, isError, data, error, refetch } = useQuery({
-    queryKey: ['roles'],
-    queryFn: () => adminRoleService.list(),
-  })
+  const { isPending, isError, data, error, refetch } = useRoles();
 
   if (isPending) {
     return <span>Loading...</span>
@@ -27,13 +23,13 @@ const RolesPage: React.FC = () => {
     return <ErrorState message={error?.message} onRetry={refetch} />
   }
 
-  const apiRoles: AdminRole[] = data.data;
+  const apiRoles = data?.data || [];
 
   return (
     <div>
       <PageHeader
         title="Roles Management"
-        subtitle={`${data.meta.total} roles`}
+        subtitle={`${data?.metaData?.total || 0} roles`}
         actions={
           <Button onClick={() => {
             setRoleDetails(null);
