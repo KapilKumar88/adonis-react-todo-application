@@ -111,8 +111,9 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          example: 1
+          type: string
+          format: uuid
+          example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
         name:
           type: string
           example: editor
@@ -151,6 +152,16 @@ components:
           maxLength: 500
           nullable: true
           example: Can edit content
+        permissions:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+            [
+              "1b362ce1-cb56-4c2d-8449-cff8edf022a7",
+              "2c473de2-df45-4e6a-9f8b-123456789abc",
+            ]
 
     PaginationMeta:
       type: object
@@ -689,14 +700,73 @@ paths:
               schema:
                 type: object
                 properties:
-                  meta:
+                  metaData:
                     $ref: "#/components/schemas/PaginationMeta"
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Role"
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
+                        name:
+                          type: string
+                          example: editor
+                        displayName:
+                          type: string
+                          nullable: true
+                          example: Editor
+                        description:
+                          type: string
+                          nullable: true
+                          example: Can edit content
+                        permissions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
+                              name:
+                                type: string
+                                example: users:create
+                              displayName:
+                                type: string
+                                nullable: true
+                                example: Create Users
+                              description:
+                                type: string
+                                nullable: true
+                                example: Allows creating new users
+                  message:
+                    type: string
+                    example: Roles retrieved successfully
+        "400":
+          description: Something Went wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     post:
       tags:
         - Admin_Roles
@@ -716,15 +786,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Role"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Role"
+                  message:
+                    type: string
+                    example: Role created successfully
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "422":
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   /admin/roles/{id}:
     parameters:
@@ -732,8 +818,9 @@ paths:
         name: id
         required: true
         schema:
-          type: integer
-        example: 1
+          type: string
+          format: uuid
+        example: 1b362ce1-cb56-4c2d-8449-cff8edf022a7
     get:
       tags:
         - Admin_Roles
@@ -756,6 +843,22 @@ paths:
                 $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     put:
       tags:
         - Admin_Roles
@@ -778,8 +881,16 @@ paths:
                 $ref: "#/components/schemas/Role"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "404":
           description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "422":
           description: Validation error
           content:

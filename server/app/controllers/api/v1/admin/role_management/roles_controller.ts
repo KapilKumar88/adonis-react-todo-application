@@ -12,9 +12,19 @@ export default class RolesController {
     const page = request.input('page', 1)
     const limit = request.input('limit', 10)
 
-    const roles = await Role.query().orderBy('created_at', 'desc').paginate(page, limit)
+    const roles = await Role.query()
+      .select(['id', 'name', 'display_name', 'description'])
+      .preload('permissions', (permQuery) => {
+        permQuery.select(['id', 'name', 'displayName', 'description'])
+      })
+      .orderBy('created_at', 'desc')
+      .paginate(page, limit)
 
-    return response.ok(roles)
+    return response.ok({
+      data: roles.all(),
+      metaData: roles.getMeta(),
+      message: 'Roles retrieved successfully'
+    });
   }
 
   /**
@@ -23,18 +33,24 @@ export default class RolesController {
    */
   async store(ctx: HttpContext) {
     const { request, response } = ctx
-    const payload = await request.validateUsing(createRoleValidator)
+    const { permissions, ...payload } = await request.validateUsing(createRoleValidator)
 
     const role = await Role.create(payload)
+    if (permissions && permissions.length > 0) {
+      await role.related('permissions').sync(permissions)
+    }
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Created role',
       description: `${ctx.auth.user!.fullName} created role — ${role.displayName ?? role.name}`,
       status: 'success',
       resource: 'Roles',
     })
 
-    return response.created(role)
+    return response.created({
+      data: { role, permissions: permissions || [] },
+      message: 'Role created successfully'
+    })
   }
 
   /**
@@ -44,7 +60,7 @@ export default class RolesController {
   async show({ params, response }: HttpContext) {
     const role = await Role.findOrFail(params.id)
 
-    return response.ok(role)
+    return response.ok({ data: role, message: 'Role retrieved successfully' })
   }
 
   /**
@@ -59,14 +75,14 @@ export default class RolesController {
     role.merge(payload)
     await role.save()
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Updated role',
       description: `${ctx.auth.user!.fullName} updated role — ${role.displayName ?? role.name}`,
       status: 'success',
       resource: 'Roles',
     })
 
-    return response.ok(role)
+    return response.ok({ data: role, message: 'Role updated successfully' })
   }
 
   /**
@@ -79,7 +95,7 @@ export default class RolesController {
     const roleName = role.displayName ?? role.name
     await role.delete()
 
-    await logFromContext(ctx, {
+    logFromContext(ctx, {
       action: 'Deleted role',
       description: `${ctx.auth.user!.fullName} deleted role — ${roleName}`,
       status: 'success',
