@@ -16,7 +16,11 @@ export default class PermissionController {
       .orderBy('created_at', 'desc')
       .paginate(page, limit)
 
-    return response.ok(permissions)
+    return response.ok({
+      data: permissions.all(),
+      metaData: permissions.getMeta(),
+      message: 'Permissions retrieved successfully'
+    });
   }
 
   /**
