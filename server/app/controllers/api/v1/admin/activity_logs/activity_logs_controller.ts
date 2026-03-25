@@ -39,6 +39,7 @@ export default class ActivityLogsController {
     return response.ok({
       meta: logs.getMeta(),
       data: logs.all(),
+      message: 'Activity logs retrieved successfully'
     })
   }
 
@@ -46,7 +47,7 @@ export default class ActivityLogsController {
    * GET /api/v1/admin/activity-logs/export
    * Export all matching activity logs as JSON (client converts to CSV)
    */
-  async export({ request, response }: HttpContext) {
+  async export({ request, response, serialize }: HttpContext) {
     const search = request.input('search')
     const status = request.input('status')
     const resource = request.input('resource')
@@ -73,8 +74,11 @@ export default class ActivityLogsController {
 
     const logs = await query.orderBy('created_at', 'desc')
 
+    const data = await Promise.all(logs.map(async (log) => (await serialize(ActivityLogTransformer.transform(log)))?.data))
+
     return response.ok({
-      data: logs.map((log) => ActivityLogTransformer.transform(log)),
+      data,
+      message: 'Activity logs exported successfully'
     })
   }
 }

@@ -197,6 +197,70 @@ components:
         firstPage:
           type: integer
 
+    ActivityLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
+        action:
+          type: string
+          example: "users:create"
+        description:
+          type: string
+          nullable: true
+          example: "Created new user account"
+        ip:
+          type: string
+          nullable: true
+          example: "192.168.1.100"
+        userAgent:
+          type: string
+          nullable: true
+          example: "Mozilla/5.0"
+        status:
+          type: string
+          example: "success"
+        resource:
+          type: string
+          example: "users"
+        userName:
+          type: string
+          nullable: true
+          example: "John Doe"
+        userInitials:
+          type: string
+          nullable: true
+          example: "JD"
+        createdAt:
+          type: string
+          format: date-time
+
+    ActivityLogListResponse:
+      type: object
+      properties:
+        meta:
+          $ref: "#/components/schemas/PaginationMeta"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityLog"
+        message:
+          type: string
+          example: "Activity logs retrieved successfully"
+
+    ActivityLogExportResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityLog"
+        message:
+          type: string
+          example: "Activity logs exported successfully"
+
     Permission:
       type: object
       properties:
@@ -1517,6 +1581,130 @@ paths:
                 $ref: "#/components/schemas/ValidationError"
         "500":
           description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+
+  # ─── admin activity logs ──────────────────────────────────────────────────────────────────────
+  /admin/activity-logs:
+    get:
+      tags:
+        - Admin_Activity_Logs
+      summary: List activity logs (paginated)
+      operationId: listActivityLogs
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 15
+          description: Number of items per page
+        - in: query
+          name: search
+          schema:
+            type: string
+            nullable: true
+          description: Search term for action, description, or user name
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [success, error, warning, all]
+            nullable: true
+          description: Filter by status (use 'all' to include all statuses)
+        - in: query
+          name: resource
+          schema:
+            type: string
+            enum: [todos, users, roles, permissions, all]
+            nullable: true
+          description: Filter by resource type (use 'all' to include all resources)
+      responses:
+        "200":
+          description: Paginated list of activity logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityLogListResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /admin/activity-logs/export:
+    get:
+      tags:
+        - Admin_Activity_Logs
+      summary: Export activity logs
+      operationId: exportActivityLogs
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+            nullable: true
+          description: Search term for action, description, or user name
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [success, error, warning, all]
+            nullable: true
+          description: Filter by status (use 'all' to include all statuses)
+        - in: query
+          name: resource
+          schema:
+            type: string
+            enum: [todos, users, roles, permissions, all]
+            nullable: true
+          description: Filter by resource type (use 'all' to include all resources)
+      responses:
+        "200":
+          description: Exported activity logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityLogExportResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
