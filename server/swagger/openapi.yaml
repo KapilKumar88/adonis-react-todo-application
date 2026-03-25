@@ -1359,11 +1359,38 @@ paths:
           schema:
             type: integer
             default: 1
+          description: Page number (1-based)
         - in: query
           name: limit
           schema:
             type: integer
             default: 10
+          description: Number of users per page
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [createdAt, updatedAt]
+            default: createdAt
+          description: Field to sort by
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort direction
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search users by name or email (case-insensitive, partial match)
+        - in: query
+          name: role
+          schema:
+            type: string
+            format: uuid
+          description: Filter users by role ID (UUID)
       responses:
         "200":
           description: Paginated list of users

@@ -1,6 +1,7 @@
 import User from '#models/user'
 import UserForAdminTransformer from '#transformers/admin/user_for_admin_transformer'
 import { createUserValidator, updateUserValidator } from '#validators/api/v1/admin/user'
+import { userPaginationValidator } from '#validators/api/v1/admin/pagination'
 import stringHelpers from '@adonisjs/core/helpers/string'
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
@@ -15,13 +16,24 @@ export default class UserController {
    * Return paginated list of users with their role
    */
   async index({ request, serialize }: HttpContext) {
-    const page = request.input('page', 1)
-    const limit = request.input('limit', 10)
-
-    const users = await User.query()
+    const { page = 1, limit = 10, sortBy = 'created_at', sortOrder = 'desc', search, role } = await request.validateUsing(userPaginationValidator);
+    const query = User.query()
       .whereDoesntHave('roles', (qb) => qb.where('name', DefaultSystemRoles.SUPER_ADMIN))
       .preload('roles', (qb) => qb.select('id', 'name', 'displayName'))
-      .orderBy('created_at', 'desc')
+
+    if (search) {
+      query.where((q) => {
+        q.whereILike('full_name', `%${search}%`)
+          .orWhereILike('email', `%${search}%`)
+      })
+    }
+
+    if (role) {
+      query.whereHas('roles', (qb) => qb.where('roles.id', role))
+    }
+
+    const users = await query
+      .orderBy(sortBy, sortOrder)
       .paginate(page, limit)
 
     return serialize(UserForAdminTransformer.paginate(users.all(), users.getMeta()))

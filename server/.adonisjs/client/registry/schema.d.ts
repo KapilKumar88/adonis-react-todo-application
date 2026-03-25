@@ -135,7 +135,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api/v1/admin/pagination').paginationValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/permission_management/permission_controller').default['index']>>>
     }
   }
@@ -190,7 +190,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api/v1/admin/pagination').userPaginationValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/user_management/user_controller').default['index']>>>
     }
   }
@@ -245,7 +245,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api/v1/admin/pagination').paginationValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/activity_logs/activity_logs_controller').default['index']>>>
     }
   }
