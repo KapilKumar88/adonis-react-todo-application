@@ -1,32 +1,25 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageHeader from '@/components/common/PageHeader';
-import { useQuery } from '@tanstack/react-query';
-import { adminPermissionService } from '@/services/admin/permission.service';
 import ErrorState from '@/components/common/ErrorState';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import MatrixView from '@/components/admin/permission/tabView/MatrixView';
 import ListView from '@/components/admin/permission/tabView/ListView';
-import { adminRoleService } from '@/services/admin/role.service';
+import { useGetPermissionsList } from '@/hooks/usePermission';
+import { useRoles } from '@/hooks/useRole';
 
 const PermissionsPage: React.FC = () => {
 
-  const { isPending, isError, data, error, refetch } = useQuery({
-    queryKey: ['permissions'],
-    queryFn: () => adminPermissionService.list(),
-  });
+  const { isPending, isError, data, error, refetch } = useGetPermissionsList();
 
-  const { isPending: isRolesPending, isError: isRolesError, data: rolesData, error: rolesError, refetch: refetchRoles } = useQuery({
-    queryKey: ['roles'],
-    queryFn: () => adminRoleService.list(),
-  })
+  const { isPending: isRolesPending, isError: isRolesError, data: rolesData, error: rolesError, refetch: refetchRoles } = useRoles();
 
-  if (isPending) {
+  if (isPending || isRolesPending) {
     return <LoadingSpinner />
   }
 
-  if (isError) {
-    return <ErrorState message={error?.message} onRetry={refetch} />
+  if (isError || isRolesError) {
+    return <ErrorState message={error?.message || rolesError?.message} onRetry={() => { refetch(); refetchRoles(); }} />
   }
 
   return (
@@ -44,7 +37,7 @@ const PermissionsPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="list">
-          <ListView data={data?.data} roles={rolesData?.data} />
+          <ListView data={data?.data} />
         </TabsContent>
       </Tabs>
     </div>

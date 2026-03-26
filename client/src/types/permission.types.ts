@@ -1,4 +1,5 @@
 import { PAGINATION_META_DATA } from ".";
+import { AdminSideRoleType } from "./role.types";
 
 // ─── Admin Permission Management ────────────────────────────────────────────────────
 
@@ -10,6 +11,7 @@ export interface AdminPermission {
     createdAt: string;
     updatedAt: string;
     source: string;
+    roles: AdminSideRoleType[];
 }
 
 export interface AdminPermissionListResponse {
@@ -17,14 +19,7 @@ export interface AdminPermissionListResponse {
     data: AdminPermission[];
 }
 
-export interface CreatePermissionPayload {
-    name: string;
-    displayName: string;
-    description?: string | null;
-}
-
 export interface UpdatePermissionPayload {
-    name?: string | null;
-    displayName?: string | null;
-    description?: string | null;
+    role: AdminSideRoleType;
+    attach: boolean;
 }

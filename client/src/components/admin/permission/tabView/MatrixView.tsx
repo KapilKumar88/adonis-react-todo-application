@@ -1,16 +1,24 @@
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useUpdatePermission } from "@/hooks/usePermission";
 import { AdminPermission } from "@/types/permission.types"
-import { AdminRole } from "@/types/role.types";
+import { AdminSideRoleType } from "@/types/role.types";
 import { firstLetterUpperCase } from "@/utils/helpers";
+
+const hasPerm = (role: AdminSideRoleType, permission: AdminPermission) => {
+  const perm = permission.roles.find(r => r.id === role.id);
+  return !!perm;
+}
 
 export default function MatrixView({
   data,
   roles,
 }: Readonly<{
   data: AdminPermission[];
-  roles: AdminRole[];
+  roles: AdminSideRoleType[];
 }>) {
+  const { mutate: updatePermission } = useUpdatePermission();
+
   return (
     <div className="rounded-md border overflow-x-auto">
       <Table>
@@ -24,22 +32,25 @@ export default function MatrixView({
         </TableHeader>
         <TableBody>
           {data?.map(permission =>
-            // actions.filter(action => allPermissions.some(p => p.resource === resource && p.action === action)).map(action => (
             <TableRow key={permission?.id} >
               <TableCell className="sticky left-0 bg-background z-10">
-                <span className="capitalize font-medium">{permission?.name}</span>
-                <span className="text-muted-foreground"> / {permission?.displayName}</span>
+                <span className="capitalize font-medium">{permission?.source?.replace(/_/g, ' ')}</span>
+                <span className="text-muted-foreground capitalize"> / {permission?.name?.split('.').pop()}</span>
               </TableCell>
               {roles?.map(role => (
                 <TableCell key={role.id} className="text-center">
                   <Switch
-                  // checked={hasPerm(role, resource, action)}
-                  // onCheckedChange={() => togglePerm(role.id, resource, action)}
+                    checked={hasPerm(role, permission)}
+                    onCheckedChange={(e) => updatePermission({
+                      id: permission.id, payload: {
+                        role: role,
+                        attach: e,
+                      }
+                    })}
                   />
                 </TableCell>
               ))}
             </TableRow>
-            // ))
           )}
         </TableBody>
       </Table>

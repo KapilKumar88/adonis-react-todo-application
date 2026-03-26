@@ -1,7 +1,11 @@
 import apiConstant from '@/constants/api.constant';
 import { apiClient } from '@/lib/api-client';
-import { AdminPermission, AdminPermissionListResponse, CreatePermissionPayload, UpdatePermissionPayload } from '@/types/permission.types';
+import { AdminPermission, AdminPermissionListResponse } from '@/types/permission.types';
 
+
+export const permissionKeys = {
+    all: ['admin', 'permissions'] as const,
+};
 
 export interface PermissionListParams {
     page?: number;
@@ -27,12 +31,8 @@ export const adminPermissionService = {
     get: (id: string): Promise<AdminPermission> =>
         apiClient.get<AdminPermission>(apiConstant.ADMIN.PERMISSION.GET_PERMISSION_BY_ID.replace('{id}', id)),
 
-    /** POST /admin/permissions */
-    create: (payload: CreatePermissionPayload): Promise<AdminPermission> =>
-        apiClient.post<AdminPermission>(apiConstant.ADMIN.PERMISSION.CREATE_PERMISSION, payload),
-
     /** PUT /admin/permissions/:id */
-    update: (id: string, payload: UpdatePermissionPayload): Promise<AdminPermission> =>
+    update: (id: string, payload: { roleId: string; attach: boolean }): Promise<AdminPermission> =>
         apiClient.put<AdminPermission>(apiConstant.ADMIN.PERMISSION.UPDATE_PERMISSION.replace('{id}', id), payload),
 
     /** DELETE /admin/permissions/:id */
