@@ -290,23 +290,12 @@ components:
     PermissionBody:
       type: object
       required:
-        - name
-        - displayName
+        - roleId
       properties:
-        name:
+        roleId:
           type: string
-          maxLength: 100
-          example: users:create
-          description: Lowercase letters, numbers, underscores and colons only
-        displayName:
-          type: string
-          maxLength: 150
-          example: Create Users
-        description:
-          type: string
-          maxLength: 500
-          nullable: true
-          example: Allows creating new users
+          format: uuid
+          example: "1b362ce1-cb56-4c2d-8449-cff8edf022a7"
 
     AdminUser:
       type: object
@@ -1144,57 +1133,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
-    post:
-      tags:
-        - Admin_Permissions
-      summary: Create a new permission
-      operationId: createPermission
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PermissionBody"
-      responses:
-        "201":
-          description: Permission created
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: "#/components/schemas/Permission"
-                  message:
-                    type: string
-                    example: Permission created successfully
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "422":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ValidationError"
-        "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InternalServerError"
-
   /admin/permissions/{id}:
     parameters:
       - in: path
@@ -1595,51 +1533,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
-    delete:
-      tags:
-        - Admin_Users
-      summary: Delete a user
-      operationId: deleteUser
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: User deleted
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "422":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ValidationError"
-        "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InternalServerError"
-
 
   # ─── admin activity logs ──────────────────────────────────────────────────────────────────────
   /admin/activity-logs:

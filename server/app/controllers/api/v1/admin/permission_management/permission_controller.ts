@@ -1,5 +1,6 @@
 import Permission from '#models/permission'
-import { createPermissionValidator } from '#validators/api/v1/admin/permission'
+import { updatePermissionValidator } from '#validators/api/v1/admin/permission'
+import { permissionPaginationValidator } from '#validators/api/v1/admin/pagination'
 import type { HttpContext } from '@adonisjs/core/http'
 import { logFromContext } from '#helpers/common.helper'
 
@@ -9,10 +10,12 @@ export default class PermissionController {
    * Return paginated list of permissions
    */
   async index({ request, response }: HttpContext) {
-    const page = request.input('page', 1)
-    const limit = request.input('limit', 10)
+    const { page = 1, limit = 100 } = await request.validateUsing(permissionPaginationValidator)
 
     const permissions = await Permission.query()
+      .preload('roles', (roleQuery) => {
+        roleQuery.select(['id', 'name', 'displayName'])
+      })
       .orderBy('created_at', 'desc')
       .paginate(page, limit)
 
@@ -24,31 +27,14 @@ export default class PermissionController {
   }
 
   /**
-   * POST /api/v1/admin/permissions
-   * Create a new permission
-   */
-  async store(ctx: HttpContext) {
-    const { request, response } = ctx
-    const payload = await request.validateUsing(createPermissionValidator)
-
-    const permission = await Permission.create(payload)
-
-    logFromContext(ctx, {
-      action: 'Created permission',
-      description: `${ctx.auth.user!.fullName} created permission — ${permission.displayName ?? permission.name}`,
-      status: 'success',
-      resource: 'Permissions',
-    })
-
-    return response.created({ data: permission, message: 'Permission created successfully' })
-  }
-
-  /**
    * GET /api/v1/admin/permissions/:id
    * Return a single permission
    */
   async show({ params, response }: HttpContext) {
     const permission = await Permission.findOrFail(params.id)
+    await permission.load('roles', (roleQuery) => {
+      roleQuery.select(['id', 'name', 'displayName'])
+    });
 
     return response.ok({ data: permission, message: 'Permission retrieved successfully' })
   }
@@ -60,10 +46,13 @@ export default class PermissionController {
   async update(ctx: HttpContext) {
     const { params, request, response } = ctx
     const permission = await Permission.findOrFail(params.id)
-    const payload = await request.validateUsing(createPermissionValidator)
+    const { roleId, attach } = await request.validateUsing(updatePermissionValidator)
 
-    permission.merge(payload)
-    await permission.save()
+    if (attach) {
+      await permission.related('roles').attach([roleId]);
+    } else {
+      await permission.related('roles').detach([roleId]);
+    }
 
     logFromContext(ctx, {
       action: 'Updated permission',
@@ -73,25 +62,5 @@ export default class PermissionController {
     })
 
     return response.ok({ data: permission, message: 'Permission updated successfully' })
-  }
-
-  /**
-   * DELETE /api/v1/admin/permissions/:id
-   * Delete a permission
-   */
-  async destroy(ctx: HttpContext) {
-    const { params, response } = ctx
-    const permission = await Permission.findOrFail(params.id)
-    const permName = permission.displayName ?? permission.name
-    await permission.delete()
-
-    logFromContext(ctx, {
-      action: 'Deleted permission',
-      description: `${ctx.auth.user!.fullName} deleted permission — ${permName}`,
-      status: 'success',
-      resource: 'Permissions',
-    })
-
-    return response.ok({ message: 'Permission deleted successfully' })
   }
 }

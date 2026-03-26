@@ -143,10 +143,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/api/v1/admin/permissions'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api/v1/admin/permission').createPermissionValidator)>>
+      body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/admin/permission').createPermissionValidator)>>
+      query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/permission_management/permission_controller').default['store']>>>
     }
   }
@@ -165,10 +165,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/api/v1/admin/permissions/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api/v1/admin/permission').createPermissionValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/api/v1/admin/permission').updatePermissionValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/admin/permission').createPermissionValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/v1/admin/permission').updatePermissionValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/permission_management/permission_controller').default['update']>>>
     }
   }
