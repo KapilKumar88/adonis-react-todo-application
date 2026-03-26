@@ -32,6 +32,7 @@ import AuthGuard from "@/guard/AuthGuard";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import { SYSTEM_ROLES } from "./types/role.types";
 import { PERMISSIONS } from "@/constants/permission.constant";
+import SettingsPage from "./pages/admin/SettingsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,40 +58,40 @@ const App = () => (
           <Sonner position="top-right" />
           <BrowserRouter>
             <ErrorBoundary>
-            <Routes>
-              {/* Public routes users */}
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Routes>
+                {/* Public routes users */}
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
 
-              {/* User protected routes */}
-              <Route element={<AuthGuard requiredRole={SYSTEM_ROLES.USER}><UserLayout /></AuthGuard>}>
-                <Route path="/dashboard" element={<AuthGuard requiredPermission={PERMISSIONS.USER_DASHBOARD.VIEW}><DashboardPage /></AuthGuard>} />
-                <Route path="/todos" element={<AuthGuard requiredPermission={PERMISSIONS.TODO_MANAGEMENT.VIEW}><TodosPage /></AuthGuard>} />
-                <Route path="/profile" element={<ProfilePage />} />
-              </Route>
+                {/* User protected routes */}
+                <Route element={<AuthGuard requiredRole={SYSTEM_ROLES.USER}><UserLayout /></AuthGuard>}>
+                  <Route path="/dashboard" element={<AuthGuard requiredPermission={PERMISSIONS.USER_DASHBOARD.VIEW}><DashboardPage /></AuthGuard>} />
+                  <Route path="/todos" element={<AuthGuard requiredPermission={PERMISSIONS.TODO_MANAGEMENT.VIEW}><TodosPage /></AuthGuard>} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                </Route>
 
 
-              {/* Public routes admin */}
-              <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
-              <Route path="/admin/login" element={<AdminLoginPage />} />
+                {/* Public routes admin */}
+                <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+                <Route path="/admin/login" element={<AdminLoginPage />} />
 
 
-              {/* Admin routes */}
-              <Route element={<AuthGuard requiredRole={SYSTEM_ROLES.SUPER_ADMIN}><AdminLayout /></AuthGuard>} >
-                <Route path="/admin/dashboard" element={<AuthGuard requiredPermission={PERMISSIONS.ADMIN_DASHBOARD.VIEW}><AdminDashboardPage /></AuthGuard>} />
-                <Route path="/admin/users" element={<AuthGuard requiredPermission={PERMISSIONS.USER_MANAGEMENT.VIEW}><UsersPage /></AuthGuard>} />
-                <Route path="/admin/roles" element={<AuthGuard requiredPermission={PERMISSIONS.ROLES_MANAGEMENT.VIEW}><RolesPage /></AuthGuard>} />
-                <Route path="/admin/permissions" element={<AuthGuard requiredPermission={PERMISSIONS.PERMISSION_MANAGEMENT.VIEW}><PermissionsPage /></AuthGuard>} />
-                <Route path="/admin/logs" element={<AuthGuard requiredPermission={PERMISSIONS.ACTIVITY_LOGS.VIEW}><ActivityLogsPage /></AuthGuard>} />
-                {/* <Route path="/admin/settings" element={<SettingsPage />} /> */}
-              </Route>
+                {/* Admin routes */}
+                <Route element={<AuthGuard requiredRole={SYSTEM_ROLES.SUPER_ADMIN}><AdminLayout /></AuthGuard>} >
+                  <Route path="/admin/dashboard" element={<AuthGuard requiredPermission={PERMISSIONS.ADMIN_DASHBOARD.VIEW}><AdminDashboardPage /></AuthGuard>} />
+                  <Route path="/admin/users" element={<AuthGuard requiredPermission={PERMISSIONS.USER_MANAGEMENT.VIEW}><UsersPage /></AuthGuard>} />
+                  <Route path="/admin/roles" element={<AuthGuard requiredPermission={PERMISSIONS.ROLES_MANAGEMENT.VIEW}><RolesPage /></AuthGuard>} />
+                  <Route path="/admin/permissions" element={<AuthGuard requiredPermission={PERMISSIONS.PERMISSION_MANAGEMENT.VIEW}><PermissionsPage /></AuthGuard>} />
+                  <Route path="/admin/logs" element={<AuthGuard requiredPermission={PERMISSIONS.ACTIVITY_LOGS.VIEW}><ActivityLogsPage /></AuthGuard>} />
+                  <Route path="/admin/settings" element={<SettingsPage />} />
+                </Route>
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
             </ErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
