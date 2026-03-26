@@ -1,4 +1,5 @@
 import { PAGINATION_META_DATA } from '.';
+import { AdminUser } from './user.types';
 
 export type ActivityLogStatus = 'success' | 'failure' | 'warning' | 'info';
 export type ActivityLogResource = 'Auth' | 'Todos' | 'Users' | 'Roles' | 'Permissions' | 'Settings' | 'Logs' | 'Tags' | 'Profile';
@@ -14,6 +15,7 @@ export interface ActivityLogEntry {
   userName: string | null;
   userInitials: string | null;
   createdAt: string;
+  user: AdminUser | null;
 }
 
 export interface ActivityLogListResponse {

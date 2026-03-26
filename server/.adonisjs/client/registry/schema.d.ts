@@ -245,7 +245,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api/v1/admin/pagination').paginationValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api/v1/admin/pagination').activityLogPaginationValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api/v1/admin/activity_logs/activity_logs_controller').default['index']>>>
     }
   }

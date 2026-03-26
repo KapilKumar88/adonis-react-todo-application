@@ -6,6 +6,11 @@ import type {
   ActivityLogListParams,
 } from '@/types/activity-log.types';
 
+export const activityLogKeys = {
+  all: ['admin-activity-logs'] as const,
+  list: (params: ActivityLogListParams) => [...activityLogKeys.all, 'list', params] as const,
+};
+
 export const adminActivityLogService = {
   list: (params: ActivityLogListParams = {}): Promise<ActivityLogListResponse> => {
     const query = new URLSearchParams();

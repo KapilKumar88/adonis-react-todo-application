@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Search, Download, ScrollText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import PageHeader from '@/components/common/PageHeader';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import EmptyState from '@/components/common/EmptyState';
 import ErrorState from '@/components/common/ErrorState';
-import { formatDateTime, formatRelativeTime } from '@/utils/helpers';
+import { formatDateTime, formatRelativeTime, getInitials } from '@/utils/helpers';
 import { toast } from '@/hooks/use-toast';
-import { useActivityLogs } from '@/hooks/useActivityLogs';
-import { adminActivityLogService } from '@/services/admin/activity-log.service';
+import { activityLogKeys, adminActivityLogService } from '@/services/admin/activity-log.service';
 import { useDebounce } from '@/hooks/useDebounce';
 import type { ActivityLogResource } from '@/types/activity-log.types';
+import { useQuery } from '@tanstack/react-query';
 
 const RESOURCES: ActivityLogResource[] = ['Auth', 'Todos', 'Users', 'Roles', 'Permissions', 'Settings', 'Logs', 'Tags', 'Profile'];
 
@@ -27,13 +27,17 @@ const ActivityLogsPage: React.FC = () => {
   const perPage = 15;
 
   const debouncedSearch = useDebounce(search, 400);
-
-  const { data, isPending, isError, error, refetch } = useActivityLogs({
+  const params = useMemo(() => ({
     page,
     limit: perPage,
     search: debouncedSearch || undefined,
     status: statusFilter === 'all' ? undefined : statusFilter,
     resource: resourceFilter === 'all' ? undefined : resourceFilter,
+  }), [page, perPage, debouncedSearch, statusFilter, resourceFilter]);
+
+  const { data, isPending, isError, error, refetch } = useQuery({
+    queryKey: activityLogKeys.list(params),
+    queryFn: () => adminActivityLogService.list(params),
   });
 
   const logs = data?.data ?? [];
@@ -51,7 +55,7 @@ const ActivityLogsPage: React.FC = () => {
       const csv = [
         'ID,User,Action,Resource,Details,IP,Status,Timestamp',
         ...result.data.map(l =>
-          `${l.id},"${l.userName ?? ''}","${l.action}","${l.resource}","${(l.description ?? '').replaceAll('"', '""')}","${l.ip ?? ''}","${l.status}","${l.createdAt}"`
+          `${l.id},"${l.userName ?? ''}","${l.action}","${l.resource}","${(l.description ?? '').replace(/"/g, '""')}","${l.ip ?? ''}","${l.status}","${l.createdAt}"`
         ),
       ].join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -99,6 +103,7 @@ const ActivityLogsPage: React.FC = () => {
             <SelectItem value="success">Success</SelectItem>
             <SelectItem value="failure">Failed</SelectItem>
             <SelectItem value="warning">Warning</SelectItem>
+            <SelectItem value="info">Info</SelectItem>
           </SelectContent>
         </Select>
         <Select value={resourceFilter} onValueChange={handleFilterChange(setResourceFilter)}>
@@ -144,11 +149,12 @@ const ActivityLogsPage: React.FC = () => {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-7 w-7">
+                        <AvatarImage src={log?.user?.profileImage} alt={log?.user?.fullName ?? 'Unknown'} />
                         <AvatarFallback className="text-xs bg-muted">
-                          {log.userInitials ?? '??'}
+                          {getInitials(log?.user?.fullName)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm">{log.userName ?? 'Unknown'}</span>
+                      <span className="text-sm">{log.user?.fullName ?? 'Unknown'}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-sm">{log.action}</TableCell>
